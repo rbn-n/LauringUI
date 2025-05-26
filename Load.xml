@@ -1,0 +1,4 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Include file ="Libs\Load_Libs.xml"/>
+	<Include file ="Media\Load_Media.xml"/>
+</Ui>

@@ -1,0 +1,8 @@
+## Title: |cff8033b3Lauring|r|cffffffffCore|r
+## Notes: LauringCore
+## Author: Lauring
+## Version: 1
+## SavedVariables: LauringDB
+## Interface: 50500
+
+Load.xml
