@@ -1,8 +1,16 @@
-## Title: |cff8033b3Lauring|r|cffffffffCore|r
-## Notes: LauringCore
+## Interface: 50500
+## Title: |cff8033b3Lauring|r|cffffffffUI|r
+## Notes: LauringUI
 ## Author: Lauring
 ## Version: 1
-## SavedVariables: LauringDB
-## Interface: 50500
+## SavedVariables: LauringUIDB, LauringUIAccountDB
+## SavedVariablesPerCharacter: LauringUICharacterDB
 
-Load.xml
+Init.lua
+Libs\Load_Libs.xml
+Media\Load_Media.xml
+Locales\Load_Locales.xml
+Core\Load_Core.xml
+Config\Load_Config.xml
+Modules\Load_Modules.xml
+Plugins\Load_Plugins.xml

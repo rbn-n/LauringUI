@@ -1,0 +1,146 @@
+local _, ns = ...
+local Core, Config, L, DB = unpack(ns)
+local UF = Core:GetModule("UnitFrames")
+
+function UF:CalculateHealthHeight(frame)
+
+    if (UF.IsPlayerOrTarget(frame)) then
+        if UF.HidePower(frame) then
+            return Config.DB["UFs"]["PlayerHeight"]
+        end
+
+        return Config.DB["UFs"]["PlayerHeight"] - Config.DB["UFs"]["PlayerPowerSpacing"] - Config.DB["UFs"]["PlayerPowerHeight"]
+    end
+
+    return Config.DB["UFs"][frame.mystyle.."Height"]
+end
+
+function UF:CreateHealthBar(frame)
+    local health = CreateFrame("StatusBar", nil, frame)
+    health:SetPoint("TOPLEFT", frame)
+	health:SetPoint("TOPRIGHT", frame)
+
+    local healthHeight = UF:CalculateHealthHeight(frame)
+    health:SetHeight(healthHeight)
+    health:SetStatusBarTexture(DB.StatusBarTexture)
+    health:SetStatusBarColor(.1, .1, .1, 0.7)
+    health:SetFrameLevel(frame:GetFrameLevel() - 2)
+
+    local background = health:CreateTexture(nil, "BACKGROUND")
+    background:SetTexture("Interface\\Buttons\\WHITE8x8")
+    background:SetAllPoints(health)
+
+    Core:SmoothBar(health)
+	health.frequentUpdates = true
+
+    --Core:CreateSD(health)
+    Core:CreateHealthBorder(health, 1)
+    Core:CreateShadow(health, 5)
+
+    frame.Health = health
+    frame.Health.bg = background
+    frame.Health.PostUpdate = UF.HealthPostUpdate
+end
+
+function UF:UpdateFrameNameTag(frame)
+    if not frame then return end
+	local name = frame.nameText
+	if not name then return end
+
+	local mystyle = frame.mystyle
+
+	local colorNameTag = "[color][name]"
+
+	if mystyle == "Player" then
+		frame:Tag(name, " "..colorNameTag)
+	elseif mystyle == "Target" then
+		frame:Tag(name, " [fulllevel] "..colorNameTag.."[afkdnd]")
+	elseif mystyle == "Focus" then
+		frame:Tag(name, " "..colorNameTag.."[afkdnd]")
+	elseif mystyle == "Arena" then
+		frame:Tag(name, colorNameTag)
+	else
+		frame:Tag(name, "[nplevel]"..colorNameTag)
+	end
+
+	name:UpdateTag()
+end
+
+local function CreateNameText(frame, textFrame)
+    if frame.mystyle == "Player" and Config.DB["UFs"]["HidePlayerName"] then return end
+
+    local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
+    local name = Core.CreateFS(textFrame, fontSize)
+    frame.nameText = name
+	name:SetJustifyH("LEFT")
+
+    if UF.IsPlayerOrTarget(frame) then
+        name:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+    elseif UF.IsPartyOrRaid(frame)  then
+        name:SetJustifyH("CENTER")
+        name:SetPoint("CENTER", frame, "CENTER", 0, 0)
+    else
+        name:SetPoint("LEFT", frame, "LEFT", 2, 0)
+    end
+
+    UF:UpdateFrameNameTag(frame)
+end
+
+function UF:UpdateFrameHealthTag(frame)
+    if UF.IsPartyOrRaid(frame) then return end
+
+    local valueType = UF.VariousTagIndex[Config.DB["UFs"][frame.mystyle.."HPTag"]]
+
+	frame:Tag(frame.healthValue, "[VariousHP("..valueType..")]")
+    frame.healthValue:UpdateTag()
+end
+
+local function CreateHealthText(frame, textFrame)
+    if UF.IsPartyOrRaid(frame) then return end
+
+    local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
+    local healthText = Core.CreateFS(textFrame, fontSize)
+
+    if UF.IsPlayerOrTarget(frame) then
+        healthText:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, 0)
+    else
+        healthText:SetPoint("LEFT", frame, "LEFT", -6, 0)
+    end
+
+    frame.healthValue = healthText
+
+    if UF.IsPlayerOrTarget(frame) then
+        local percentHPText = Core.CreateFS(textFrame, fontSize - 2)
+        frame.percentHealthValue = percentHPText
+
+        percentHPText:SetPoint("RIGHT", frame.Health:GetStatusBarTexture())
+        frame:Tag(percentHPText, "[VariousHP(cleanpercent)]")
+    end
+
+    UF:UpdateFrameHealthTag(frame)
+end
+
+function UF:CreateHealthAndNameText(frame)
+	local textFrame = CreateFrame("Frame", nil, frame)
+	textFrame:SetAllPoints(frame.Health)
+
+    CreateNameText(frame, textFrame)
+    CreateHealthText(frame, textFrame)
+end
+
+function UF.HealthPostUpdate(element, unit, cur, max)
+    local color
+    local self = element.__owner
+
+    if UnitIsPlayer(unit) then
+        local class = select(2, UnitClass(unit))
+        color = self.colors.class[class]
+    end
+
+    local r, g, b = 1, 0, 0
+    if color and color[1] then
+        r, g, b = color[1], color[2], color[3]
+    end
+
+    element.bg:SetVertexColor(r, g, b, 0.15)
+end

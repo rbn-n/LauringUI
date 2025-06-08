@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Infobars.lua"/>
+    <Script file="AutoSellJunk.lua"/>
+	<Include file="Panels\Load_Panels.xml" />
+	<Include file="DataTexts\Load_DataTexts.xml" />
+    <Script file="ExperienceBar.lua"/>
+</Ui>

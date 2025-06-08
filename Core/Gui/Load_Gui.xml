@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="GuiDefaultSettings.lua"/>
+    <Script file="Mover.lua"/>
+
+    <Script file="GuiUnitFrames.lua"/>
+
+    <Script file="GuiDialogs.lua"/>
+    <Script file="GuiElements.lua"/>
+
+    <Script file="Gui.lua"/>
+    <Script file="ProfileGui.lua"/>
+
+    <Script file="ExtraGui.lua"/>
+</Ui>
+

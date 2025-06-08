@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Database.lua"/>
+
+	<Script file="Colors.lua"/>
+	<Script file="Commands.lua"/>
+	<Script file="CVars.lua"/>
+	<Script file="Frames.lua"/>
+	<Script file="HideBlizzard.lua"/>
+	<Script file="Math.lua"/>
+	<Script file="SmoothBar.lua"/>
+	<Script file="Tooltip.lua"/>
+
+	<Include file="Gui\Load_Gui.xml"/>
+</Ui>

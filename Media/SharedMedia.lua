@@ -42,7 +42,7 @@ local sounds = {
     "Lauring - Silenced", "Lauring - Smash inc", "Lauring - Smash", "Lauring - Soak", "Lauring - Spread",
     "Lauring - Stack", "Lauring - Stay", "Lauring - Stop", "Lauring - Stopcast", "Lauring - Stunned",
     "Lauring - Switch", "Lauring - Taunt", "Lauring - Throw", "Lauring - Trap", "Lauring - Trinket",
-    "Lauring - Turn", "Lauring - Up", "Lauring - Watch Feet", "Lauring - White", "Lauring - Yellow" 
+    "Lauring - Turn", "Lauring - Up", "Lauring - Watch Feet", "Lauring - White", "Lauring - Yellow"
 }
 
 for _, sound in ipairs(sounds) do

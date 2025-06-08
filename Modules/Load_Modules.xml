@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<!-- <Include file="Bags\Load_Bags.xml" /> -->
+	<Include file="Infobars\Load_Infobars.xml" />
+	<Include file="Chat\Load_Chat.xml" /> <!-- Needs to be loaded after Infobars -->
+	<Include file="Maps\Load_Maps.xml" />
+	<Include file="UnitFrames\Load_UnitFrames.xml" />
+</Ui>
