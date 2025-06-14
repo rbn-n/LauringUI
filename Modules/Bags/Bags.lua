@@ -428,7 +428,7 @@ local function GetCustomGroupTitle(index)
 	return Config.DB["Bags"]["CustomNames"][index] or (PREFERENCES.." "..index)
 end
 
-StaticPopupDialogs["NDUI_RENAMECUSTOMGROUP"] = {
+StaticPopupDialogs["LAURINGUI_RENAMECUSTOMGROUP"] = {
 	text = BATTLE_PET_RENAME,
 	button1 = OKAY,
 	button2 = CANCEL,
@@ -452,7 +452,7 @@ StaticPopupDialogs["NDUI_RENAMECUSTOMGROUP"] = {
 
 function module:RenameCustomGroup(index)
 	module.selectGroupIndex = index
-	StaticPopup_Show("NDUI_RENAMECUSTOMGROUP")
+	StaticPopup_Show("LAURINGUI_RENAMECUSTOMGROUP")
 end
 
 function module:MoveItemToCustomBag(index)
@@ -534,7 +534,7 @@ local function favouriteOnClick(self)
 	end
 end
 
-StaticPopupDialogs["NDUI_WIPE_JUNK_LIST"] = {
+StaticPopupDialogs["LAURINGUI_WIPE_JUNK_LIST"] = {
 	text = L["Reset junklist warning"],
 	button1 = YES,
 	button2 = NO,
@@ -557,7 +557,7 @@ function module:CreateJunkButton()
 	end
 	bu:SetScript("OnClick", function(self)
 		if IsAltKeyDown() and IsControlKeyDown() then
-			StaticPopup_Show("NDUI_WIPE_JUNK_LIST")
+			StaticPopup_Show("LAURINGUI_WIPE_JUNK_LIST")
 			return
 		end
 
@@ -677,7 +677,7 @@ function module:IsAcceptableQuestItem(link)
 		Core.ScanTip:SetHyperlink(link)
 
 		for i = 2, Core.ScanTip:NumLines() do
-			local line = _G["NDui_ScanTooltipTextLeft"..i]
+			local line = _G["LauringUI_ScanTooltipTextLeft"..i]
 			local lineText = line and line:GetText()
 			if lineText and strmatch(lineText, ITEM_STARTS_QUEST) then
 				canAccept = true
@@ -699,7 +699,7 @@ function module:OnLogin()
 	local hasPawn = C_AddOns.IsAddOnLoaded("Pawn")
 
 	-- Init
-	local Backpack = cargBags:NewImplementation("NDui_Backpack")
+	local Backpack = cargBags:NewImplementation("LauringUI_Backpack")
 	Backpack:RegisterBlizzard()
 	Backpack:HookScript("OnShow", function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end)
 	Backpack:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
@@ -1144,17 +1144,4 @@ function module:OnLogin()
 	-- Fixes
 	BankFrame.GetRight = function() return f.bank:GetRight() end
 	BankFrameItemButton_Update = Core.Dummy
-
-	-- Shift key alert
-	local function onUpdate(self, elapsed)
-		if IsShiftKeyDown() then
-			self.elapsed = (self.elapsed or 0) + elapsed
-			if self.elapsed > 5 then
-				UIErrorsFrame:AddMessage(DB.InfoColor..L["StupidShiftKey"])
-				self.elapsed = 0
-			end
-		end
-	end
-	local shiftUpdater = CreateFrame("Frame", nil, f.main)
-	shiftUpdater:SetScript("OnUpdate", onUpdate)
 end

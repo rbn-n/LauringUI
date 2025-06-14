@@ -46,7 +46,7 @@ cargBags.itemKeys["bindOn"] = function(i)
 	tip:SetBagItem(i.bagId, i.slotId)
 
 	for j = 2, 5 do
-		local line = _G["NDui_ScanTooltipTextLeft"..j]
+		local line = _G["LauringUI_ScanTooltipTextLeft"..j]
 		local lineText = line and line:GetText()
 		if not lineText then break end
 

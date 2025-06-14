@@ -156,7 +156,6 @@ local function CreateGroup(frame)
 	UF:CreateRaidIcons(frame)
 	UF:CreateHealPrediction(frame)
 	UF:CreateThreatBorder(frame)
-    UF:CreateGroupAuras(frame)
 end
 
 local function CreateParty(frame)
@@ -581,7 +580,6 @@ function UF:OnLogin()
     --UF:UpdateRaidInfo()
 
     SetCVar("predictedHealth", 1)
-    UF:UpdateCornerSpells()
     Core:HideDefaultRaidFrame()
 
     UF.headers = {}

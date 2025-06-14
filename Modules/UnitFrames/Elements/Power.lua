@@ -41,7 +41,7 @@ function UF:CreatePowerBar(frame)
     if UF.IsPlayerOrTarget(frame) then
         power:SetPoint("LEFT")
         power:SetPoint("RIGHT")
-        power:SetPoint("TOP", frame.Health, "BOTTOM" , 0, -Config.DB.UFs.PlayerPowerSpacing)
+        power:SetPoint("TOP", frame.Health, "BOTTOM" , 0, -Config.DB.UFs.PlayerPowerOffset)
     else
         power:SetPoint("BOTTOMLEFT", frame)
 	    power:SetPoint("BOTTOMRIGHT", frame)

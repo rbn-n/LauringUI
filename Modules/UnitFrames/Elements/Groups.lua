@@ -73,22 +73,6 @@ function UF:CreateThreatBorder(frame)
 	frame.ThreatIndicator.Override = UF.UpdateThreatBorder
 end
 
-function UF:CreateGroupAuras(frame)
-	-- Indicators
-	UF:CreateAurasIndicator(frame)
-	UF:CreateSpellsIndicator(frame)
-	UF:CreateBuffsIndicator(frame)
-	UF:CreateDebuffsIndicator(frame)
-
-	-- RaidAuras Util
-	local raidAurasFrame = CreateFrame("Frame", nil, frame)
-	raidAurasFrame:SetSize(1, 1)
-	raidAurasFrame:SetPoint("CENTER")
-
-	self.RaidAuras = raidAurasFrame
-	self.RaidAuras.PostUpdate = UF.RaidAurasPostUpdate
-end
-
 function UF:UpdateRaidInfo()
 	--checkSpecs()
 	--B:RegisterEvent("PLAYER_TALENT_UPDATE", checkSpecs)

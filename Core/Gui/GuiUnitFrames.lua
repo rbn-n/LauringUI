@@ -1,8 +1,9 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
+local UF = Core:GetModule("UnitFrames")
 
-local function SetUnitFrameSize(frame, UF)
+function G:SetUnitFrameSize(frame)
     UF:SetUnitFrameSize(frame)
     local unit = frame.mystyle
 
@@ -36,6 +37,43 @@ local function SetUnitFrameSize(frame, UF)
 	end
 end
 
+local function UpdatePlayerSize()
+	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
+	for _, mainFrame in pairs(mainFrames) do
+		G:SetUnitFrameSize(mainFrame)
+		UF.UpdateFrameHealthTag(mainFrame)
+		UF.UpdateFramePowerTag(mainFrame)
+	end
+	UF:UpdateUFAuras()
+end
+
+local function UpdateFocusSize()
+	local focusFrame = _G.oUF_Focus
+	if focusFrame then
+		G:SetUnitFrameSize(focusFrame)
+		UF.UpdateFrameHealthTag(focusFrame)
+		UF.UpdateFramePowerTag(focusFrame)
+	end
+end
+
+local function UpdatePetSize()
+	local subFrames = {_G.oUF_Pet, _G.oUF_ToT, _G.oUF_FocusTarget}
+	for _, subFrame in pairs(subFrames) do
+		G:SetUnitFrameSize(subFrame)
+		UF.UpdateFrameHealthTag(subFrame)
+	end
+end
+
+local function UpdateBossSize()
+	for _, oufFrame in pairs(ns.oUF.objects) do
+		if oufFrame.mystyle == "Boss" or oufFrame.mystyle == "Arena" then
+			G:SetUnitFrameSize(oufFrame)
+			UF.UpdateFrameHealthTag(oufFrame)
+			UF.UpdateFramePowerTag(oufFrame)
+		end
+	end
+end
+
 G.HealthValues = {DISABLE, L["ShowHealthDefault"], L["ShowHealthCurMax"], L["ShowHealthCurrent"], L["ShowHealthPercent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}
 function SetupUnitFrame(guiPage)
 	local guiName = "LauringUI_UnitFrameSetup"
@@ -48,101 +86,57 @@ function SetupUnitFrame(guiPage)
 	local widthSliderRange = {100, 500}
 
 	local options = {
-		[1] = L["Player"],
-		[2] = L["Target"],
-		[3] = L["ToT"],
-		[4] = L["Focus"],
-		[5] = L["FocusTarget"],
-		[6] = L["Pet"],
-		[7] = L["Arena"],
-		[8] = L["Boss"],
+		[1] = { L["Player&Target"], UpdatePlayerSize },
+		[2] = { L["ToT"], UpdatePetSize },
+		[3] = { L["Focus"], UpdateFocusSize },
+		[4] = { L["FocusTarget"], UpdatePetSize },
+		[5] = { L["Pet"], UpdatePetSize },
+		[6] = { L["Arena"], UpdateBossSize },
+		[7] = { L["Boss"], UpdateBossSize },
 	}
 
-	-- local defaultValues = {
+	local defaultValues = {}
+	for _, option in pairs(options) do
+		local name = option[1] == L["Player&Target"] and "Player" or option[1]
 
-	-- for _, name in pairs(options) do
-
-	-- end
-
-	local defaultValues = { -- healthWidth, healthHeight, powerHeight, healthTag, powerTag, powerOffset, nameOffset
-		["Player"] = {272, 42, 10, 2, 4, 4, 0},
-		["ToT"] = {125, 24, 2, 5, 0}, -- nameOffset on 5th
-		["Focus"] = {125, 24, 2, 2, 4, 2, 0},
-		["FocusTarget"] = {200, 22, 2, 2, 4, 2, 0},
-		["Pet"] = {125, 24, 3, 5, 0}, -- nameOffset on 5th
-		["Arena"] = {150, 22, 2, 5, 5, 2, 0},
-		["Boss"] = {150, 22, 2, 5, 5, 2, 0},
-	}
-
-	local UF = Core:GetModule("UnitFrames")
+		defaultValues[name] = {
+			 Config.DB["UFs"][name.."Width"],
+			 Config.DB["UFs"][name.."Height"],
+			 Config.DB["UFs"][name.."PowerHeight"],
+			 Config.DB["UFs"][name.."HPTag"],
+			 Config.DB["UFs"][name.."MPTag"],
+			 Config.DB["UFs"][name.."PowerOffset"],
+			 Config.DB["UFs"][name.."NameOffset"],
+			}
+	end
 
 	local function CreateOptionGroup(parent, offset, value, func)
 		G:CreateOptionTitle(parent, "", offset)
-		local defaultValue = value == "Target" and "Player" or value
-		G:CreateOptionDropdown(parent, L["HealthValueType"], offset-50, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[defaultValue][4], func)
-		local mult = 0
-		if value ~= "Pet" and value ~= "ToT" and value ~= "FocusTarget" then
-			mult = 170
-			G:CreateOptionCheck(parent, offset-90, "Hide"..value.."Power", "UFs", "Hide"..value.."Power", func)
-			G:CreateOptionDropdown(parent, L["PowerValueType"], offset-150, G.HealthValues, L["100PercentTip"], "UFs", value.."MPTag", defaultValues[defaultValue][5], func)
-            G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[defaultValue][3], offset-210, defaultValue.."PowerHeight", func)
-		end
-		-- (parent, title, minV, maxV, defaultV, yOffset, value, func, key)
-		G:CreateOptionSlider(parent, L["Width"], widthSliderRange[1], widthSliderRange[2], defaultValues[defaultValue][1], offset-110-mult, defaultValue.."Width", func)
-		G:CreateOptionSlider(parent, L["Height"], 15, 50, defaultValues[defaultValue][2], offset-180-mult, defaultValue.."Height", func)
-	end
+		G:CreateOptionSlider(parent, L["Width"], widthSliderRange[1], widthSliderRange[2], defaultValues[value][1], offset-50, value.."Width", func)
+		G:CreateOptionSlider(parent, L["Height"], 15, 50, defaultValues[value][2], offset-120, value.."Height", func)
 
-	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
-	local function updatePlayerSize()
-		for _, mainFrame in pairs(mainFrames) do
-			SetUnitFrameSize(mainFrame, UF)
-			UF.UpdateFrameHealthTag(mainFrame)
-			UF.UpdateFramePowerTag(mainFrame)
-		end
-		UF:UpdateUFAuras()
-	end
-
-	local function updateFocusSize()
-		local focusFrame = _G.oUF_Focus
-		if focusFrame then
-            SetUnitFrameSize(focusFrame, UF)
-			UF.UpdateFrameHealthTag(focusFrame)
-			UF.UpdateFramePowerTag(focusFrame)
-		end
-	end
-
-	local subFrames = {_G.oUF_Pet, _G.oUF_ToT, _G.oUF_FocusTarget}
-	local function updatePetSize()
-		for _, subFrame in pairs(subFrames) do
-            SetUnitFrameSize(subFrame, UF)
-			UF.UpdateFrameHealthTag(subFrame)
-		end
-	end
-
-	local function updateBossSize()
-		for _, oufFrame in pairs(ns.oUF.objects) do
-			if oufFrame.mystyle == "Boss" or oufFrame.mystyle == "Arena" then
-                SetUnitFrameSize(oufFrame, UF)
-				UF.UpdateFrameHealthTag(oufFrame)
-				UF.UpdateFramePowerTag(oufFrame)
+		if value == L["Player&Target"] then
+			G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[value][3], offset-190, value.."PowerHeight", func)
+			local playerAndTarget = { "Player", "Target" }
+			for i, playerOrTarget in ipairs(playerAndTarget) do
+				local offsetExtender = i == 1 and 0 or 210
+				G:CreateOptionDropdown(parent, L["HealthValueType"], offset-260-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."HPTag", defaultValues[value][4], func)
+				G:CreateOptionDropdown(parent, L["PowerValueType"], offset-330-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."MPTag", defaultValues[value][5], func)
+				G:CreateOptionCheck(parent, offset-400-offsetExtender, "Hide"..playerOrTarget.."Power", "UFs", "Hide"..playerOrTarget.."Power", func)
 			end
+		elseif value ~= "Pet" and value ~= "ToT" and value ~= "FocusTarget" then
+			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)
+			G:CreateOptionCheck(parent, offset-260, "Hide"..value.."Power", "UFs", "Hide"..value.."Power", func)
+			G:CreateOptionDropdown(parent, L["PowerValueType"], offset-330, G.HealthValues, L["100PercentTip"], "UFs", value.."MPTag", defaultValues[value][5], func)
+            G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[value][3], offset-400, value.."PowerHeight", func)
+		else
+			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)
 		end
 	end
-
-	local data = {
-		[1] = {"Player", updatePlayerSize},
-		[2] = {"Target", updatePlayerSize},
-		[3] = {"ToT", updatePetSize},
-		[4] = {"Focus", updateFocusSize},
-		[5] = {"FocusTarget", updatePetSize},
-		[6] = {"Pet", updatePetSize},
-		[7] = {"Arena", updateBossSize},
-		[8] = {"Boss", updateBossSize},
-	}
 
 	local dd = G:CreateDropdown(scroll.child, "", 40, -15, options, nil, 180, 28)
 	dd:SetFrameLevel(20)
-	dd.Text:SetText(options[1])
+	dd.Text:SetText(options[1][1])
 	dd:SetBackdropBorderColor(1, .8, 0, .5)
 	dd.panels = {}
 
@@ -151,7 +145,7 @@ function SetupUnitFrame(guiPage)
 		panel:SetSize(260, 1)
 		panel:SetPoint("TOP", 0, -30)
 		panel:Hide()
-        CreateOptionGroup(panel, -10, data[i][1], data[i][2])
+        CreateOptionGroup(panel, -10, options[i][1], options[i][2])
 
 		dd.panels[i] = panel
 		dd.options[i]:HookScript("OnClick", G.ToggleOptionsPanel)
@@ -168,7 +162,6 @@ local function SetupUFAuras(guiPage)
 	local extraGUI = G:CreateExtraGUI(guiPage, guiName, L["ShowAuras"].."*")
 	local scroll = G:CreateScroll(extraGUI, 260, 540)
 
-	local UF = Core:GetModule("UnitFrames")
 	local parent, offset = scroll.child, -10
 
 	local defaultData = {

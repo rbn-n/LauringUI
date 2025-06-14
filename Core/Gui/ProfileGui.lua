@@ -271,13 +271,6 @@ local accountStrValues = {
 	["IgnoredButtons"] = true,
 }
 
-local spellBooleanValues = {
-	["RaidBuffsWhite"] = true,
-	["RaidDebuffsBlack"] = true,
-	["NameplateWhite"] = true,
-	["NameplateBlack"] = true,
-}
-
 local booleanTable = {
 	["CustomUnits"] = true,
 	["PowerUnits"] = true,
@@ -297,23 +290,7 @@ function G:ExportGUIData()
 						end
 					elseif key == "ExplosiveCache" then
 						text = text..";"..KEY..":"..key..":EMPTYTABLE"
-					elseif KEY == "AuraWatchList" then
-						if key == "Switcher" then
-							for k, v in pairs(value) do
-								text = text..";"..KEY..":"..key..":"..k..":"..tostring(v)
-							end
-						elseif key == "IgnoreSpells" then
-							-- do nothing
-						else
-							for spellID, k in pairs(value) do
-								text = text..";"..KEY..":"..key..":"..spellID
-								if k[5] == nil then k[5] = false end
-								for _, v in ipairs(k) do
-									text = text..":"..tostring(v)
-								end
-							end
-						end
-					elseif KEY == "Mover" or KEY == "InternalCD" or KEY == "AuraWatchMover" then
+					elseif KEY == "Mover" then
 						text = text..";"..KEY..":"..key
 						for _, v in ipairs(value) do
 							text = text..":"..tostring(v)
@@ -339,55 +316,10 @@ function G:ExportGUIData()
 	end
 
 	for KEY, VALUE in pairs(LauringUIAccountDB) do
-		if spellBooleanValues[KEY] then
-			text = text..";ACCOUNT:"..KEY
-			for spellID, value in pairs(VALUE) do
-				text = text..":"..spellID..":"..tostring(value)
-			end
-		elseif KEY == "RaidDebuffs" then
-			for instName, value in pairs(VALUE) do
-				for spellID, prio in pairs(value) do
-					text = text..";ACCOUNT:"..KEY..":"..instName..":"..spellID..":"..prio
-				end
-			end
-		elseif KEY == "CornerSpells" then
-			text = text..";ACCOUNT:"..KEY
-			for class, value in pairs(VALUE) do
-				if class == DB.MyClass then
-					text = text..":"..class
-					for spellID, data in pairs(value) do
-						if not bloodlustFilter[spellID] then
-							local anchor, color, filter = unpack(data)
-							anchor = anchor or ""
-							color = color or {"", "", ""}
-							text = text..":"..spellID..":"..anchor..":"..color[1]..":"..color[2]..":"..color[3]..":"..tostring(filter or false)
-						end
-					end
-				end
-			end
-		elseif KEY == "ContactList" then
-			text = text..";ACCOUNT:"..KEY
-			for name, color in pairs(VALUE) do
-				local r, g, b = strsplit(":", color)
-				r = Core:Round(r, 2)
-				g = Core:Round(g, 2)
-				b = Core:Round(b, 2)
-				text = text..":"..name..":"..r..":"..g..":"..b
-			end
-		elseif KEY == "ProfileIndex" or KEY == "ProfileNames" then
+		if KEY == "ProfileIndex" or KEY == "ProfileNames" then
 			text = text..";ACCOUNT:"..KEY
 			for k, v in pairs(VALUE) do
 				text = text..":"..k..":"..v
-			end
-		elseif KEY == "ClickSets" then
-			text = text..";ACCOUNT:"..KEY
-			if LauringUIAccountDB[KEY][DB.MyClass] then
-				text = text..":"..DB.MyClass
-				for fullkey, value in pairs(LauringUIAccountDB[KEY][DB.MyClass]) do
-					value = gsub(value, "%:", "`")
-					value = gsub(value, ";", "}")
-					text = text..":"..fullkey..":"..value
-				end
 			end
 		elseif VALUE == true or VALUE == false or accountStrValues[KEY] then
 			text = text..";ACCOUNT:"..KEY..":"..tostring(VALUE)
@@ -406,7 +338,7 @@ local function toBoolean(value)
 	end
 end
 
-local function reloadDefaultSettings()
+local function ReloadDefaultSettings()
 	for i, j in pairs(G.DefaultSettings) do
 		if type(j) == "table" then
 			if not Config.DB[i] then Config.DB[i] = {} end
@@ -431,14 +363,14 @@ function G:ImportGUIData()
 	local profile = G.ProfileDataFrame.editBox:GetText()
 	if Core:IsBase64(profile) then profile = Core:Decode(profile) end
 	local options = {strsplit(";", profile)}
-	local title, version, _, class = strsplit(":", options[1])
+	local title, version, _, _ = strsplit(":", options[1])
 	if title ~= "LauringUISettings" or IsOldProfileVersion(version) then
 		UIErrorsFrame:AddMessage(DB.InfoColor..L["Import data error"])
 		return
 	end
 
 	-- we don't export default settings, so need to reload it
-	reloadDefaultSettings()
+	ReloadDefaultSettings()
 
 	for i = 2, #options do
 		local option = options[i]
@@ -454,32 +386,26 @@ function G:ImportGUIData()
 		elseif strfind(value, "Color") and (arg1 == "r" or arg1 == "g" or arg1 == "b") then
 			local colors = {select(3, strsplit(":", option))}
 			if Config.DB[key][value] then
-				for i = 1, #colors, 2 do
-					Config.DB[key][value][colors[i]] = tonumber(colors[i+1])
+				for j = 1, #colors, 2 do
+					Config.DB[key][value][colors[j]] = tonumber(colors[j + 1])
 				end
 			end
 		elseif booleanTable[value] then
 			local results = {select(3, strsplit(":", option))}
-			for i = 1, #results, 2 do
-				Config.DB[key][value][tonumber(results[i]) or results[i]] = toBoolean(results[i+1])
+			for j = 1, #results, 2 do
+				Config.DB[key][value][tonumber(results[j]) or results[j]] = toBoolean(results[j + 1])
 			end
 		elseif value == "CustomItems" or value == "CustomNames" then
 			local results = {select(3, strsplit(":", option))}
-			for i = 1, #results, 2 do
-				Config.DB[key][value][tonumber(results[i])] = tonumber(results[i+1]) or results[i+1]
+			for j = 1, #results, 2 do
+				Config.DB[key][value][tonumber(results[j])] = tonumber(results[j+1]) or results[j+1]
 			end
 		elseif key == "Mover" then
 			local relFrom, parent, relTo, x, y = select(3, strsplit(":", option))
-			value = tonumber(value) or value
+			local valueNumber = tonumber(value) or value
 			x = tonumber(x)
 			y = tonumber(y)
-			Config.DB[key][value] = {relFrom, parent, relTo, x, y}
-		elseif key == "InternalCD" then
-			local spellID, duration, indicator, unit, itemID = select(3, strsplit(":", option))
-			spellID = tonumber(spellID)
-			duration = tonumber(duration)
-			itemID = tonumber(itemID)
-			Config.DB[key][spellID] = {spellID, duration, indicator, unit, itemID}
+			Config.DB[key][valueNumber] = {relFrom, parent, relTo, x, y}
 		elseif value == "InfoStrLeft" or value == "InfoStrRight" or accountStrValues[value] then
 			if key == "ACCOUNT" then
 				LauringUIAccountDB[value] = arg1
@@ -487,48 +413,15 @@ function G:ImportGUIData()
 				Config.DB[key][value] = arg1
 			end
 		elseif key == "ACCOUNT" then
-			if spellBooleanValues[value] then
+			if value == "ProfileIndex" then
 				local results = {select(3, strsplit(":", option))}
-				for i = 1, #results, 2 do
-					LauringUIAccountDB[value][tonumber(results[i])] = toBoolean(results[i+1])
-				end
-			elseif value == "RaidDebuffs" then
-				local instName, spellID, priority = select(3, strsplit(":", option))
-				if not LauringUIAccountDB[value][instName] then LauringUIAccountDB[value][instName] = {} end
-				LauringUIAccountDB[value][instName][tonumber(spellID)] = tonumber(priority)
-			elseif value == "CornerSpells" then
-				local results = {select(3, strsplit(":", option))}
-				local classResult = results[1]
-				if classResult == DB.MyClass then
-					for j = 2, #results, 6 do
-						local spellID, anchor, r, g, b, filter = results[j], results[j+1], results[j+2], results[j+3], results[j+4], results[j+5]
-						spellID = tonumber(spellID)
-						r = tonumber(r)
-						g = tonumber(g)
-						b = tonumber(b)
-						filter = toBoolean(filter)
-						if not LauringUIAccountDB[value][classResult] then LauringUIAccountDB[value][classResult] = {} end
-						if anchor == "" then
-							LauringUIAccountDB[value][classResult][spellID] = {}
-						else
-							LauringUIAccountDB[value][classResult][spellID] = {anchor, {r, g, b}, filter}
-						end
-					end
-				end
-			elseif value == "ContactList" then
-				local names = {select(3, strsplit(":", option))}
-				for i = 1, #names, 4 do
-					LauringUIAccountDB[value][names[i]] = names[i+1]..":"..names[i+2]..":"..names[i+3]
-				end
-			elseif value == "ProfileIndex" then
-				local results = {select(3, strsplit(":", option))}
-				for i = 1, #results, 2 do
-					LauringUIAccountDB[value][results[i]] = tonumber(results[i+1])
+				for j = 1, #results, 2 do
+					LauringUIAccountDB[value][results[j]] = tonumber(results[j + 1])
 				end
 			elseif value == "ProfileNames" then
 				local results = {select(3, strsplit(":", option))}
-				for i = 1, #results, 2 do
-					LauringUIAccountDB[value][tonumber(results[i])] = results[i+1]
+				for j = 1, #results, 2 do
+					LauringUIAccountDB[value][tonumber(results[j])] = results[j + 1]
 				end
 			end
 		elseif tonumber(arg1) then

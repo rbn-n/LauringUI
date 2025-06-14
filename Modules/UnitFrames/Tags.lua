@@ -177,7 +177,7 @@ local healthModeType = {
 	[5] = "losspercent",
 }
 oUF.Tags.Methods["raidhp"] = function(unit)
-	local healthType = healthModeType[C.db["UFs"]["RaidHPMode"]]
+	local healthType = healthModeType[Config.DB["UFs"]["RaidHPMode"]]
 	return oUF.Tags.Methods["VariousHP"](unit, _, healthType)
 end
 oUF.Tags.Events["raidhp"] = oUF.Tags.Events["VariousHP"]
@@ -203,15 +203,13 @@ oUF.Tags.Methods["nplevel"] = function(unit)
 	local level = UnitLevel(unit)
 	if level and level ~= UnitLevel("player") then
 		if level > 0 then
-			level = Core.HexRGB(GetCreatureDifficultyColor(level))..level.."|r "
+			return Core.HexRGB(GetCreatureDifficultyColor(level))..level.."|r "
 		else
-			level = "|cffff0000??|r "
+			return "|cffff0000??|r "
 		end
 	else
-		level = ""
+		return ""
 	end
-
-	return level
 end
 oUF.Tags.Events["nplevel"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
 
@@ -237,25 +235,6 @@ oUF.Tags.Methods["pppower"] = function(unit)
 	end
 end
 oUF.Tags.Events["pppower"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
-
-oUF.Tags.Methods["npctitle"] = function(unit)
-	local isPlayer = UnitIsPlayer(unit)
-	if isPlayer and C.db["Nameplate"]["NameOnlyGuild"] then
-		local guildName = GetGuildInfo(unit)
-		if guildName then
-			return "<"..guildName..">"
-		end
-	elseif not isPlayer and C.db["Nameplate"]["NameOnlyTitle"] then
-		Core.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
-		Core.ScanTip:SetUnit(unit)
-
-		local title = _G[format("NDui_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]:GetText()
-		if title and not strfind(title, "^"..LEVEL) then
-			return title
-		end
-	end
-end
-oUF.Tags.Events["npctitle"] = "UNIT_NAME_UPDATE"
 
 oUF.Tags.Methods["tarname"] = function(unit)
 	local tarUnit = unit.."target"

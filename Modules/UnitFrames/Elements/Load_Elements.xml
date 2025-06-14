@@ -1,5 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="AuraIndicators.lua"/>
 	<Script file="Auras.lua"/>
 	<Script file="Castbar.lua"/>
 	<Script file="Groups.lua"/>
@@ -9,5 +8,4 @@
 	<Script file="Mirrorbars.lua"/>
 	<Script file="Power.lua"/>
 	<Script file="RaidMark.lua"/>
-	<Script file="SpellsIndicators.lua"/>
 </Ui>

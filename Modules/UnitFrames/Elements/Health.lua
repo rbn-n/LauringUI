@@ -9,7 +9,7 @@ function UF:CalculateHealthHeight(frame)
             return Config.DB["UFs"]["PlayerHeight"]
         end
 
-        return Config.DB["UFs"]["PlayerHeight"] - Config.DB["UFs"]["PlayerPowerSpacing"] - Config.DB["UFs"]["PlayerPowerHeight"]
+        return Config.DB["UFs"]["PlayerHeight"] - Config.DB["UFs"]["PlayerPowerOffset"] - Config.DB["UFs"]["PlayerPowerHeight"]
     end
 
     return Config.DB["UFs"][frame.mystyle.."Height"]
