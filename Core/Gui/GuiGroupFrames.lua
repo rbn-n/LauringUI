@@ -2,6 +2,11 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
 
+local function UpdateAllHeaders()
+	Core:GetModule("UnitFrames"):UpdateAllHeaders()
+end
+
+
 local function SetupRaidFrame(parent)
 	local guiName = "LauringUI_RaidFrameSetup"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
@@ -44,11 +49,11 @@ local function SetupRaidFrame(parent)
 		end
 	end
 
-	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -30, options, L["RaidDirectionTip"], "UFs", "RaidDirec", 1, UpdateRaidDirection)
+	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -30, options, L["RaidDirectionTip"], "UFs", "RaidDirection", 1, UpdateRaidDirection)
 	G:CreateOptionSlider(scroll.child, L["Width"], 60, 200, defaultValue[1], -100, "RaidWidth", ResizeRaidFrame)
 	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -180, "RaidHeight", ResizeRaidFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -260, "RaidPowerHeight", ResizeRaidFrame)
-	G:CreateOptionSlider(scroll.child, L["Num Groups"], 2, 8, defaultValue[4], -340, "NumGroups", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["RaidGroups"], 2, 8, defaultValue[4], -340, "RaidGroups", UpdateNumGroups)
 	G:CreateOptionSlider(scroll.child, L["RaidRows"], 1, 8, defaultValue[5], -420, "RaidRows", UpdateNumGroups)
 	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[6], -500, "RaidSpacing", UpdateNumGroups)
 end
@@ -81,7 +86,7 @@ local function SetupPartyFrame(parent)
 	end
 	G:CreateOptionCheck(scroll.child, -10, L["SortByRole"], "UFs", "SortByRole", ResizePartyFrame, L["SortByRoleTip"])
 	G:CreateOptionCheck(scroll.child, -40, L["SortAscending"], "UFs", "SortAscending", ResizePartyFrame, L["SortAscendingTip"])
-	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -100, options, nil, "UFs", "PartyDirec", 1, ResizePartyFrame)
+	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -100, options, nil, "UFs", "PartyDirection", 1, ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Width"], 80, 200, defaultValue[1], -180, "PartyWidth", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -260, "PartyHeight", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -340, "PartyPowerHeight", ResizePartyFrame)
@@ -120,13 +125,13 @@ local function SetupPartyPetFrame(parent)
 		options[i] = UF.RaidDirections[i].name
 	end
 
-	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -30, options, nil, "UFs", "PetDirec", 1, UpdatePartyPetHeader)
-	G:CreateOptionDropdown(scroll.child, L["Visibility"], -90, {L["ShowInParty"], L["ShowInRaid"], L["ShowInGroup"]}, nil, "UFs", "PartyPetVsby", 1, UF.UpdateAllHeaders)
+	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -30, options, nil, "UFs", "PartyPetDirection", 1, UpdatePartyPetHeader)
+	G:CreateOptionDropdown(scroll.child, L["Visibility"], -90, {L["ShowInParty"], L["ShowInRaid"], L["ShowInGroup"]}, nil, "UFs", "PartyPetVisability", 1, UpdateAllHeaders)
 	G:CreateOptionSlider(scroll.child, L["Width"], 60, 200, 100, -150, "PartyPetWidth", ResizePartyPetFrame)
 	G:CreateOptionSlider(scroll.child, L["Height"], 20, 60, 22, -220, "PartyPetHeight", ResizePartyPetFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, 2, -290, "PartyPetPowerHeight", ResizePartyPetFrame)
-	G:CreateOptionSlider(scroll.child, L["UnitsPerColumn"], 5, 40, 5, -360, "PartyPetPerCol", UpdatePartyPetHeader)
-	G:CreateOptionSlider(scroll.child, L["MaxColumns"], 1, 5, 1, -430, "PartyPetMaxCol", UpdatePartyPetHeader)
+	G:CreateOptionSlider(scroll.child, L["UnitsPerColumn"], 5, 40, 5, -360, "PartyPetPerColumn", UpdatePartyPetHeader)
+	G:CreateOptionSlider(scroll.child, L["MaxColumns"], 1, 5, 1, -430, "PartyPetMaxColumn", UpdatePartyPetHeader)
 end
 
 local function SetupRaidFrameFunc()
@@ -149,10 +154,6 @@ local function UpdateRaidTextScale()
 	Core:GetModule("UnitFrames"):UpdateRaidTextScale()
 end
 
-local function UpdateAllHeaders()
-	Core:GetModule("UnitFrames"):UpdateAllHeaders()
-end
-
 local function UpdateTeamIndex()
 	local UF = Core:GetModule("UnitFrames")
 	if UF.CreateAndUpdateRaidHeader then
@@ -163,16 +164,16 @@ local function UpdateTeamIndex()
 end
 
 local options = {
-    {1, "UFs", "RaidFrame", G.HeaderTag..L["UFs RaidFrame"], nil, SetupRaidFrameFunc, nil, L["RaidFrameTip"]},
-    {1, "UFs", "PartyFrame", L["PartyFrame"], nil, SetupPartyFrameFunc, nil, L["PartyFrameTip"]},
-    {1, "UFs", "PartyPetFrame", L["PartyPetFrame"], true, SetupPartyPetFrameFunc, nil, L["PartyPetTip"]},
+    {1, "UFs", "EnableRaidFrame", G.HeaderTag..L["UFs Raid"], nil, SetupRaidFrameFunc, nil, L["RaidFrameTip"]},
+    {1, "UFs", "EnablePartyFrame", L["UFs Party"], nil, SetupPartyFrameFunc, nil, L["PartyFrameTip"]},
+    {1, "UFs", "EnablePartyPetFrame", L["UFs PartyPet"], true, SetupPartyPetFrameFunc, nil, L["PartyPetTip"]},
     {},--blank
     {1, "UFs", "FrequentHealth", G.HeaderTag..L["FrequentHealth"].."*", nil, nil, UpdateRaidHealthMethod, L["FrequentHealthTip"]},
     {3, "UFs", "HealthFrequency", L["HealthFrequency"].."*", true, {.1, .5, .05}, UpdateRaidHealthMethod, L["HealthFrequencyTip"]},
     {},--blank
-    {4, "UFs", "RaidHPMode", L["HealthValueType"].."*", true, {DISABLE, L["ShowHealthPercent"], L["ShowHealthCurrent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}, UpdateRaidTextScale, L["100PercentTip"]},
-    {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], nil, {ALL, DISABLE, L["HideDPSRole"]}},
-    {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateRaidTextScale},
+    {4, "UFs", "RaidHPMode", L["HealthValueType"].."*", nil, {DISABLE, L["ShowHealthPercent"], L["ShowHealthCurrent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}, UpdateRaidTextScale, L["100PercentTip"]},
+    {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], true, {ALL, DISABLE, L["HideDPSRole"]}},
+    {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", nil, {.8, 1.5, .05}, UpdateRaidTextScale},
     {1, "UFs", "ShowSolo", L["ShowSolo"].."*", nil, nil, UpdateAllHeaders, L["ShowSoloTip"]},
     {1, "UFs", "SmartRaid", G.HeaderTag..L["SmartRaid"].."*", true, nil, UpdateAllHeaders, L["SmartRaidTip"]},
     {1, "UFs", "TeamIndex", L["RaidFrame TeamIndex"].."*", nil, nil, UpdateTeamIndex},

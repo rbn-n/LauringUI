@@ -2,6 +2,17 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local oUF = ns.oUF
 local UF = Core:GetModule("UnitFrames")
+local AltPowerBar = AltPowerBar
+
+-- Custom colors
+oUF.colors.smooth = {1, 0, 0, .85, .8, .45, .1, .1, .1}
+oUF.colors.debuff.none = {0, 0, 0}
+
+local function ReplacePowerColor(name, index, color)
+	oUF.colors.power[name] = color
+	oUF.colors.power[index] = oUF.colors.power[name]
+end
+ReplacePowerColor("MANA", 0, {0, .4, 1})
 
 function UF:UpdatePowerBarColor(frame, force)
 	local power = frame.Power
@@ -126,31 +137,48 @@ function UF:CreateAltPower(frame)
 	frame.AlternativePower.PostUpdate = UF.PostUpdateAltPower
 end
 
--- function UF:CreateAdditionalPower(frame)
--- 	if DB.MyClass ~= "DRUID" then return end
+function UF.PostUpdateAddPower(element, _, cur, max)
+	if element.Text and max > 0 then
+		local perc = cur / max * 100
+		if perc == 100 then
+			perc = ""
+			element:SetAlpha(0)
+		else
+			perc = format("%d%%", perc)
+			element:SetAlpha(1)
+		end
+		element.Text:SetText(perc)
+	end
+end
 
--- 	local bar = CreateFrame("StatusBar", nil, frame)
--- 	bar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, -3)
--- 	bar:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, -3)
--- 	bar:SetHeight(4)
--- 	bar:SetStatusBarTexture(DB.StatusBarTexture)
--- 	Core.CreateBorder(AltPowerBar,1)
--- 	Core.CreateShadow(AltPowerBar,5)
--- 	bar.colorPower = true
--- 	Core:SmoothBar(bar)
+function UF:CreateAdditionalPower(frame)
+	if not Config.DB["UFs"]["ShowAdditionalPower"] then return end
+	if DB.MyClass ~= "DRUID" then return end
 
--- 	local bg = bar:CreateTexture(nil, "BACKGROUND")
--- 	bg:SetAllPoints()
--- 	bg:SetTexture(DB.StatusBarTexture)
--- 	bg.multiplier = .25
--- 	local text = Core.CreateFS(bar, 12, "", false, "CENTER", 1, -3)
+	local bar = CreateFrame("StatusBar", nil, frame)
+	bar:SetOrientation("VERTICAL")
+	bar:SetPoint("TOPLEFT", frame, "TOPRIGHT", 3, 0)
+	bar:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 3, 0)
+	bar:SetWidth(4)
+	bar:SetStatusBarTexture(DB.StatusBarTexture2)
+	Core:StyleFrame(bar)
+	bar.colorPower = true
+	Core:SmoothBar(bar)
 
--- 	self.AdditionalPower = bar
--- 	self.AdditionalPower.bg = bg
--- 	self.AdditionalPower.Text = text
--- 	self.AdditionalPower.PostUpdate = UF.PostUpdateAddPower
--- 	self.AdditionalPower.frequentUpdates = true
--- end
+	local bg = bar:CreateTexture(nil, "BACKGROUND")
+	bg:SetAllPoints()
+	bg:SetTexture(DB.StatusBarTexture2)
+	bg.multiplier = .25
+
+	local text = Core.CreateFS(bar, 12, "", false, "CENTER", 0, 0)
+
+	frame.AdditionalPower = bar
+	frame.AdditionalPower.bg = bg
+	frame.AdditionalPower.Text = text
+	frame.AdditionalPower.Text:Hide()
+	frame.AdditionalPower.PostUpdate = UF.PostUpdateAddPower
+	frame.AdditionalPower.frequentUpdates = true
+end
 
 function UF:CheckPowerBars()
 	for _, frame in pairs(oUF.objects) do

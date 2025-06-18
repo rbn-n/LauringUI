@@ -86,7 +86,41 @@ end
 function Core.SplitList(list, variable, cleanup)
     if cleanup then wipe(list) end
     for word in gmatch(variable, "%S+") do
-        word = tonumber(word) or word
-        list[word] = true
+        local wordNumber = tonumber(word) or word
+        list[wordNumber] = true
     end
+end
+
+function Core:FormatGold(money, full)
+	if money < 0 then
+		return " 0"..COPPER_AMOUNT_SYMBOL
+	end
+
+    if money >= 1e6 and not full then
+        -- Show abbreviated gold, e.g. " 1234g"
+        return format(" %.0f%s", money / 1e4, GOLD_AMOUNT_SYMBOL)
+	end
+
+	local moneyString = ""
+	local gold = floor(money / 1e4)
+	if gold > 0 then
+		moneyString = " "..gold..GOLD_AMOUNT_SYMBOL
+	end
+
+	local silver = floor((money - (gold * 1e4)) / 100)
+	if silver > 0 then
+		moneyString = moneyString.." "..silver..SILVER_AMOUNT_SYMBOL
+	end
+
+	local copper = money % 100
+	if copper > 0 then
+		moneyString = moneyString.." "..copper..COPPER_AMOUNT_SYMBOL
+	end
+
+	return moneyString
+end
+
+function Core.GetNPCID(guid)
+    local id = tonumber(strmatch((guid or ""), "%-(%d-)%-%x-$"))
+    return id
 end

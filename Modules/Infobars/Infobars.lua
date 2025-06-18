@@ -4,10 +4,6 @@ local Infobars = Core:RegisterModule("Infobars")
 
 Infobars.DataTexts = {}
 
-local GOLD_AMOUNT_SYMBOL = format("|cffffd700%s|r", GOLD_AMOUNT_SYMBOL)
-local SILVER_AMOUNT_SYMBOL = format("|cffd0d0d0%s|r", SILVER_AMOUNT_SYMBOL)
-local COPPER_AMOUNT_SYMBOL = format("|cffc77050%s|r", COPPER_AMOUNT_SYMBOL)
-
 function Infobars:CreatePanels()
     self:CreateLeftBottomPanel()
     self:CreateRightBottomPanel()
@@ -16,11 +12,11 @@ function Infobars:CreatePanels()
 end
 
 function Infobars:CreateDataTexts()
-    self:PositionDataTexts(self.CentralBottomPanel, {
+    self:PositionBottomPanelDataTexts({
         "Spec", "Guild", "Friends", "Latency", "Fps", "System"
     })
 
-	self:PositionDataTexts(self.RightBottomPanel, {
+	self:PositionRightPanelDataTexts({
 		"Mail", "Durability", "Bags", "Gold", "Time"
 	})
 end
@@ -57,7 +53,9 @@ function Infobars:RegisterDataText(name, options)
 	return frame
 end
 
-function Infobars:PositionDataTexts(panel, names)
+function Infobars:PositionBottomPanelDataTexts(names)
+	local panel = Infobars.CentralBottomPanel
+
 	if not panel then
 		print("PositionDataTexts: panel is nil!")
 		return
@@ -77,10 +75,39 @@ function Infobars:PositionDataTexts(panel, names)
 			frame:SetSize(spacing, panel:GetHeight())
 
 			if i == 1 then
-				frame:SetPoint("LEFT", panel, "LEFT", padding, 0)
+				frame:SetPoint("LEFT", panel, "LEFT", 15, 0)
 			else
 				local prev = self.DataTexts[names[i - 1]]
 				frame:SetPoint("LEFT", prev, "RIGHT", 0, 0)
+			end
+		else
+			print("Missing DataText:", name)
+		end
+
+	end
+end
+
+function Infobars:PositionRightPanelDataTexts(names)
+	local panel = Infobars.RightBottomPanel
+
+	if not panel then
+		print("PositionDataTexts: panel is nil!")
+		return
+	end
+
+	for i, name in ipairs(names) do
+		local frame = self.DataTexts[name]
+		if frame then
+
+			frame:ClearAllPoints()
+			frame:SetParent(panel)
+			frame:SetSize(frame.Text:GetWidth(), panel:GetHeight())
+
+			if i == 1 then
+				frame:SetPoint("LEFT", panel, "LEFT", 5, 0)
+			else
+				local prev = self.DataTexts[names[i - 1]]
+				frame:SetPoint("LEFT", prev, "RIGHT", 50, 0)
 			end
 		else
 			print("Missing DataText:", name)
@@ -96,35 +123,6 @@ function Infobars:GetTooltipAnchor(info)
 	else
 		return "BOTTOM", "TOP", 15
 	end
-end
-
-function Infobars:FormatGold(money, full)
-	if money < 0 then
-		return " 0"..COPPER_AMOUNT_SYMBOL
-	end
-
-    if money >= 1e6 and not full then
-        -- Show abbreviated gold, e.g. " 1234g"
-        return format(" %.0f%s", money / 1e4, GOLD_AMOUNT_SYMBOL)
-	end
-
-	local moneyString = ""
-	local gold = floor(money / 1e4)
-	if gold > 0 then
-		moneyString = " "..gold..GOLD_AMOUNT_SYMBOL
-	end
-
-	local silver = floor((money - (gold * 1e4)) / 100)
-	if silver > 0 then
-		moneyString = moneyString.." "..silver..SILVER_AMOUNT_SYMBOL
-	end
-
-	local copper = money % 100
-	if copper > 0 then
-		moneyString = moneyString.." "..copper..COPPER_AMOUNT_SYMBOL
-	end
-
-	return moneyString
 end
 
 function Infobars:StylePanel(panel)

@@ -1,7 +1,11 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<!-- <Include file="Bags\Load_Bags.xml" /> -->
+	<Include file="Bags\Load_Bags.xml" />
 	<Include file="Infobars\Load_Infobars.xml" />
-	<Include file="Chat\Load_Chat.xml" /> <!-- Needs to be loaded after Infobars -->
+	<Include file="Chat\Load_Chat.xml" /> <!-- Needs to be loaded after Infobars and before QualityOfLife -->
+	<Include file="QualityOfLife\Load_QualityOfLife.xml" />
+	<Include file="Loot\Load_Loot.xml" />
 	<Include file="Maps\Load_Maps.xml" />
+	<Include file="Quests\Load_Quests.xml" />
+	<Include file="Tooltips\Load_Tooltips.xml" />
 	<Include file="UnitFrames\Load_UnitFrames.xml" />
 </Ui>

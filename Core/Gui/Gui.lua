@@ -5,8 +5,7 @@ local guiTab, guiFrame = {}, nil
 G.GuiPage = {}
 G.NeedUIReload = nil
 
-local unpack, strfind, gsub = unpack, strfind, gsub
-local tonumber, pairs, ipairs, next, type, tinsert = tonumber, pairs, ipairs, next, type, tinsert
+local pairs, ipairs, tinsert = pairs, ipairs, tinsert
 
 local function ScrollBarHook(self, delta)
 	local scrollBar = self.ScrollBar
@@ -57,6 +56,20 @@ function CreateTab(parent, i, name)
 	return tab
 end
 
+local orderedTabs = {
+    L["UnitFrames"],
+    L["GroupFrames"],
+    L["Castbars"],
+    L["Bags"],
+    L["Chat"],
+    L["Loot"],
+    L["Maps"],
+    L["Quests"],
+    L["Tooltips"],
+    L["Quality of Life"],
+    L["Profile"],
+}
+
 local function OpenGUI()
     if guiFrame then guiFrame:Show() return end
 
@@ -91,8 +104,7 @@ local function OpenGUI()
 		StaticPopup_Show("RELOAD_LAURINGUI")
 	end)
 
-    local i = 1
-	for name in pairs(G.TabList) do
+	for i, name in ipairs(orderedTabs) do
 		guiTab[name] = CreateTab(guiFrame, i, name)
 
 		G.GuiPage[name] = CreateFrame("ScrollFrame", nil, guiFrame, "UIPanelScrollFrameTemplate")
@@ -100,6 +112,7 @@ local function OpenGUI()
 		G.GuiPage[name]:SetSize(610, 500)
 		Core.CreateBDFrame(G.GuiPage[name], .3)
 		G.GuiPage[name]:Hide()
+
 		G.GuiPage[name].child = CreateFrame("Frame", nil, G.GuiPage[name])
 		G.GuiPage[name].child:SetSize(610, 1)
 		G.GuiPage[name]:SetScrollChild(G.GuiPage[name].child)
@@ -107,8 +120,6 @@ local function OpenGUI()
 		G.GuiPage[name]:SetScript("OnMouseWheel", ScrollBarHook)
 
 		G:CreateOption(name, G.GuiPage)
-
-		i = i + 1
 	end
 
     G:CreateProfileGUI(G.GuiPage["Profile"])

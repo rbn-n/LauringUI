@@ -1,0 +1,12 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="QualityOfLife.lua"/>
+
+    <Script file="AutoSellJunk.lua"/>
+	<Script file="EnhancedColorPicker.lua"/>
+	<Script file="ErrorFilter.lua"/>
+	<Script file="ItemLevel.lua"/>
+	<Script file="LootFaster.lua"/>
+	<Script file="Mail.lua"/>
+	<Script file="TaxiDismount.lua"/>
+	<Script file="ZoomLevel.lua"/>
+</Ui>

@@ -114,7 +114,7 @@ local function OnEnter(self)
 
 	if totalCost > 0 then
 		GameTooltip:AddLine(" ")
-		GameTooltip:AddDoubleLine(repairCostString, module:FormatGold(totalCost), .6, .8, 1, 1, 1, 1)
+		GameTooltip:AddDoubleLine(repairCostString, Core:FormatGold(totalCost), .6, .8, 1, 1, 1, 1)
 	end
 
 	GameTooltip:AddLine(" ")
@@ -146,7 +146,7 @@ local function DelayFunc()
 	if isBankEmpty then
 		AutoRepair(true)
 	else
-		print(format(DB.InfoColor .. "%s|r%s", L["Guild repair"], module:FormatGold(repairAllCost, true)))
+		print(format(DB.InfoColor .. "%s|r%s", L["Guild repair"], Core:FormatGold(repairAllCost, true)))
 	end
 end
 
@@ -163,7 +163,7 @@ function AutoRepair(override)
 			RepairAllItems(true)
 		elseif myMoney > repairAllCost then
 			RepairAllItems()
-			print(format(DB.InfoColor .. "%s|r%s", L["Repair cost"], module:FormatGold(repairAllCost, true)))
+			print(format(DB.InfoColor .. "%s|r%s", L["Repair cost"], Core:FormatGold(repairAllCost, true)))
 			return
 		else
 			print(format("%s%s", DB.InfoColor, L["Repair error"]))

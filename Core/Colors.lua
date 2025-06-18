@@ -19,22 +19,22 @@ function Core:ClassColor(class)
 end
 
 function Core.UnitColor(unit)
-    local r, g, b = 1, 1, 1
-    if UnitIsPlayer(unit) then
-        local class = select(2, UnitClass(unit))
-        if class then
-            r, g, b = Core.ClassColor(class)
-        end
-    elseif UnitIsTapDenied(unit) then
-        r, g, b = .6, .6, .6
-    else
-        local reaction = UnitReaction(unit, "player")
-        if reaction then
-            local color = FACTION_BAR_COLORS[reaction]
-            r, g, b = color.r, color.g, color.b
-        end
-    end
-    return r, g, b
+	local r, g, b = 1, 1, 1
+	if UnitIsPlayer(unit) then
+		local class = select(2, UnitClass(unit))
+		if class then
+			r, g, b = Core:ClassColor(class)
+		end
+	elseif UnitIsTapDenied(unit) then
+		r, g, b = .6, .6, .6
+	else
+		local reaction = UnitReaction(unit, "player")
+		if reaction then
+			local color = FACTION_BAR_COLORS[reaction]
+			r, g, b = color.r, color.g, color.b
+		end
+	end
+	return r, g, b
 end
 
 local function UpdateColorPicker()
@@ -91,7 +91,7 @@ local function UpdateColorPicker()
 		end
 		local tex = swatch:CreateTexture()
         Core:SetInside(tex)
-		tex:SetTexture(DB.bdTex)
+		tex:SetTexture(DB.BackgroundTexture)
 		tex:SetVertexColor(color.r, color.g, color.b)
 		tex.GetColor = GetSwatchTexColor
 

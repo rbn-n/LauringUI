@@ -1,6 +1,5 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
-local oUF = ns.oUF
 
 local UF = Core:GetModule("UnitFrames")
 
@@ -340,7 +339,6 @@ function UF:ToggleCastBar(unit)
 	end
 end
 
-
 local function CreateSpark(castbar)
 	castbar.Spark = castbar:CreateTexture(nil, "OVERLAY")
 	castbar.Spark:SetTexture(DB.SparkTexture)
@@ -390,8 +388,6 @@ function UF:CreateCastbar(frame)
 	local mystyle = frame.mystyle
 
 	local castbar = CreateFrame("StatusBar", "oUF_Castbar"..mystyle, frame)
-	castbar:SetHeight(Config.DB.Castbars[mystyle.."Height"])
-	castbar:SetWidth(Config.DB.Castbars[mystyle.."Width"])
 	castbar:SetStatusBarTexture(DB.StatusBarTexture2)
 	castbar:SetStatusBarColor(.3, .7, 1)
 
@@ -400,7 +396,10 @@ function UF:CreateCastbar(frame)
 		castbar:SetPoint("TOPLEFT", frame.Power, "BOTTOMLEFT", 0, -3)
 		castbar:SetPoint("TOPRIGHT", frame.Power, "BOTTOMRIGHT", 0, -3)
 		castbar:SetHeight(10)
+		castbar:SetWidth(frame:GetWidth() - 22)
 	else
+		castbar:SetHeight(Config.DB.Castbars[mystyle.."Height"])
+		castbar:SetWidth(Config.DB.Castbars[mystyle.."Width"])
 		castbar:SetFrameLevel(10)
 		CreateBarMover(castbar, L[mystyle.." Castbar"], mystyle.."Castbar", Config.UFs[mystyle.."Castbar"])
 	end

@@ -3,6 +3,15 @@
     <Script file="Mover.lua"/>
 
     <Script file="GuiUnitFrames.lua"/>
+    <Script file="GuiGroupFrames.lua"/>
+    <Script file="GuiCastbars.lua"/>
+    <Script file="GuiBags.lua"/>
+    <Script file="GuiChat.lua"/>
+    <Script file="GuiLoot.lua"/>
+    <Script file="GuiMaps.lua"/>
+    <Script file="GuiQuests.lua"/>
+    <Script file="GuiTooltips.lua"/>
+    <Script file="GuiQualityOfLife.lua"/>
 
     <Script file="GuiDialogs.lua"/>
     <Script file="GuiElements.lua"/>

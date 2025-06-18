@@ -22,24 +22,6 @@ local function EditBoxClearFocus(frame)
     frame:ClearFocus()
 end
 
-function Core:Texture_OnEnter()
-    if self.IsEnabled and self:IsEnabled() then
-        if self.bg then
-            self.bg:SetBackdropColor(DB.r, DB.g, DB.b, .25)
-        else
-            self.__texture:SetVertexColor(0, .6, 1)
-        end
-    end
-end
-
-function Core:Texture_OnLeave()
-    if self.bg then
-        self.bg:SetBackdropColor(0, 0, 0, .25)
-    else
-        self.__texture:SetVertexColor(1, 1, 1)
-    end
-end
-
 local function Button_OnEnter(self)
     if not self:IsEnabled() then return end
 
@@ -551,6 +533,7 @@ function G:CreateDropdown(parent, text, x, y, data, tip, width, height)
 	return dd
 end
 
+
 function G:CreateOption(tabName, guiPage)
 	local parent, offset = guiPage[tabName].child, 20
 
@@ -583,7 +566,14 @@ function G:CreateOption(tabName, guiPage)
 			if tooltip then
 				Core.AddTooltip(cb, "ANCHOR_RIGHT", tooltip, "info", true)
 			end
-			if disabled then cb:Hide() end
+            if disabled then
+                if type(disabled) == "table" and disabled.OnHide and not cb:GetChecked() then
+                    disabled.OnHide()
+                end
+                if type(disabled) == "boolean" then
+                    cb:Hide()
+                end
+            end
 		-- Editbox
 		elseif optType == 2 then
 			local eb = Core.CreateEditBox(parent, 200, 28)
@@ -631,7 +621,7 @@ function G:CreateOption(tabName, guiPage)
 			end
 		-- Dropdown
 		elseif optType == 4 then
-			if value == "TexStyle" then
+            if value == "TexStyle" then
 				for _, v in ipairs(G.TextureList) do
 					tinsert(data, v.name)
 				end
@@ -803,7 +793,8 @@ end
 
 function Core:ReskinMenuButton()
     Core.RemoveBlizzTextures(self)
-    self.bg = Core.SetBD(self)
+    --self.bg = Core.SetBD(self)
+    Core:StyleFrame(self)
     self:SetScript("OnEnter", Menu_OnEnter)
     self:SetScript("OnLeave", Menu_OnLeave)
     self:HookScript("OnMouseUp", Menu_OnMouseUp)

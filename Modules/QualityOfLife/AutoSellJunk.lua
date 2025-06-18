@@ -1,6 +1,5 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
-local module = Core:GetModule("Infobars")
 
 local C_Timer_After = C_Timer.After
 local sellCount, stop, cache = 0, true, {}
@@ -9,7 +8,7 @@ local errorText = _G.ERR_VENDOR_DOESNT_BUY
 local function StopSelling(tell)
 	stop = true
 	if sellCount > 0 and tell then
-		print(format("|cff99CCFF%s|r%s", L["Selljunk Calculate"], module:FormatGold(sellCount, true)))
+		print(format("|cff99CCFF%s|r%s", L["Selljunk Calculate"], Core:FormatGold(sellCount, true)))
 	end
 	sellCount = 0
 end

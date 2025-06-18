@@ -21,3 +21,8 @@ Config.UFs = {
 	PetPosition 		= {"BOTTOM", UIParent, "BOTTOM", -473.5, 530},
 	FocusPosition		= {"LEFT", UIParent, "LEFT", 5, -150},
 }
+
+
+Config.Tooltips = {
+	Position = { "BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -55, 230 },
+}

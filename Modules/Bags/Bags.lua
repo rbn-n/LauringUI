@@ -19,6 +19,8 @@ local NUM_BAG_SLOTS = NUM_BAG_SLOTS or 4
 local NUM_BANKBAGSLOTS = NUM_BANKBAGSLOTS or 7
 local ITEM_STARTS_QUEST = ITEM_STARTS_QUEST
 
+local EasyMenu, PawnIsContainerItemAnUpgrade = EasyMenu, PawnIsContainerItemAnUpgrade
+
 local anchorCache = {}
 
 function module:UpdateBagsAnchor(parent, bags)
@@ -182,7 +184,8 @@ end
 function module:CreateBagBar(settings, columns)
 	local bagBar = self:SpawnPlugin("BagBar", settings.Bags)
 	bagBar:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, -5)
-	Core.SetBD(bagBar)
+	--Core.SetBD(bagBar)
+	Core:StyleFrame(bagBar)
 	bagBar.highlightFunction = highlightFunction
 	bagBar.isGlobal = true
 	bagBar:Hide()
@@ -244,7 +247,7 @@ function module:CreateBagToggle()
 end
 
 function module:CreateSortButton(name)
-	local bu = Core.CreateButton(self, 22, 22, true, DB.sortTex)
+	local bu = Core.CreateButton(self, 22, 22, true, DB.SortTexture)
 	bu:SetScript("OnClick", function()
 		if Config.DB["Bags"]["BagSortMode"] == 3 then
 			UIErrorsFrame:AddMessage(DB.InfoColor..L["BagSortDisabled"])
@@ -364,7 +367,8 @@ function module:CreateSplitButton()
 	splitFrame:SetSize(100, 50)
 	splitFrame:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -5)
 	Core.CreateFS(splitFrame, 14, L["SplitCount"], "system", "TOP", 1, -5)
-	Core.SetBD(splitFrame)
+	--Core.SetBD(splitFrame)
+	Core:StyleFrame(splitFrame)
 	splitFrame:Hide()
 	local editbox = Core.CreateEditBox(splitFrame, 90, 20)
 	editbox:SetPoint("BOTTOMLEFT", 5, 5)
@@ -978,7 +982,7 @@ function module:OnLogin()
 		self.Settings = settings
 		self:SetFrameStrata("HIGH")
 		self:SetClampedToScreen(true)
-		Core.SetBD(self)
+		Core:StyleFrame(self)
 		if settings.Bags then
 			Core.CreateMF(self, nil, true)
 		end
@@ -1128,7 +1132,7 @@ function module:OnLogin()
 	Core:RegisterEvent("AUCTION_HOUSE_CLOSED", module.CloseBags)
 
 	-- Update infobar slots
-	local INFO = Core:GetModule("Infobar")
+	local INFO = Core:GetModule("Infobars")
 	if INFO.modules then
 		for _, info in pairs(INFO.modules) do
 			if info.name == "Gold" then

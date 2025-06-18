@@ -11,9 +11,11 @@ local C_Timer_After = C_Timer.After
 local MiniMapTracking, MiniMapTrackingBackground, MiniMapTrackingButtonBorder, MiniMapTrackingIcon, MiniMapTrackingIconOverlay = MiniMapTracking, MiniMapTrackingBackground, MiniMapTrackingButtonBorder, MiniMapTrackingIcon, MiniMapTrackingIconOverlay
 local MiniMapTrackingButton, MiniMapLFGFrame, MiniMapLFGFrameBorder, MiniMapInstanceDifficulty, GuildInstanceDifficulty, Minimap_OnClick = MiniMapTrackingButton, MiniMapLFGFrame, MiniMapLFGFrameBorder, MiniMapInstanceDifficulty, GuildInstanceDifficulty, Minimap_OnClick
 local MiniMapBattlefieldFrame, MAX_BATTLEFIELD_QUEUES = MiniMapBattlefieldFrame, MAX_BATTLEFIELD_QUEUES
-local MiniMapBattlefieldBorder, MiniMapBattlefieldIcon, BattlegroundShine = MiniMapBattlefieldBorder, MiniMapBattlefieldIcon, BattlegroundShine
 
-function module:CreatePulse()
+function module:CombatPulse()
+	if not Config.DB["Minimap"]["Enable"] then return end
+	if not Config.DB["Minimap"]["ShowCombatPulse"] then return end
+
 	local bg = Core:CreateBackdropFrame(Minimap)
 	bg:SetFrameStrata("BACKGROUND")
 
@@ -40,6 +42,8 @@ function module:CreatePulse()
 end
 
 function module:WhoPingsMyMap()
+	if not Config.DB["Minimap"]["ShowWhoPings"] then return end
+
 	local f = CreateFrame("Frame", nil, Minimap)
 	f:SetAllPoints()
 	f.text = Core.CreateFS(f, 12, "", false, "TOP", 0, -3)
@@ -66,7 +70,10 @@ function module:WhoPingsMyMap()
 	end)
 end
 
-function module:ReplaceCalendar()
+function module:ShowCalendar()
+	if not Config.DB["Minimap"]["Enable"] then return end
+	if not Config.DB["Minimap"]["ShowCalendar"] then return end
+
 	GameTimeFrame:Hide()
 
 	local date = CreateFrame("Button", nil, Minimap)
@@ -138,7 +145,10 @@ function module:OnMouseWheel(zoom)
 	end
 end
 
-function module:VolumeScroll()
+function module:EasyVolume()
+	if not Config.DB["Minimap"]["Enable"] then return end
+	if not Config.DB["Minimap"]["EnableEasyVolume"] then return end
+
 	local frame = CreateFrame("Frame", nil, Minimap)
 	frame:SetAllPoints()
 	local text = Core.CreateFS(frame, 30)
@@ -180,6 +190,8 @@ function module:HideDefaultFrames()
 end
 
 function module:RecycleBin()
+	if not Config.DB["Minimap"]["ShowRecycleBin"] then return end
+
 	local blackList = {
 		["GameTimeFrame"] = true,
 		["MiniMapLFGFrame"] = true,
@@ -416,9 +428,6 @@ local function ReskinLFGFrame()
 	MiniMapBattlefieldFrame:ClearAllPoints()
 	MiniMapBattlefieldFrame:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", -5, -5)
 	MiniMapBattlefieldFrame:SetFrameLevel(999)
-	MiniMapBattlefieldBorder:Hide()
-	MiniMapBattlefieldIcon:SetAlpha(0)
-	BattlegroundShine:SetTexture(nil)
 
 	local queueIcon = Minimap:CreateTexture(nil, "ARTWORK")
 	queueIcon:SetPoint("CENTER", MiniMapBattlefieldFrame)
@@ -479,6 +488,8 @@ function module:Reskin()
 end
 
 function module:UpdateMinimapScale()
+	if not Config.DB["Minimap"]["Enable"] then return end
+
 	local size = Config.DB["Minimap"]["Size"]
 	local scale = Config.DB["Minimap"]["Scale"]
 	Minimap:SetSize(size, size)
@@ -486,6 +497,8 @@ function module:UpdateMinimapScale()
 end
 
 function module:OnLogin()
+	if not Config.DB["Minimap"]["Enable"] then return end
+
 	Minimap:SetFrameLevel(10)
 	Minimap:SetMaskTexture("Interface\\Buttons\\WHITE8X8")
 	Minimap:ClearAllPoints()
@@ -494,10 +507,10 @@ function module:OnLogin()
 	Core:CreateBackdropFrame(Minimap)
 
 	self:HideDefaultFrames()
-	self:ReplaceCalendar()
+	self:ShowCalendar()
 	self:HandleTracking()
-	self:VolumeScroll()
-	self:CreatePulse()
+	self:EasyVolume()
+	self:CombatPulse()
 	self:WhoPingsMyMap()
 	self:RecycleBin()
 	self:Reskin()

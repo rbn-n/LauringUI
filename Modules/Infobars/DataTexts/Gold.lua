@@ -49,7 +49,7 @@ local function OnEvent(self)
 		UpdateStoredGold()
 	end
 
-	self.Text:SetText(showSession and module:FormatGold(profit - spent) or module:FormatGold(newMoney))
+	self.Text:SetText(showSession and Core:FormatGold(profit - spent) or Core:FormatGold(newMoney))
 end
 
 local function OnEnter(self)
@@ -61,14 +61,14 @@ local function OnEnter(self)
 	GameTooltip:AddLine(" ")
 
 	GameTooltip:AddLine("Session", 0.8, 0.8, 0.8)
-	GameTooltip:AddDoubleLine("Earned:", module:FormatGold(profit), 1, 1, 1)
-	GameTooltip:AddDoubleLine("Spent:", module:FormatGold(spent), 1, 1, 1)
+	GameTooltip:AddDoubleLine("Earned:", Core:FormatGold(profit), 1, 1, 1)
+	GameTooltip:AddDoubleLine("Spent:", Core:FormatGold(spent), 1, 1, 1)
 
 	local net = profit - spent
 	if net >= 0 then
-		GameTooltip:AddDoubleLine("Profit:", module:FormatGold(net), 0, 1, 0)
+		GameTooltip:AddDoubleLine("Profit:", Core:FormatGold(net), 0, 1, 0)
 	else
-		GameTooltip:AddDoubleLine("Deficit:", module:FormatGold(-net), 1, 0, 0)
+		GameTooltip:AddDoubleLine("Deficit:", Core:FormatGold(-net), 1, 0, 0)
 	end
 
 	GameTooltip:AddLine(" ")
@@ -80,13 +80,13 @@ local function OnEnter(self)
 			local class = data.class
 			local money = data.money
 			local color = DB.ClassColors[class] or { r = 1, g = 1, b = 1 }
-			GameTooltip:AddDoubleLine(name .. " - " .. realm, module:FormatGold(money), color.r, color.g, color.b, 1, 1, 1)
+			GameTooltip:AddDoubleLine(name .. " - " .. realm, Core:FormatGold(money), color.r, color.g, color.b, 1, 1, 1)
 			total = total + money
 		end
 	end
 
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine("Total:", module:FormatGold(total), 0.6, 0.8, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine("Total:", Core:FormatGold(total), 0.6, 0.8, 1, 1, 1, 1)
 
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(DB.LeftButton .. "+ALT " .. "Reset All Character Gold", "", 0.7, 0.7, 0.7, 0.7, 0.7, 0.7)

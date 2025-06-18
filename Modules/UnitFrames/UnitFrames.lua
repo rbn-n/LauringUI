@@ -35,10 +35,10 @@ local function CreatePlayer(frame)
 	UF:CreateRaidMark(frame)
 	UF:CreateIcons(frame)
 	UF:CreateHealPrediction(frame)
-	--UF:CreateAdditionalPowerPower(frame)
-	--UF:CreateClassPower(frame)
+	UF:CreateAdditionalPower(frame)
+	UF:CreateClassPower(frame)
 	UF:CreateAuras(frame)
-	--UF:EclipseBar(frame)
+	UF:CreateEclipseBar(frame)
     UF:ReskinMirrorBars()
 end
 
@@ -202,7 +202,7 @@ end
 
 local function GetRaidVisibility()
 	local visibility
-	if Config.DB["UFs"]["PartyFrame"] then
+	if Config.DB["UFs"]["EnablePartyFrame"] then
 		if Config.DB["UFs"]["SmartRaid"] then
 			visibility = "[@raid6,exists] show;hide"
 		else
@@ -244,6 +244,24 @@ end
 local function ResetHeaderPoints(header)
 	for i = 1, header:GetNumChildren() do
 		select(i, header:GetChildren()):ClearAllPoints()
+	end
+end
+
+function UF:UpdateAllHeaders()
+	if not UF.headers then return end
+
+	for _, header in pairs(UF.headers) do
+		if header.groupType == "party" then
+			RegisterStateDriver(header, "visibility", GetPartyVisibility())
+		elseif header.groupType == "pet" then
+			RegisterStateDriver(header, "visibility", GetPartyPetVisibility())
+		elseif header.groupType == "raid" then
+			if header.__disabled then
+				RegisterStateDriver(header, "visibility", "hide")
+			else
+				RegisterStateDriver(header, "visibility", GetRaidVisibility())
+			end
+		end
 	end
 end
 
@@ -441,7 +459,7 @@ function UF:SetupRaid()
     function UF:CreateAndUpdateRaidHeader()
         local index = Config.DB["UFs"]["RaidDirection"]
         local rows = Config.DB["UFs"]["RaidRows"]
-        local numGroups = Config.DB["UFs"]["NumRaidGroups"]
+        local numGroups = Config.DB["UFs"]["RaidGroups"]
         local raidWidth, raidHeight = Config.DB["UFs"]["RaidWidth"], Config.DB["UFs"]["RaidHeight"]
         local raidFrameHeight = raidHeight + Config.DB["UFs"]["RaidPowerHeight"]
         local indexSpacing = Config.DB["UFs"]["TeamIndex"] and 20 or 0
@@ -504,12 +522,12 @@ function UF:SetupRaid()
         for i = 1, 8 do
             local group = groups[i]
             if group then
-                group.__disabled = i > Config.DB["UFs"]["NumRaidGroups"]
+                group.__disabled = i > Config.DB["UFs"]["RaidGroups"]
             end
         end
     end
 
-    UF:CreateAndUpdateRaidHeader(true)
+    UF:CreateAndUpdateRaidHeader()
     UF:UpdateRaidTeamIndex()
     UF:UpdateRaidHealthMethod()
 end
@@ -575,9 +593,9 @@ function UF:OnLogin()
         end
     end
 
+    UF:ToggleUFClassPower()
     UF:ToggleAllAuras()
     UF:CheckPowerBars()
-    --UF:UpdateRaidInfo()
 
     SetCVar("predictedHealth", 1)
     Core:HideDefaultRaidFrame()

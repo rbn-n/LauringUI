@@ -257,8 +257,32 @@ oUF.Tags.Events["altpower"] = "UNIT_POWER_UPDATE"
 -- Eclipse power for Druid
 local POWERTYPE_BALANCE = Enum.PowerType.Balance or 26
 oUF.Tags.Methods["cureclipse"] = function(unit)
-	local textFormat = GetEclipseDirection() == "sun" and "|cff40bfff%s>" or "|cffffff00<%s"
+	local textFormat = GetEclipseDirection() == "sun" and "|cff4d85e6%s>" or "|cffccd199<%s"
 	local max = UnitPowerMax("player", POWERTYPE_BALANCE)
 	return format(textFormat, (max == 0 and 0) or math.abs(UnitPower("player", POWERTYPE_BALANCE)))
 end
 oUF.Tags.Events["cureclipse"] = "UNIT_POWER_FREQUENT ECLIPSE_DIRECTION_CHANGE"
+
+oUF.Tags.Methods["abbrevname"] = function(unit)
+	local name = UnitName(unit)
+	if not name then return "" end
+
+	if #name <= 20 then
+		return name
+	end
+
+	local parts = {}
+	for word in name:gmatch("%S+") do
+		tinsert(parts, word)
+	end
+
+	local last = tremove(parts) -- Remove and save last word
+	for i, word in ipairs(parts) do
+		parts[i] = strsub(word, 1, 1) .. "."
+	end
+
+	tinsert(parts, last)
+	return table.concat(parts, " ")
+end
+
+oUF.Tags.Events["abbrevname"] = "UNIT_NAME_UPDATE"

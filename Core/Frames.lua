@@ -24,21 +24,7 @@ function Core:CreateBorder(frame, x)
     border:SetBackdrop(borders)
     border:SetBackdropColor(0.1, 0.1, 0.1, 0.6)
     border:SetBackdropBorderColor(0, 0, 0)
-end
-
-function Core:SetBorderColor()
-    self:SetBackdropBorderColor(0, 0, 0)
-end
-
-function Core:CreateHealthBorder(frame, x)
-    local border = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    border:SetFrameLevel(1)
-    border:SetFrameStrata(frame:GetFrameStrata())
-    border:SetPoint("TOPLEFT", -x, x)
-    border:SetPoint("BOTTOMRIGHT", x, -x)
-    border:SetBackdrop(borders)
-    border:SetBackdropColor(1, 0, 0, 0)
-    border:SetBackdropBorderColor(0, 0, 0)
+    frame.__border = border
 end
 
 function Core:CreateBackdrop(frame)
@@ -68,6 +54,21 @@ function Core:CreateShadow(frame, size)
     shadow:SetBackdropBorderColor(0, 0, 0, .4)
 
     frame.__shadow = shadow
+end
+
+function Core:SetBorderColor()
+    self:SetBackdropBorderColor(0, 0, 0)
+end
+
+function Core:CreateHealthBorder(frame, x)
+    local border = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    border:SetFrameLevel(1)
+    border:SetFrameStrata(frame:GetFrameStrata())
+    border:SetPoint("TOPLEFT", -x, x)
+    border:SetPoint("BOTTOMRIGHT", x, -x)
+    border:SetBackdrop(borders)
+    border:SetBackdropColor(1, 0, 0, 0)
+    border:SetBackdropBorderColor(0, 0, 0)
 end
 
 function Core:SetFontSize(size)
@@ -137,7 +138,7 @@ function Core:SetInside(frame, anchor, xOffset, yOffset, anchor2)
     frame:SetPoint("BOTTOMRIGHT", anchor2 or anchor, "BOTTOMRIGHT", -xOffset, yOffset)
 end
 
-function Core:SetOutSide(frame, anchor, xOffset, yOffset, anchor2)
+function Core:SetOutside(frame, anchor, xOffset, yOffset, anchor2)
     xOffset = xOffset or Config.PixelMultiplexer
     yOffset = yOffset or Config.PixelMultiplexer
     anchor = anchor or frame:GetParent()
@@ -147,15 +148,15 @@ function Core:SetOutSide(frame, anchor, xOffset, yOffset, anchor2)
     frame:SetPoint("BOTTOMRIGHT", anchor2 or anchor, "BOTTOMRIGHT", xOffset, -yOffset)
 end
 
-function Core:CreateSD()
+function Core:CreateSD(size)
     if self.__shadow then return end
 
     local frame = self
     if self:IsObjectType("Texture") then frame = self:GetParent() end
 
-    shadowBackdrop.edgeSize = 5
+    shadowBackdrop.edgeSize = size or 5
     self.__shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    Core:SetOutSide(self.__shadow, self)
+    Core:SetOutside(self.__shadow, self)
     self.__shadow:SetBackdrop(shadowBackdrop)
     self.__shadow:SetBackdropBorderColor(0, 0, 0, .4)
     self.__shadow:SetFrameLevel(1)
@@ -194,8 +195,8 @@ function Core:CreateTex()
     local frame = self
     if self:IsObjectType("Texture") then frame = self:GetParent() end
 
-    local tex = frame:CreateTexture(nil, "BACKGROUND")
-    --local tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
+    --local tex = frame:CreateTexture(nil, "BACKGROUND")
+    local tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
     tex:SetAllPoints(self)
     tex:SetTexture(DB.StatusBarTexture)
     tex:SetHorizTile(true)
@@ -206,14 +207,6 @@ function Core:CreateTex()
     self.__bgTex = tex
 end
 
--- function Core:CreateBackdrop(frame)
---     local background = frame:CreateTexture(nil, "BACKGROUND")
---     background:SetTexture(DB.StatusBarTexture)
---     background:SetAllPoints()
---     background:SetVertexColor(0.1, 0.1, 0.1, 0)
---     frame.__backdrop = background
--- end
-
 function Core:SetBD(a, x, y, x2, y2)
     local bg = Core.CreateBDFrame(self, a)
     if x then
@@ -221,7 +214,7 @@ function Core:SetBD(a, x, y, x2, y2)
         bg:SetPoint("BOTTOMRIGHT", self, x2, y2)
     end
     Core.CreateSD(bg)
-    --Core.CreateTex(bg)
+    Core.CreateTex(bg)
 
     return bg
 end
@@ -250,7 +243,7 @@ function Core:CreateBDFrame(a, gradient)
     local lvl = frame:GetFrameLevel()
 
     local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    Core:SetOutSide(bg, self)
+    Core:SetOutside(bg, self)
     bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
     Core.CreateBD(bg, a)
     if gradient then
@@ -426,4 +419,65 @@ function Core:CreateDropDown(width, height, data)
 
     dropdown.Type = "DropDown"
     return dropdown
+end
+
+function Core:Texture_OnEnter()
+    if self.IsEnabled and self:IsEnabled() then
+        if self.bg then
+            self.bg:SetBackdropColor(DB.r, DB.g, DB.b, .25)
+        else
+            self.__texture:SetVertexColor(0, .6, 1)
+        end
+    end
+end
+
+function Core:Texture_OnLeave()
+    if self.bg then
+        self.bg:SetBackdropColor(0, 0, 0, .25)
+    else
+        self.__texture:SetVertexColor(1, 1, 1)
+    end
+end
+
+local function ResetCloseButtonAnchor(button)
+    if button.isSetting then return end
+    button.isSetting = true
+    button:ClearAllPoints()
+    button:SetPoint("TOPRIGHT", button.__owner, "TOPRIGHT", button.__xOffset, button.__yOffset)
+    button.isSetting = nil
+end
+
+function Core:ReskinClose(parent, xOffset, yOffset, override)
+    parent = parent or self:GetParent()
+    xOffset = xOffset or -6
+    yOffset = yOffset or -6
+
+    self:SetSize(16, 16)
+    if not override then
+        self:ClearAllPoints()
+        self:SetPoint("TOPRIGHT", parent, "TOPRIGHT", xOffset, yOffset)
+        self.__owner = parent
+        self.__xOffset = xOffset
+        self.__yOffset = yOffset
+        hooksecurefunc(self, "SetPoint", ResetCloseButtonAnchor)
+    end
+
+    Core.RemoveBlizzTextures(self)
+    if self.Border then self.Border:SetAlpha(0) end
+    local bg = Core.CreateBDFrame(self, 0, true)
+    bg:SetAllPoints()
+
+    self:SetDisabledTexture(DB.BackgroundTexture)
+    local dis = self:GetDisabledTexture()
+    dis:SetVertexColor(0, 0, 0, .4)
+    dis:SetDrawLayer("OVERLAY")
+    dis:SetAllPoints()
+
+    local tex = self:CreateTexture()
+    tex:SetTexture(DB.CloseTexture)
+    tex:SetAllPoints()
+    self.__texture = tex
+
+    self:HookScript("OnEnter", Core.Texture_OnEnter)
+    self:HookScript("OnLeave", Core.Texture_OnLeave)
 end

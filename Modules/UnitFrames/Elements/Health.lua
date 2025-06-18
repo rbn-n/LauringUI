@@ -33,7 +33,6 @@ function UF:CreateHealthBar(frame)
     Core:SmoothBar(health)
 	health.frequentUpdates = true
 
-    --Core:CreateSD(health)
     Core:CreateHealthBorder(health, 1)
     Core:CreateShadow(health, 5)
 
@@ -49,7 +48,7 @@ function UF:UpdateFrameNameTag(frame)
 
 	local mystyle = frame.mystyle
 
-	local colorNameTag = "[color][name]"
+	local colorNameTag = "[color][abbrevname]"
 
 	if mystyle == "Player" then
 		frame:Tag(name, " "..colorNameTag)

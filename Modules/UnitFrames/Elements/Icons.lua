@@ -17,8 +17,8 @@ function UF:CreateIcons(frame)
 	local mystyle = frame.mystyle
 	if mystyle == "Player" then
 		local combat = frame:CreateTexture(nil, "OVERLAY")
-		combat:SetPoint("CENTER", frame, "BOTTOMLEFT")
-		combat:SetSize(20, 20)
+		combat:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -1, -1)
+		combat:SetSize(15, 15)
 		combat:SetTexture("Interface\\WORLDSTATEFRAME\\CombatSwords")
 		combat:SetTexCoord(0, .5, 0, .5)
 		combat:SetVertexColor(.8, 0, 0)
@@ -49,7 +49,7 @@ function UF:CreateIcons(frame)
     frame.GroupRoleIndicator = roleIcon
 
 	local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
-	leaderIcon:SetPoint("TOPLEFT", frame, -1, 8)
+	leaderIcon:SetPoint("TOPLEFT", frame, 0, 1)
 	leaderIcon:SetSize(12, 12)
 	frame.LeaderIndicator = leaderIcon
 

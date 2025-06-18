@@ -11,15 +11,15 @@ local function ShowCalendar()
 end
 
 local options = {
-    {1, "Map", "DisableMinimap", "|cffff0000"..L["DisableMinimap"], nil, nil, nil, L["DisableMinimapTip"]},
-    {3, "Map", "MinimapScale", L["Minimap Scale"].."*", nil, {.5, 3, .1}, UpdateMinimapScale},
-    {3, "Map", "MinimapSize", L["Minimap Size"].."*", true, {100, 500, 1}, UpdateMinimapScale},
-    {1, "Map", "Calendar", L["MinimapCalendar"].."*", true, nil, ShowCalendar, L["MinimapCalendarTip"]},
-    {1, "Map", "CombatPulse", L["Minimap Pulse"]},
-    {1, "Map", "WhoPings", L["Show WhoPings"], true},
-    {1, "Map", "EasyVolume", L["EasyVolume"], nil, nil, nil, L["EasyVolumeTip"]},
-    {1, "Map", "ShowRecycleBin", L["Show RecycleBin"]},
-    {2, "ACCOUNT", "IgnoredButtons", L["IgnoredButtons"], nil, nil, nil, L["IgnoredButtonsTip"]},
+    {1, "Minimap", "Enable", G.HeaderTag..L["EnableMinimap"], nil, nil, nil, L["EnableMinimapTip"]},
+    {3, "Minimap", "Scale", L["Minimap Scale"].."*", nil, {.5, 3, .1}, UpdateMinimapScale},
+    {3, "Minimap", "Size", L["Minimap Size"].."*", true, {100, 500, 1}, UpdateMinimapScale},
+    {1, "Minimap", "ShowCalendar", L["MinimapCalendar"].."*", nil, nil, ShowCalendar, L["MinimapCalendarTip"]},
+    {1, "Minimap", "ShowCombatPulse", L["Minimap Pulse"], true},
+    {1, "Minimap", "ShowWhoPings", L["Show WhoPings"], nil},
+    {1, "Minimap", "EnableEasyVolume", L["EasyVolume"], true, nil, nil, L["EasyVolumeTip"]},
+    {1, "Minimap", "ShowRecycleBin", L["Show RecycleBin"]},
+    --{2, "ACCOUNT", "IgnoredButtons", L["IgnoredButtons"], nil, nil, nil, L["IgnoredButtonsTip"]},
 }
 
 G.TabList["Maps"] = options

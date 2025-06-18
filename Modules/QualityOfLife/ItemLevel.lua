@@ -1,0 +1,469 @@
+local _, ns = ...
+local Core, Config, L, DB = unpack(ns)
+local QoL = Core:GetModule("QoL")
+
+local pairs, select, next, wipe = pairs, select, next, wipe
+local UnitGUID, GetItemInfo = UnitGUID, C_Item.GetItemInfo
+local GetContainerItemLink = C_Container.GetContainerItemLink
+local GetInventoryItemLink = GetInventoryItemLink
+local GetTradePlayerItemLink, GetTradeTargetItemLink = GetTradePlayerItemLink, GetTradeTargetItemLink
+local InspectModelFrameRotateRightButton = InspectModelFrameRotateRightButton
+
+local inspectSlots = {
+	"Head",
+	"Neck",
+	"Shoulder",
+	"Shirt",
+	"Chest",
+	"Waist",
+	"Legs",
+	"Feet",
+	"Wrist",
+	"Hands",
+	"Finger0",
+	"Finger1",
+	"Trinket0",
+	"Trinket1",
+	"Back",
+	"MainHand",
+	"SecondaryHand",
+	"Ranged",
+}
+
+function QoL:GetSlotAnchor(index)
+	if not index then return end
+
+	if index <= 5 or index == 9 or index == 15 then
+		return "BOTTOMLEFT", 40, 20
+	elseif index == 16 then
+		return "BOTTOMRIGHT", -40, 2
+	elseif index == 17 then
+		return "BOTTOMLEFT", 40, 2
+	else
+		return "BOTTOMRIGHT", -40, 20
+	end
+end
+
+function QoL:CreateItemTexture(slot, relF, x, y)
+	local icon = slot:CreateTexture()
+	icon:SetPoint(relF, x, y)
+	icon:SetSize(14, 14)
+	icon.bg = Core.ReskinIcon(icon)
+	icon.bg:SetFrameLevel(3)
+	icon.bg:Hide()
+
+	return icon
+end
+
+function QoL:CreateColorBorder()
+	local frame = CreateFrame("Frame", nil, self)
+	frame:SetAllPoints()
+	self.colorBG = Core.CreateSD(frame, 2)
+	self.colorBG:SetFrameLevel(5)
+end
+
+function QoL:CreateItemString(frame, strType)
+	if frame.fontCreated then return end
+
+	for index, slot in pairs(inspectSlots) do
+        local slotFrame = _G[strType..slot.."Slot"]
+        slotFrame.iLvlText = Core.CreateFS(slotFrame, DB.Font[2] -2)
+        slotFrame.iLvlText:ClearAllPoints()
+        slotFrame.iLvlText:SetPoint("BOTTOMLEFT", slotFrame, 1, 1)
+
+        local relF, x, _ = QoL:GetSlotAnchor(index)
+        slotFrame.enchantText = Core.CreateFS(slotFrame, DB.Font[2] -2)
+        slotFrame.enchantText:ClearAllPoints()
+        slotFrame.enchantText:SetPoint("TOPRIGHT", slotFrame, 1, 1)
+        slotFrame.enchantText:SetTextColor(0, 1, 0)
+
+        for i = 1, 5 do
+            local offset = (i-1)*18 + 5
+            local iconX = x > 0 and x+offset or x-offset
+            local iconY = index > 15 and 20 or 2
+            slotFrame["textureIcon"..i] = QoL:CreateItemTexture(slotFrame, relF, iconX, iconY)
+        end
+
+        QoL.CreateColorBorder(slotFrame)
+
+	end
+
+	frame.fontCreated = true
+end
+
+function QoL:ItemBorderSetColor(slotFrame, r, g, b)
+	if slotFrame.colorBG then
+		slotFrame.colorBG:SetBackdropBorderColor(r, g, b)
+	end
+	if slotFrame.bg then
+		slotFrame.bg:SetBackdropBorderColor(r, g, b)
+	end
+end
+
+local pending = {}
+
+
+function QoL:RefreshButtonInfo()
+	local unit = InspectFrame and InspectFrame.unit
+	if unit then
+		for index, slotFrame in pairs(pending) do
+			local link = GetInventoryItemLink(unit, index)
+			if link then
+				local quality, level = select(3, GetItemInfo(link))
+				if quality then
+					local color = DB.QualityColors[quality]
+					QoL:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
+					if Config.DB["QoL"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
+						slotFrame.iLvlText:SetText(level)
+						slotFrame.iLvlText:SetTextColor(color.r, color.g, color.b)
+					end
+					QoL:UpdateInspectILvl()
+
+					pending[index] = nil
+				end
+			end
+		end
+
+		if not next(pending) then
+			self:Hide()
+			return
+		end
+	else
+		wipe(pending)
+		self:Hide()
+	end
+end
+
+function QoL:ItemLevel_SetupLevel(frame, strType, unit)
+	if not UnitExists(unit) then return end
+
+	QoL:CreateItemString(frame, strType)
+
+	for index, slot in pairs(inspectSlots) do
+		--if index ~= 4 then
+			local slotFrame = _G[strType..slot.."Slot"]
+			slotFrame.iLvlText:SetText("")
+			slotFrame.enchantText:SetText("")
+			for i = 1, 5 do
+				local texture = slotFrame["textureIcon"..i]
+				texture:SetTexture(nil)
+				texture.bg:Hide()
+			end
+			QoL:ItemBorderSetColor(slotFrame, 0, 0, 0)
+
+			local itemTexture = GetInventoryItemTexture(unit, index)
+			if itemTexture then
+				local link = GetInventoryItemLink(unit, index)
+				if link then
+					local quality, level = select(3, GetItemInfo(link))
+					if quality then
+						local color = DB.QualityColors[quality]
+						QoL:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
+						if Config.DB["QoL"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
+							slotFrame.iLvlText:SetText(level)
+							slotFrame.iLvlText:SetTextColor(color.r, color.g, color.b)
+						end
+
+					else
+						pending[index] = slotFrame
+						QoL.QualityUpdater:Show()
+					end
+				else
+					pending[index] = slotFrame
+					QoL.QualityUpdater:Show()
+				end
+			end
+		--end
+	end
+end
+
+function QoL:ItemLevel_UpdatePlayer()
+	QoL:ItemLevel_SetupLevel(CharacterFrame, "Character", "player")
+end
+
+local function GetItemSlotLevel(unit, index)
+	local level
+	local itemLink = GetInventoryItemLink(unit, index)
+	if itemLink then
+		level = select(4, GetItemInfo(itemLink))
+	end
+	return tonumber(level) or 0
+end
+
+-- P1 174,187,200,213
+-- P2 200,213,226,239
+-- P3 200,226,239,252
+-- P4 200,246,259,272
+local function GetILvlTextColor(level)
+	if level >= 372 then
+		return 1, .5, 0
+	elseif level >= 359 then
+		return .63, .2, .93
+	elseif level >= 346 then
+		return 0, .43, .87
+	elseif level >= 272 then
+		return .12, 1, 0
+	else
+		return 1, 1, 1
+	end
+end
+
+function QoL:UpdateUnitILvl(unit, text)
+	if not text then return end
+
+	local total = 0
+	for index = 1, 15 do
+		if index ~= 4 then
+			local level = GetItemSlotLevel(unit, index)
+			if level > 0 then
+				total = total + level
+			end
+		end
+	end
+
+	local mainhand = GetItemSlotLevel(unit, 16)
+	local offhand = GetItemSlotLevel(unit, 17)
+	local ranged = GetItemSlotLevel(unit, 18)
+
+	--[[
+ 		Note: We have to unify iLvl with others who use MerInspect,
+		 although it seems incorrect for Hunter with two melee weapons.
+	]]
+	if mainhand > 0 and offhand > 0 then
+		total = total + mainhand + offhand
+	elseif offhand > 0 and ranged > 0 then
+		total = total + offhand + ranged
+	else
+		total = total + max(mainhand, offhand, ranged) * 2
+	end
+
+	local average = Core:Round(total/16, 1)
+	text:SetText(average)
+	text:SetTextColor(GetILvlTextColor(average))
+end
+
+function QoL:UpdateInspectILvl()
+	if not QoL.InspectILvl then return end
+
+	QoL:UpdateUnitILvl(InspectFrame.unit, QoL.InspectILvl)
+	QoL.InspectILvl:SetFormattedText("iLvl %s", QoL.InspectILvl:GetText())
+end
+
+local anchored
+local function AnchorInspectRotate()
+	if anchored then return end
+	InspectModelFrameRotateRightButton:ClearAllPoints()
+	InspectModelFrameRotateRightButton:SetPoint("BOTTOMLEFT", InspectFrameTab1, "TOPLEFT", 0, 2)
+
+	QoL.InspectILvl = Core.CreateFS(InspectPaperDollFrame, 15)
+	QoL.InspectILvl:ClearAllPoints()
+	QoL.InspectILvl:SetPoint("TOP", InspectLevelText, "BOTTOM", 0, -4)
+
+	anchored = true
+end
+
+function QoL:ItemLevel_UpdateInspect(...)
+	local guid = ...
+	if InspectFrame and InspectFrame.unit and UnitGUID(InspectFrame.unit) == guid then
+		AnchorInspectRotate()
+		QoL:ItemLevel_SetupLevel(InspectFrame, "Inspect", InspectFrame.unit)
+		QoL:UpdateInspectILvl()
+	end
+end
+
+local function GetItemQualityAndLevel(link)
+	local _, _, quality, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
+	if quality and quality > 1 and level and level > 1 and DB.iLvlClassIDs[classID] then
+		return quality, level
+	end
+end
+
+function QoL:ItemLevel_UpdateMerchant(link)
+	if not self.iLvl then
+		self.iLvl = Core.CreateFS(_G[self:GetName().."ItemButton"], DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+	end
+	self.iLvl:SetText("")
+	if link then
+		local quality, level = GetItemQualityAndLevel(link)
+		if quality and level then
+			local color = DB.QualityColors[quality]
+			self.iLvl:SetText(level)
+			self.iLvl:SetTextColor(color.r, color.g, color.b)
+		end
+	end
+end
+
+function QoL.ItemLevel_UpdateTradePlayer(index)
+	local button = _G["TradePlayerItem"..index]
+	local link = GetTradePlayerItemLink(index)
+	QoL.ItemLevel_UpdateMerchant(button, link)
+end
+
+function QoL.ItemLevel_UpdateTradeTarget(index)
+	local button = _G["TradeRecipientItem"..index]
+	local link = GetTradeTargetItemLink(index)
+	QoL.ItemLevel_UpdateMerchant(button, link)
+end
+
+local itemCache = {}
+local CHAT = Core:GetModule("Chat")
+
+function QoL.ItemLevel_ReplaceItemLink(link, name)
+	if not link then return end
+
+	local modLink = itemCache[link]
+	if not modLink then
+		local itemLevel = select(4, GetItemInfo(link))
+		if itemLevel then
+			modLink = gsub(link, "|h%[(.-)%]|h", "|h("..itemLevel..CHAT.IsItemWithGem(link)..")"..name.."|h")
+			itemCache[link] = modLink
+		end
+	end
+	return modLink
+end
+
+function QoL:GuildNewsButtonOnClick(btn)
+	if self.isEvent or not self.playerName then return end
+	if btn == "LeftButton" and IsShiftKeyDown() then
+		if MailFrame:IsShown() then
+			MailFrameTab_OnClick(nil, 2)
+			SendMailNameEditBox:SetText(self.playerName)
+			SendMailNameEditBox:HighlightText()
+		else
+			local editBox = ChatEdit_ChooseBoxForSend()
+			local hasText = (editBox:GetText() ~= "")
+			ChatEdit_ActivateChat(editBox)
+			editBox:Insert(self.playerName)
+			if not hasText then editBox:HighlightText() end
+		end
+	end
+end
+
+function QoL:ItemLevel_ReplaceGuildNews(_, _, playerName)
+	self.playerName = playerName
+
+	local newText = gsub(self.text:GetText(), "(|Hitem:%d+:.-|h%[(.-)%]|h)", QoL.ItemLevel_ReplaceItemLink)
+	if newText then
+		self.text:SetText(newText)
+	end
+
+	if not self.hooked then
+		self.text:SetFontObject(Game13Font)
+		self:HookScript("OnClick", QoL.GuildNewsButtonOnClick) -- copy name by key shift
+		self.hooked = true
+	end
+end
+
+function QoL:ItemLevel_FlyoutUpdate(bag, slot, quality)
+	if not self.iLvl then
+		self.iLvl = Core.CreateFS(self, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+	end
+
+	if quality and quality <= 1 then return end
+
+	local link
+	if bag then
+		link = GetContainerItemLink(bag, slot)
+	else
+		link = GetInventoryItemLink("player", slot)
+	end
+	local quality, level = select(3, GetItemInfo(link))
+
+	local color = DB.QualityColors[quality or 0]
+	self.iLvl:SetText(level)
+	self.iLvl:SetTextColor(color.r, color.g, color.b)
+	QoL:ItemBorderSetColor(self, color.r, color.g, color.b)
+end
+
+function QoL:ItemLevel_FlyoutUpdateByID(id)
+	if not self.iLvl then
+		self.iLvl = Core.CreateFS(self, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+	end
+
+	local quality, level = select(3, GetItemInfo(id))
+	if quality and quality <= 1 then return end
+
+	local color = DB.QualityColors[quality or 0]
+	self.iLvl:SetText(level)
+	self.iLvl:SetTextColor(color.r, color.g, color.b)
+	QoL:ItemBorderSetColor(self, color.r, color.g, color.b)
+end
+
+function QoL:ItemLevel_FlyoutSetup()
+	if self.iLvl then self.iLvl:SetText("") end
+
+	local location = self.location
+	if not location then return end
+
+	if tonumber(location) then
+		if location >= EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION then return end
+
+		local _, _, bags, slot, bag = EquipmentManager_UnpackLocation(location)
+		local itemLocation = self:GetItemLocation()
+
+		local quality = itemLocation and C_Item.GetItemQuality(itemLocation)
+		if bags then
+			QoL.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
+		else
+			QoL.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
+		end
+	else
+		local itemLocation = self:GetItemLocation()
+		local quality = itemLocation and C_Item.GetItemQuality(itemLocation)
+		if itemLocation:IsBagAndSlot() then
+			local bag, slot = itemLocation:GetBagAndSlot()
+			QoL.ItemLevel_FlyoutUpdate(self, bag, slot, quality)
+		elseif itemLocation:IsEquipmentSlot() then
+			local slot = itemLocation:GetEquipmentSlot()
+			QoL.ItemLevel_FlyoutUpdate(self, nil, slot, quality)
+		end
+	end
+end
+
+function QoL:ShowItemLevel()
+	if not Config.DB["QoL"]["ShowItemLevel"] then return end
+
+	-- iLvl on CharacterFrame
+	CharacterFrame:HookScript("OnShow", QoL.ItemLevel_UpdatePlayer)
+	Core:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", QoL.ItemLevel_UpdatePlayer)
+
+	hooksecurefunc("PaperDollFrame_SetItemLevel", function(statFrame, unit)
+		if unit ~= "player" then return end
+
+		local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
+
+		local text = _G[statFrame:GetName().."StatText"]
+		if text then
+			text:SetText(format("%.1f", avgItemLevelEquipped).."/"..format("%.1f", avgItemLevel))
+		end
+	end)
+
+	-- iLvl on InspectFrame
+	Core:RegisterEvent("INSPECT_READY", QoL.ItemLevel_UpdateInspect)
+
+	-- iLvl on FlyoutButtons
+	hooksecurefunc("EquipmentFlyout_UpdateItems", function()
+		for _, button in pairs(EquipmentFlyoutFrame.buttons) do
+			if button:IsShown() then
+				QoL.ItemLevel_FlyoutSetup(button)
+			end
+		end
+	end)
+
+	-- Update item quality
+	QoL.QualityUpdater = CreateFrame("Frame")
+	QoL.QualityUpdater:Hide()
+	QoL.QualityUpdater:SetScript("OnUpdate", QoL.RefreshButtonInfo)
+
+	-- iLvl on MerchantFrame
+	hooksecurefunc("MerchantFrameItem_UpdateQuality", QoL.ItemLevel_UpdateMerchant)
+
+	-- iLvl on TradeFrame
+	hooksecurefunc("TradeFrame_UpdatePlayerItem", QoL.ItemLevel_UpdateTradePlayer)
+	hooksecurefunc("TradeFrame_UpdateTargetItem", QoL.ItemLevel_UpdateTradeTarget)
+
+	-- iLvl on GuildNews
+	hooksecurefunc("GuildNewsButton_SetText", QoL.ItemLevel_ReplaceGuildNews)
+end
+
+QoL:RegisterQoL("GearInfo", QoL.ShowItemLevel)

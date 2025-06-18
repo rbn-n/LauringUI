@@ -1,9 +1,10 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
-local UF = Core:GetModule("UnitFrames")
 
 function G:SetUnitFrameSize(frame)
+	local UF = Core:GetModule("UnitFrames")
+
     UF:SetUnitFrameSize(frame)
     local unit = frame.mystyle
 
@@ -39,6 +40,7 @@ end
 
 local function UpdatePlayerSize()
 	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
+	local UF = Core:GetModule("UnitFrames")
 	for _, mainFrame in pairs(mainFrames) do
 		G:SetUnitFrameSize(mainFrame)
 		UF.UpdateFrameHealthTag(mainFrame)
@@ -49,6 +51,7 @@ end
 
 local function UpdateFocusSize()
 	local focusFrame = _G.oUF_Focus
+	local UF = Core:GetModule("UnitFrames")
 	if focusFrame then
 		G:SetUnitFrameSize(focusFrame)
 		UF.UpdateFrameHealthTag(focusFrame)
@@ -56,8 +59,9 @@ local function UpdateFocusSize()
 	end
 end
 
-local function UpdatePetSize()
+local function UpdateSubFramesSize()
 	local subFrames = {_G.oUF_Pet, _G.oUF_ToT, _G.oUF_FocusTarget}
+	local UF = Core:GetModule("UnitFrames")
 	for _, subFrame in pairs(subFrames) do
 		G:SetUnitFrameSize(subFrame)
 		UF.UpdateFrameHealthTag(subFrame)
@@ -65,6 +69,7 @@ local function UpdatePetSize()
 end
 
 local function UpdateBossSize()
+	local UF = Core:GetModule("UnitFrames")
 	for _, oufFrame in pairs(ns.oUF.objects) do
 		if oufFrame.mystyle == "Boss" or oufFrame.mystyle == "Arena" then
 			G:SetUnitFrameSize(oufFrame)
@@ -75,7 +80,7 @@ local function UpdateBossSize()
 end
 
 G.HealthValues = {DISABLE, L["ShowHealthDefault"], L["ShowHealthCurMax"], L["ShowHealthCurrent"], L["ShowHealthPercent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}
-function SetupUnitFrame(guiPage)
+local function SetupUnitFrame(guiPage)
 	local guiName = "LauringUI_UnitFrameSetup"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
 	if exatraGuis[guiName] then return end
@@ -83,14 +88,14 @@ function SetupUnitFrame(guiPage)
 	local panel = G:CreateExtraGUI(guiPage, guiName, L["UnitFrame Size"].."*")
 	local scroll = G:CreateScroll(panel, 260, 540)
 
-	local widthSliderRange = {100, 500}
+	local widthSliderRange = {75, 500}
 
 	local options = {
 		[1] = { L["Player&Target"], UpdatePlayerSize },
-		[2] = { L["ToT"], UpdatePetSize },
+		[2] = { L["ToT"], UpdateSubFramesSize },
 		[3] = { L["Focus"], UpdateFocusSize },
-		[4] = { L["FocusTarget"], UpdatePetSize },
-		[5] = { L["Pet"], UpdatePetSize },
+		[4] = { L["FocusTarget"], UpdateSubFramesSize },
+		[5] = { L["Pet"], UpdateSubFramesSize },
 		[6] = { L["Arena"], UpdateBossSize },
 		[7] = { L["Boss"], UpdateBossSize },
 	}
@@ -111,11 +116,12 @@ function SetupUnitFrame(guiPage)
 	end
 
 	local function CreateOptionGroup(parent, offset, value, func)
+		value = value == L["Player&Target"] and "Player" or value
 		G:CreateOptionTitle(parent, "", offset)
 		G:CreateOptionSlider(parent, L["Width"], widthSliderRange[1], widthSliderRange[2], defaultValues[value][1], offset-50, value.."Width", func)
 		G:CreateOptionSlider(parent, L["Height"], 15, 50, defaultValues[value][2], offset-120, value.."Height", func)
 
-		if value == L["Player&Target"] then
+		if value == "Player" then
 			G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[value][3], offset-190, value.."PowerHeight", func)
 			local playerAndTarget = { "Player", "Target" }
 			for i, playerOrTarget in ipairs(playerAndTarget) do
@@ -134,7 +140,12 @@ function SetupUnitFrame(guiPage)
 		end
 	end
 
-	local dd = G:CreateDropdown(scroll.child, "", 40, -15, options, nil, 180, 28)
+	local labels = {}
+	for i, v in ipairs(options) do
+		labels[i] = v[1]
+	end
+
+	local dd = G:CreateDropdown(scroll.child, "", 40, -15, labels, nil, 180, 28)
 	dd:SetFrameLevel(20)
 	dd.Text:SetText(options[1][1])
 	dd:SetBackdropBorderColor(1, .8, 0, .5)
@@ -155,6 +166,7 @@ function SetupUnitFrame(guiPage)
 end
 
 local function SetupUFAuras(guiPage)
+	local UF = Core:GetModule("UnitFrames")
 	local guiName = "LauringUI_UnitFrameAurasSetup"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
 	if exatraGuis[guiName] then return end
@@ -186,7 +198,7 @@ local function SetupUFAuras(guiPage)
 		if isBoss then
 			offset = offset + 130
 		else
-			G:CreateOptionDropdown(parent, L["GrowthDirection"], offset-50, growthOptions, "", "UFs", value.."AuraDirec", 1, func)
+			G:CreateOptionDropdown(parent, L["GrowthDirection"], offset-50, growthOptions, "", "UFs", value.."AuraDirection", 1, func)
 			G:CreateOptionSlider(parent, L["yOffset"], 0, 200, 10, offset-110, value.."AuraOffset", func)
 		end
 		G:CreateOptionDropdown(parent, L["BuffType"], offset-180, buffOptions, nil, "UFs", value.."BuffType", default[1], func)
@@ -264,6 +276,14 @@ local options = {
     {1, "UFs", "Arena", L["Arena Frame"], true},
     {1, "UFs", "ShowAuras", L["ShowAuras"].."*", nil, SetupUFAurasFunc, ToggleAllAuras},
     {3, "UFs", "UFTextScale", L["UFTextScale"].."*", nil, {.8, 1.5, .05}, UpdateUFTextScale},
+	{}, -- blank
+	{1, "UFs", "ShowAdditionalPower", G.HeaderTag..L["ShowAdditionalPower"], nil, nil, nil, L["ShowAdditionalPowerTip"]},
+	{1, "UFs", "ShowClassPower", G.HeaderTag..L["ShowClassPower"], nil, nil, nil, L["ShowClassPowerTip"]},
+	{1, "UFs", "ShowRuneTimer", L["UFs RuneTimer"], true},
+	{3, "UFs", "ClassPowerWidth", L["Width"], nil, {100, 400, 1}, UpdateUFTextScale},
+	{3, "UFs", "ClassPowerHeight", L["Height"], true, { 2, 30, 1}, UpdateUFTextScale},
+	{3, "UFs", "ClassPowerxOffset", L["xOffset"], nil, {-20, 200, 1}, UpdateUFTextScale},
+	{3, "UFs", "ClassPoweryOffset", L["yOffset"], true, {-200, 20, 1}, UpdateUFTextScale},
 }
 
 G.TabList["UnitFrames"] = options

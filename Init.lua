@@ -116,6 +116,10 @@ Core:RegisterEvent("PLAYER_LOGIN", function()
 	Core:SetSmoothingAmount(LauringUIAccountDB["SmoothAmount"])
 	Config.Margin = 3
 
+	local LBG = LibStub("LibButtonGlow-1.0")
+	Core.ShowOverlayGlow = LBG.ShowOverlayGlow
+	Core.HideOverlayGlow = LBG.HideOverlayGlow
+
     for i = 1, #initQueue do
 		local module = initQueue[i]
 
