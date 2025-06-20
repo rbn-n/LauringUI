@@ -21,8 +21,8 @@ local options = {
     {},--blank
     {4, "ACCOUNT", "TimestampFormat", L["TimestampFormat"].."*", nil, {DISABLE, "03:27 PM", "03:27:32 PM", "15:27", "15:27:32"}},
     {3, "Chat", "EditBoxFontSize", L["EditBoxFontSize"].."*", true, {10, 30, 1}, ToggleEditBoxAnchor},
-    {1, "Chat", "WhisperColor", L["Differ WhisperColor"].."*", true},
-    {1, "Chat", "BottomEditBox", L["BottomEditBox"].."*", true, nil, ToggleEditBoxAnchor},
+    {1, "Chat", "WhisperColor", L["Differ WhisperColor"].."*", nil},
+    --{1, "Chat", "BottomEditBox", L["BottomEditBox"].."*", true, nil, ToggleEditBoxAnchor},
     {},--blank
     {1, "Chat", "WhisperInvite", G.HeaderTag..L["Whisper Invite"]},
     {1, "Chat", "WhisperInviteGuildOnly", L["Guild Invite Only"].."*"},

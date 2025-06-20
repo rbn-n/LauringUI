@@ -376,7 +376,7 @@ function UF:ToggleCastBarLatency(frame)
 end
 
 local function CreateBarMover(bar, text, value, anchor)
-	local mover = Core.Mover(bar, text, value, anchor, bar:GetHeight()+bar:GetWidth() + 3, bar:GetHeight() + 3)
+	local mover = Core.Mover(bar, text, value, anchor, bar:GetHeight() + bar:GetWidth() + 3, bar:GetHeight())
 	bar:ClearAllPoints()
 	bar:SetPoint("RIGHT", mover)
 	bar.mover = mover

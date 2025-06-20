@@ -352,19 +352,12 @@ local function ReloadDefaultSettings()
 	Config.DB["BFA"] = true -- don't empty data on next loading
 end
 
-local function IsOldProfileVersion(version)
-	local major, minor, _ = strsplit(".", version)
-	local majorNumber = tonumber(major)
-	local minorNumber = tonumber(minor)
-	return majorNumber < 3 and minorNumber < 11
-end
-
 function G:ImportGUIData()
 	local profile = G.ProfileDataFrame.editBox:GetText()
 	if Core:IsBase64(profile) then profile = Core:Decode(profile) end
 	local options = {strsplit(";", profile)}
 	local title, version, _, _ = strsplit(":", options[1])
-	if title ~= "LauringUISettings" or IsOldProfileVersion(version) then
+	if title ~= "LauringUISettings" then
 		UIErrorsFrame:AddMessage(DB.InfoColor..L["Import data error"])
 		return
 	end

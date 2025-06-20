@@ -540,7 +540,7 @@ function G:CreateOption(tabName, guiPage)
     local tabOptions = G.TabList[tabName]
 
 	for _, option in pairs(tabOptions) do
-		local optType, key, value, name, horizon, data, callback, tooltip, disabled = unpack(option)
+		local optType, key, value, name, horizon, data, callback, tooltip, disabled, isFirstRowSlider = unpack(option)
 		-- Checkboxes
 		if optType == 1 then
 			local cb = Core.CreateCheckBox(parent)
@@ -602,7 +602,8 @@ function G:CreateOption(tabName, guiPage)
 			local min, max, step = unpack(data)
 			local x, y
 			if horizon then
-				x, y = 350, -offset + 40
+                local yMult = isFirstRowSlider and 30 or 40
+				x, y = 350, -offset + yMult
 			else
 				x, y = 40, -offset - 30
 				offset = offset + 70

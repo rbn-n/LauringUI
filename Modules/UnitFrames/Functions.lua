@@ -38,13 +38,10 @@ function UF:SetUnitFrameSize(frame)
     end
 
     frame:SetSize(width, height)
-
-	return healthHeight, powerHeight
 end
 
 function UF.HidePower(frame)
     local mystyle = frame.mystyle
-
 	return Config.DB["UFs"]["Hide"..mystyle.."Power"]
 end
 

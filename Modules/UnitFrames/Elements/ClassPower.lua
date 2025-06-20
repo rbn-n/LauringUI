@@ -1,6 +1,5 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
-
 local UF = Core:GetModule("UnitFrames")
 
 function UF.PostUpdateClassPower(element, cur, max, diff, powerType)

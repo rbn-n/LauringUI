@@ -4,24 +4,6 @@ local Core, Config, L, DB = unpack(ns)
 local oUF = ns.oUF
 local UF = Core:GetModule("UnitFrames")
 
-function UF:SetUnitFrameSize(frame)
-    local unit = frame.mystyle
-
-    local width
-    local height
-    if UF.IsPlayerOrTarget(frame) then
-        width = Config.DB["UFs"]["PlayerWidth"]
-        height = Config.DB["UFs"]["PlayerHeight"]
-    else
-        width = Config.DB["UFs"][unit.."Width"]
-        local healthHeight = Config.DB["UFs"][unit.."Height"]
-        local powerHeight = Config.DB["UFs"][unit.."PowerHeight"]
-        height = healthHeight + (powerHeight or 0)
-    end
-
-    frame:SetSize(width, height)
-end
-
 local function CreatePlayer(frame)
     frame.mystyle = "Player"
 	UF:SetUnitFrameSize(frame)
@@ -38,6 +20,7 @@ local function CreatePlayer(frame)
 	UF:CreateAdditionalPower(frame)
 	UF:CreateClassPower(frame)
 	UF:CreateAuras(frame)
+	UF:CreateDebuffHighlight(frame)
 	UF:CreateEclipseBar(frame)
     UF:ReskinMirrorBars()
 end
@@ -154,6 +137,7 @@ local function CreateGroup(frame)
 	UF:CreateIcons(frame)
 	UF:CreateTargetBorder(frame)
 	UF:CreateRaidIcons(frame)
+    UF:CreateDebuffHighlight(frame)
 	UF:CreateHealPrediction(frame)
 	UF:CreateThreatBorder(frame)
 end

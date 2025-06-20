@@ -77,3 +77,20 @@ function UF:UpdateRaidInfo()
 	--checkSpecs()
 	--B:RegisterEvent("PLAYER_TALENT_UPDATE", checkSpecs)
 end
+
+function UF:UpdateRaidTextScale()
+	local scale = Config.DB["UFs"]["RaidTextScale"]
+	for _, frame in pairs(oUF.objects) do
+		if frame.mystyle == "Raid" or frame.mystyle == "Raid10" then
+			UF:SetPartyAndRaidName(frame.nameText, frame)
+			frame.nameText:SetScale(scale)
+			--frame.healthValue:SetScale(scale)
+			--frame.healthValue:UpdateTag()
+			if frame.powerText then frame.powerText:SetScale(scale) end
+			--UF:UpdateHealthBarColor(frame, true)
+			UF:UpdatePowerBarColor(frame, true)
+			UF.UpdateFrameNameTag(frame)
+			frame.disableTooltip = Config.DB["UFs"]["HideTip"]
+		end
+	end
+end

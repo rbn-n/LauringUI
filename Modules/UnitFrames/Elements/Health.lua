@@ -65,6 +65,11 @@ function UF:UpdateFrameNameTag(frame)
 	name:UpdateTag()
 end
 
+function UF:SetPartyAndRaidName(name, frame)
+    name:SetJustifyH("CENTER")
+    name:SetPoint("CENTER", frame, "CENTER", 0, 0)
+end
+
 local function CreateNameText(frame, textFrame)
     if frame.mystyle == "Player" and Config.DB["UFs"]["HidePlayerName"] then return end
 
@@ -76,8 +81,7 @@ local function CreateNameText(frame, textFrame)
     if UF.IsPlayerOrTarget(frame) then
         name:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
     elseif UF.IsPartyOrRaid(frame)  then
-        name:SetJustifyH("CENTER")
-        name:SetPoint("CENTER", frame, "CENTER", 0, 0)
+        UF:SetPartyAndRaidName(name, frame)
     else
         name:SetPoint("LEFT", frame, "LEFT", 2, 0)
     end
@@ -98,12 +102,14 @@ local function CreateHealthText(frame, textFrame)
     if UF.IsPartyOrRaid(frame) then return end
 
     local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
-    local healthText = Core.CreateFS(textFrame, fontSize)
+    local healthText
 
     if UF.IsPlayerOrTarget(frame) then
+        healthText = Core.CreateFS(textFrame, fontSize)
         healthText:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, 0)
     else
-        healthText:SetPoint("LEFT", frame, "LEFT", -6, 0)
+        healthText = Core.CreateFS(textFrame, fontSize - 2)
+        healthText:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
     end
 
     frame.healthValue = healthText

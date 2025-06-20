@@ -5,8 +5,6 @@ local module = Core:GetModule("Infobars")
 -- MoP-compatible wrappers
 local GetSpecialization = GetSpecialization or C_SpecializationInfo.GetSpecialization
 local GetSpecializationInfo = GetSpecializationInfo or C_SpecializationInfo.GetSpecializationInfo
-local GetLootSpecialization = GetLootSpecialization or C_SpecializationInfo.GetLootSpecialization
-local GetSpecializationInfoByID = GetSpecializationInfoByID or C_SpecializationInfo.GetSpecializationInfoByID
 
 local ToggleTalentFrame = ToggleTalentFrame
 local UnitLevel = UnitLevel
@@ -19,7 +17,7 @@ local ERR_NOT_IN_COMBAT = ERR_NOT_IN_COMBAT
 local SHOW_SPEC_LEVEL = SHOW_SPEC_LEVEL or 10
 local NONE = NONE or "NONE"
 
-local currentSpecIndex, currentLootSpecIndex
+local currentSpecIndex
 
 local function AddIcon(texture)
 	if not texture then return "" end

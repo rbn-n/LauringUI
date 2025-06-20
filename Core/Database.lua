@@ -15,7 +15,7 @@ DB.BackgroundTexture = "Interface\\ChatFrame\\ChatFrameBackground"
 DB.RecycleBinTexture = "Interface\\HelpFrame\\ReportLagIcon-Loot"
 DB.EyeTexture = "Interface\\Minimap\\Raid_Icon"
 DB.SparkTexture = "Interface\\CastingBar\\UI-CastingBar-Spark"
-DB.IconBorder = Media.."Textures\\iconborder"
+DB.DebuffIconBorder = Media.."Textures\\iconborder"
 DB.GearTexture = "Interface\\WorldMap\\Gear_64"
 DB.ArrowUpTexture = Media.."Textures\\arrow"
 DB.TankTexture = Media.."Textures\\Tank"
@@ -64,6 +64,13 @@ end
 DB.QualityColors[-1] = {r = 0, g = 0, b = 0}
 DB.QualityColors[LE_ITEM_QUALITY_POOR] = {r = .61, g = .61, b = .61}
 DB.QualityColors[LE_ITEM_QUALITY_COMMON] = {r = 0, g = 0, b = 0}
+
+DB.DebuffHighlightColors = {
+	MAGIC = {r = 0.2, g = 0.6, b = 1, a = 0.45},
+	CURSE = {r = 0.6, g = 0, b = 1, a = 0.45},
+	DISEASE = {r = 0.6, g = 0.4, b = 0, a = 0.45},
+	POISON = {r = 0, g = 0.6, b = 0, a = 0.45}
+}
 
 DB.TexCoord = {.08, .92, .08, .92}
 

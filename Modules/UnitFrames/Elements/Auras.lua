@@ -1,6 +1,5 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
-
 local UF = Core:GetModule("UnitFrames")
 
 local x1, x2, y1, y2 = unpack(DB.TexCoord)
@@ -251,4 +250,46 @@ function UF:ToggleAllAuras()
 	UF:ToggleUFAuras(_G.oUF_Target, enable)
 	UF:ToggleUFAuras(_G.oUF_Focus, enable)
 	UF:ToggleUFAuras(_G.oUF_ToT, enable)
+end
+
+function UF:RefreshUFAuras(frame)
+	if not frame then return end
+	local element = frame.Auras
+	if not element then return end
+
+	UF:ConfigureAuras(element)
+	UF:UpdateAuraContainer(frame, element, element.numBuffs + element.numDebuffs)
+	UF:UpdateAuraDirection(frame, element)
+	element:ForceUpdate()
+end
+
+function UF:RefreshBuffAndDebuff(frame)
+	if not frame then return end
+
+	local buffs = frame.Buffs
+	if buffs then
+		UF:ConfigureBuffAndDebuff(buffs)
+		UF:UpdateAuraContainer(frame, buffs, buffs.num)
+		buffs:ForceUpdate()
+	end
+
+	local debuffs = frame.Debuffs
+	if debuffs then
+		UF:ConfigureBuffAndDebuff(debuffs, true)
+		UF:UpdateAuraContainer(frame, debuffs, debuffs.num)
+		debuffs:ForceUpdate()
+	end
+end
+
+function UF:UpdateUFAuras()
+	UF:RefreshUFAuras(_G.oUF_Player)
+	UF:RefreshUFAuras(_G.oUF_Target)
+	UF:RefreshUFAuras(_G.oUF_Focus)
+	UF:RefreshUFAuras(_G.oUF_ToT)
+	UF:RefreshUFAuras(_G.oUF_Pet)
+
+	for i = 1, 5 do
+		UF:RefreshBuffAndDebuff(_G["oUF_Boss"..i])
+		UF:RefreshBuffAndDebuff(_G["oUF_Arena"..i])
+	end
 end

@@ -79,16 +79,8 @@ function module:UpdateChatSize()
 end
 
 local function UpdateEditBoxAnchor(editBox)
-	local parent = editBox.__owner
-	editBox:ClearAllPoints()
 	local leftBottomPanel = Core:GetModule("Infobars").LeftBottomPanel
-	if Config.DB["Chat"]["BottomEditBox"] then
-		WatchFrame(editBox, leftBottomPanel)
-	else
-		editBox:SetSize(leftBottomPanel:GetWidth(), leftBottomPanel:GetHeight())
-		editBox:SetPoint("BOTTOMLEFT", parent, "TOPLEFT", 4, 26)
-		editBox:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -15, 50)
-	end
+	WatchFrame(editBox, leftBottomPanel)
 end
 
 local function UpdateEditboxFont(editbox)
@@ -99,7 +91,7 @@ end
 function module:ToggleEditBoxAnchor()
 	for _, editBox in pairs(chatEditboxes) do
 		UpdateEditboxFont(editBox)
-		UpdateEditBoxAnchor(editBox)
+		--UpdateEditBoxAnchor(editBox)
 	end
 end
 

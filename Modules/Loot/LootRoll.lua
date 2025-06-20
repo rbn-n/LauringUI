@@ -318,6 +318,7 @@ function Loot:LootRoll_Start(rollID, rollTime)
 
 	if Config.DB["Loot"]["ItemQuality"] then
 		bar.button.bg:SetBackdropBorderColor(color.r, color.g, color.b)
+		bar.status__border:SetBackdropBorderColor(color.r, color.g, color.b)
 	else
 		bar.button.bg:SetBackdropBorderColor(0, 0, 0)
 	end
@@ -443,6 +444,7 @@ function Loot:LootRollTest()
 		testFrame.fsbind:SetVertexColor(bop and 1 or .3, bop and .3 or 1, bop and .1 or .3)
 
 		testFrame.status:SetStatusBarColor(color.r, color.g, color.b, .7)
+		testFrame.status.__border:SetBackdropBorderColor(color.r, color.g, color.b)
 		testFrame.status:SetMinMaxValues(0, 100)
 		testFrame.status:SetValue(80)
 

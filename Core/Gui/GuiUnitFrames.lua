@@ -1,15 +1,14 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
+local _G = _G
 
-function G:SetUnitFrameSize(frame)
-	local UF = Core:GetModule("UnitFrames")
-
+function G:SetUnitFrameSize(frame, UF)
     UF:SetUnitFrameSize(frame)
     local unit = frame.mystyle
 
-	local healthHeight = UF.CalculateHealthHeight(frame)
-	local powerHeight = Config.DB["UFs"][unit.."PowerHeight"]
+	local healthHeight = UF:CalculateHealthHeight(frame)
+	local powerHeight = unit == "Target" and Config.DB["UFs"]["PlayerPowerHeight"] or Config.DB["UFs"][unit.."PowerHeight"]
 	local nameOffset = Config.DB["UFs"][unit.."NameOffset"]
 	local powerOffset = Config.DB["UFs"][unit.."PowerOffset"]
 
@@ -20,7 +19,7 @@ function G:SetUnitFrameSize(frame)
 		frame.nameText:SetWidth(frame:GetWidth()*(nameOffset == 0 and .55 or 1))
 	end
 
-    if powerHeight == 0 or UF:HidePower(frame) then
+    if powerHeight == 0 or UF.HidePower(frame) then
 		if frame:IsElementEnabled("Power") then
 			frame:DisableElement("Power")
 			if frame.powerText then frame.powerText:Hide() end
@@ -31,50 +30,10 @@ function G:SetUnitFrameSize(frame)
 			frame.Power:ForceUpdate()
 			if frame.powerText then frame.powerText:Show() end
 		end
+
 		frame.Power:SetHeight(powerHeight)
 		if frame.powerText and powerOffset then
 			frame.powerText:SetPoint("RIGHT", -3, powerOffset)
-		end
-	end
-end
-
-local function UpdatePlayerSize()
-	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
-	local UF = Core:GetModule("UnitFrames")
-	for _, mainFrame in pairs(mainFrames) do
-		G:SetUnitFrameSize(mainFrame)
-		UF.UpdateFrameHealthTag(mainFrame)
-		UF.UpdateFramePowerTag(mainFrame)
-	end
-	UF:UpdateUFAuras()
-end
-
-local function UpdateFocusSize()
-	local focusFrame = _G.oUF_Focus
-	local UF = Core:GetModule("UnitFrames")
-	if focusFrame then
-		G:SetUnitFrameSize(focusFrame)
-		UF.UpdateFrameHealthTag(focusFrame)
-		UF.UpdateFramePowerTag(focusFrame)
-	end
-end
-
-local function UpdateSubFramesSize()
-	local subFrames = {_G.oUF_Pet, _G.oUF_ToT, _G.oUF_FocusTarget}
-	local UF = Core:GetModule("UnitFrames")
-	for _, subFrame in pairs(subFrames) do
-		G:SetUnitFrameSize(subFrame)
-		UF.UpdateFrameHealthTag(subFrame)
-	end
-end
-
-local function UpdateBossSize()
-	local UF = Core:GetModule("UnitFrames")
-	for _, oufFrame in pairs(ns.oUF.objects) do
-		if oufFrame.mystyle == "Boss" or oufFrame.mystyle == "Arena" then
-			G:SetUnitFrameSize(oufFrame)
-			UF.UpdateFrameHealthTag(oufFrame)
-			UF.UpdateFramePowerTag(oufFrame)
 		end
 	end
 end
@@ -89,6 +48,45 @@ local function SetupUnitFrame(guiPage)
 	local scroll = G:CreateScroll(panel, 260, 540)
 
 	local widthSliderRange = {75, 500}
+
+	local UF = Core:GetModule("UnitFrames")
+
+	local mainFrames = {_G.oUF_Player, _G.oUF_Target}
+	local function UpdatePlayerSize()
+		for _, mainFrame in pairs(mainFrames) do
+			G:SetUnitFrameSize(mainFrame, UF)
+			UF:UpdateFrameHealthTag(mainFrame)
+			UF:UpdateFramePowerTag(mainFrame)
+		end
+		UF:UpdateUFAuras()
+	end
+
+	local focusFrame = _G.oUF_Focus
+	local function UpdateFocusSize()
+		if focusFrame then
+			G:SetUnitFrameSize(focusFrame, UF)
+			UF:UpdateFrameHealthTag(focusFrame)
+			UF:UpdateFramePowerTag(focusFrame)
+		end
+	end
+
+	local subFrames = {_G.oUF_Pet, _G.oUF_ToT, _G.oUF_FocusTarget}
+	local function UpdateSubFramesSize()
+		for _, subFrame in pairs(subFrames) do
+			G:SetUnitFrameSize(subFrame, UF)
+			UF:UpdateFrameHealthTag(subFrame)
+		end
+	end
+
+	local function UpdateBossSize()
+		for _, oufFrame in pairs(ns.oUF.objects) do
+			if oufFrame.mystyle == "Boss" or oufFrame.mystyle == "Arena" then
+				G:SetUnitFrameSize(oufFrame, UF)
+				UF:UpdateFrameHealthTag(oufFrame)
+				UF:UpdateFramePowerTag(oufFrame)
+			end
+		end
+	end
 
 	local options = {
 		[1] = { L["Player&Target"], UpdatePlayerSize },
@@ -267,15 +265,20 @@ local function ToggleAllAuras()
 	Core:GetModule("UnitFrames"):ToggleAllAuras()
 end
 
+local function ToggleDebuffHighlight()
+	Core:GetModule("UnitFrames"):ToggleDebuffHighlight()
+end
+
 local function UpdateUFTextScale()
 	Core:GetModule("UnitFrames"):UpdateTextScale()
 end
 
 local options = {
     {1, "UFs", "Enable", G.HeaderTag..L["Enable UFs"], nil, SetupUnitFrameFunc, nil, L["HideUFWarning"]},
-    {1, "UFs", "Arena", L["Arena Frame"], true},
+    {3, "UFs", "UFTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateUFTextScale, nil, nil, true},
+    {1, "UFs", "ShowArena", L["Arena Frame"], nil},
     {1, "UFs", "ShowAuras", L["ShowAuras"].."*", nil, SetupUFAurasFunc, ToggleAllAuras},
-    {3, "UFs", "UFTextScale", L["UFTextScale"].."*", nil, {.8, 1.5, .05}, UpdateUFTextScale},
+    {1, "UFs", "EnableDebuffHighlight", L["DebuffHighlight"].."*", true, nil, ToggleDebuffHighlight, L["DebuffHighlightTip"]},
 	{}, -- blank
 	{1, "UFs", "ShowAdditionalPower", G.HeaderTag..L["ShowAdditionalPower"], nil, nil, nil, L["ShowAdditionalPowerTip"]},
 	{1, "UFs", "ShowClassPower", G.HeaderTag..L["ShowClassPower"], nil, nil, nil, L["ShowClassPowerTip"]},

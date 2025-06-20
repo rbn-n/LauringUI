@@ -32,8 +32,8 @@ local function SetupRaidFrame(parent)
 	local function ResizeRaidFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.mystyle == "Raid" or frame.mystyle == "Raid10" then
-				G:SetUnitFrameSize(frame)
-				UF.UpdateRaidNameAnchor(frame, frame.nameText)
+				G:SetUnitFrameSize(frame, UF)
+				UF:SetPartyAndRaidName(frame.nameText, frame)
 			end
 		end
 		if UF.CreateAndUpdateRaidHeader then
@@ -70,8 +70,8 @@ local function SetupPartyFrame(parent)
 	local function ResizePartyFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.mystyle == "Party" then
-				G:SetUnitFrameSize(frame)
-				UF.UpdateRaidNameAnchor(frame, frame.nameText)
+				G:SetUnitFrameSize(frame, UF)
+				UF:SetPartyAndRaidName(frame.nameText, frame)
 			end
 		end
 		if UF.CreateAndUpdatePartyHeader then
@@ -87,8 +87,8 @@ local function SetupPartyFrame(parent)
 	G:CreateOptionCheck(scroll.child, -10, L["SortByRole"], "UFs", "SortByRole", ResizePartyFrame, L["SortByRoleTip"])
 	G:CreateOptionCheck(scroll.child, -40, L["SortAscending"], "UFs", "SortAscending", ResizePartyFrame, L["SortAscendingTip"])
 	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -100, options, nil, "UFs", "PartyDirection", 1, ResizePartyFrame)
-	G:CreateOptionSlider(scroll.child, L["Width"], 80, 200, defaultValue[1], -180, "PartyWidth", ResizePartyFrame)
-	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -260, "PartyHeight", ResizePartyFrame)
+	G:CreateOptionSlider(scroll.child, L["Width"], 80, 400, defaultValue[1], -180, "PartyWidth", ResizePartyFrame)
+	G:CreateOptionSlider(scroll.child, L["Height"], 25, 200, defaultValue[2], -260, "PartyHeight", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -340, "PartyPowerHeight", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[4], -420, "PartySpacing", ResizePartyFrame)
 end
@@ -112,8 +112,8 @@ local function SetupPartyPetFrame(parent)
 	local function ResizePartyPetFrame()
 		for _, frame in pairs(ns.oUF.objects) do
 			if frame.mystyle == "PartyPet" then
-				G:SetUnitFrameSize(frame)
-				UF.UpdateRaidNameAnchor(frame, frame.nameText)
+				G:SetUnitFrameSize(frame, UF)
+				UF:SetPartyAndRaidName(frame.nameText, frame)
 			end
 		end
 
@@ -169,16 +169,15 @@ local options = {
     {1, "UFs", "EnablePartyPetFrame", L["UFs PartyPet"], true, SetupPartyPetFrameFunc, nil, L["PartyPetTip"]},
     {},--blank
     {1, "UFs", "FrequentHealth", G.HeaderTag..L["FrequentHealth"].."*", nil, nil, UpdateRaidHealthMethod, L["FrequentHealthTip"]},
-    {3, "UFs", "HealthFrequency", L["HealthFrequency"].."*", true, {.1, .5, .05}, UpdateRaidHealthMethod, L["HealthFrequencyTip"]},
+    {3, "UFs", "HealthFrequency", L["HealthFrequency"].."*", true, {.1, .5, .05}, UpdateRaidHealthMethod, L["HealthFrequencyTip"], nil, true},
     {},--blank
-    {4, "UFs", "RaidHPMode", L["HealthValueType"].."*", nil, {DISABLE, L["ShowHealthPercent"], L["ShowHealthCurrent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}, UpdateRaidTextScale, L["100PercentTip"]},
-    {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], true, {ALL, DISABLE, L["HideDPSRole"]}},
-    {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", nil, {.8, 1.5, .05}, UpdateRaidTextScale},
+    --{4, "UFs", "RaidHPMode", L["HealthValueType"].."*", nil, {DISABLE, L["ShowHealthPercent"], L["ShowHealthCurrent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}, UpdateRaidTextScale, L["100PercentTip"]},
+    {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], nil, {ALL, DISABLE, L["HideDPSRole"]}},
+    {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateRaidTextScale},
     {1, "UFs", "ShowSolo", L["ShowSolo"].."*", nil, nil, UpdateAllHeaders, L["ShowSoloTip"]},
     {1, "UFs", "SmartRaid", G.HeaderTag..L["SmartRaid"].."*", true, nil, UpdateAllHeaders, L["SmartRaidTip"]},
     {1, "UFs", "TeamIndex", L["RaidFrame TeamIndex"].."*", nil, nil, UpdateTeamIndex},
     {1, "UFs", "HideTip", L["HideTooltip"].."*", true, nil, UpdateRaidTextScale, L["HideTooltipTip"]},
-    {1, "UFs", "RCCName", L["ClassColor Name"].."*", nil, nil, UpdateRaidTextScale},
 }
 
 G.TabList["GroupFrames"] = options
