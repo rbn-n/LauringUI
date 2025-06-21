@@ -241,7 +241,6 @@ function Tooltip:ReskinStatusBar()
 	self.StatusBar:SetStatusBarTexture(DB.StatusBarTexture2)
 	self.StatusBar:SetHeight(5)
 	Core.SetBD(self.StatusBar)
-    --Core:StyleFrame(self.StatusBar)
 end
 
 function Tooltip:GameTooltip_ShowStatusBar()

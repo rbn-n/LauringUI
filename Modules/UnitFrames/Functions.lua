@@ -21,20 +21,15 @@ function UF:SetUnitFrameSize(frame)
 
     local width
     local height
-	local healthHeight
-	local powerHeight
     if UF.IsPlayerOrTarget(frame) then
         width = Config.DB["UFs"]["PlayerWidth"]
         height = Config.DB["UFs"]["PlayerHeight"]
-    else
+	elseif frame.raidLayout then
+		width = Config.DB["UFs"][frame.raidLayout.."Width"]
+		height = Config.DB["UFs"][frame.raidLayout.."Height"]
+	else
         width = Config.DB["UFs"][unit.."Width"]
-        healthHeight = Config.DB["UFs"][unit.."Height"]
-        powerHeight = Config.DB["UFs"][unit.."PowerHeight"]
-		if UF.HidePower(frame) then
-			powerHeight = 0
-		end
-
-        height = healthHeight + (powerHeight or 0)
+		height = Config.DB["UFs"][unit.."Height"]
     end
 
     frame:SetSize(width, height)
@@ -50,7 +45,7 @@ function UF.IsPlayerOrTarget(frame)
 end
 
 function UF.IsPartyOrRaid(frame)
-    return frame.mystyle == "Party" or frame.mystyle == "Raid10" or frame.mystyle == "Raid"
+    return frame.mystyle == "Party" or frame.mystyle == "Raid"
 end
 
 local function UF_OnEnter(frame)

@@ -124,9 +124,10 @@ local function SetupUnitFrame(guiPage)
 			local playerAndTarget = { "Player", "Target" }
 			for i, playerOrTarget in ipairs(playerAndTarget) do
 				local offsetExtender = i == 1 and 0 or 210
-				G:CreateOptionDropdown(parent, L["HealthValueType"], offset-260-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."HPTag", defaultValues[value][4], func)
-				G:CreateOptionDropdown(parent, L["PowerValueType"], offset-330-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."MPTag", defaultValues[value][5], func)
-				G:CreateOptionCheck(parent, offset-400-offsetExtender, "Hide"..playerOrTarget.."Power", "UFs", "Hide"..playerOrTarget.."Power", func)
+				G:CreateOptionTitle(parent, playerOrTarget, offset-240-offsetExtender)
+				G:CreateOptionDropdown(parent, L["HealthValueType"], offset-290-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."HPTag", defaultValues[value][4], func)
+				G:CreateOptionDropdown(parent, L["PowerValueType"], offset-360-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."MPTag", defaultValues[value][5], func)
+				G:CreateOptionCheck(parent, offset-410-offsetExtender, "Hide"..playerOrTarget.."Power", "UFs", "Hide"..playerOrTarget.."Power", func)
 			end
 		elseif value ~= "Pet" and value ~= "ToT" and value ~= "FocusTarget" then
 			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)

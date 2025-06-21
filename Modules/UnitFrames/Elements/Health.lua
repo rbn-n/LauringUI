@@ -3,16 +3,21 @@ local Core, Config, L, DB = unpack(ns)
 local UF = Core:GetModule("UnitFrames")
 
 function UF:CalculateHealthHeight(frame)
+    local mystyle = frame.mystyle
 
-    if (UF.IsPlayerOrTarget(frame)) then
-        if UF.HidePower(frame) then
-            return Config.DB["UFs"]["PlayerHeight"]
-        end
-
-        return Config.DB["UFs"]["PlayerHeight"] - Config.DB["UFs"]["PlayerPowerOffset"] - Config.DB["UFs"]["PlayerPowerHeight"]
+    if UF.HidePower(frame) then
+        return Config.DB["UFs"][mystyle.."Height"]
     end
 
-    return Config.DB["UFs"][frame.mystyle.."Height"]
+    if (UF.IsPlayerOrTarget(frame)) then
+        return Config.DB["UFs"]["PlayerHeight"] - Config.DB["UFs"]["PlayerPowerOffset"] - Config.DB["UFs"]["PlayerPowerHeight"]
+    elseif frame.raidLayout then
+        return Config.DB["UFs"][frame.raidLayout.."Height"] - Config.DB["UFs"][frame.raidLayout.."PowerHeight"]
+    elseif Config.DB["UFs"][mystyle.."PowerHeight"] then
+        return Config.DB["UFs"][mystyle.."Height"] - Config.DB["UFs"][mystyle.."PowerHeight"]
+    end
+
+    return Config.DB["UFs"][mystyle.."Height"]
 end
 
 function UF:CreateHealthBar(frame)
@@ -51,11 +56,11 @@ function UF:UpdateFrameNameTag(frame)
 	local colorNameTag = "[color][abbrevname]"
 
 	if mystyle == "Player" then
-		frame:Tag(name, " "..colorNameTag)
+		frame:Tag(name, " "..colorNameTag.."[afkdnd]")
 	elseif mystyle == "Target" then
 		frame:Tag(name, " [fulllevel] "..colorNameTag.."[afkdnd]")
 	elseif mystyle == "Focus" then
-		frame:Tag(name, " "..colorNameTag.."[afkdnd]")
+		frame:Tag(name, " "..colorNameTag)
 	elseif mystyle == "Arena" then
 		frame:Tag(name, colorNameTag)
 	else
