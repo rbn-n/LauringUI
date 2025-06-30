@@ -330,7 +330,9 @@ function Tooltip:ReskinTooltip()
 		if self.NineSlice then self.NineSlice:SetAlpha(0) end
 		if self.SetBackdrop then self:SetBackdrop(nil) end
 		self:DisableDrawLayer("BACKGROUND")
-		Core:StyleFrame(self)
+		self.bg = Core.SetBD(self)
+		Core:SetInside(self.bg, self)
+		self.bg:SetFrameLevel(self:GetFrameLevel())
 
 		if self.StatusBar then
 			Tooltip.ReskinStatusBar(self)
@@ -339,14 +341,14 @@ function Tooltip:ReskinTooltip()
 		self.tipStyled = true
 	end
 
-	Core.SetBorderColor(self.__border)
+	Core.SetBorderColor(self.bg)
 	if Config.DB["Tooltips"]["ItemQuality"] and self.GetItem then
 		local _, item = self:GetItem()
 		if item then
 			local quality = select(3, C_Item.GetItemInfo(item))
 			local color = DB.QualityColors[quality or 1]
 			if color then
-				self.__border:SetBackdropBorderColor(color.r, color.g, color.b)
+				self.bg:SetBackdropBorderColor(color.r, color.g, color.b)
 			end
 		end
 	end

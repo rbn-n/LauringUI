@@ -150,13 +150,15 @@ end
 
 function Core:CreateSD(size)
     if self.__shadow then return end
+    size = size or 5
 
     local frame = self
     if self:IsObjectType("Texture") then frame = self:GetParent() end
 
-    shadowBackdrop.edgeSize = size or 5
+    shadowBackdrop.edgeSize = size
     self.__shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    Core:SetOutside(self.__shadow, self)
+    self.__shadow:SetPoint("TOPLEFT", -size, size)
+    self.__shadow:SetPoint("BOTTOMRIGHT", size, -size)
     self.__shadow:SetBackdrop(shadowBackdrop)
     self.__shadow:SetBackdropBorderColor(0, 0, 0, .4)
     self.__shadow:SetFrameLevel(1)
@@ -195,7 +197,6 @@ function Core:CreateTex()
     local frame = self
     if self:IsObjectType("Texture") then frame = self:GetParent() end
 
-    --local tex = frame:CreateTexture(nil, "BACKGROUND")
     local tex = frame:CreateTexture(nil, "BACKGROUND", nil, 1)
     tex:SetAllPoints(self)
     tex:SetTexture(DB.StatusBarTexture)
@@ -205,6 +206,22 @@ function Core:CreateTex()
     tex:SetVertexColor(0.1, 0.1, 0.1, 0)
 
     self.__bgTex = tex
+end
+
+function Core:CreateBDFrame(a, gradient)
+    local frame = self
+    if self:IsObjectType("Texture") then frame = self:GetParent() end
+    local lvl = frame:GetFrameLevel()
+
+    local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+    Core:SetOutside(bg, self)
+    bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
+    Core.CreateBD(bg, a)
+    if gradient then
+        self.__gradient = Core.CreateGradient(bg)
+    end
+
+    return bg
 end
 
 function Core:SetBD(a, x, y, x2, y2)
@@ -230,27 +247,12 @@ function Core:CreateGradient()
 end
 
 local defaultBackdrop = {bgFile = DB.BackgroundTexture, edgeFile = DB.BackgroundTexture}
-function Core:CreateBD(a)
+function Core:CreateBD(alpha)
+    alpha = alpha or 0.6
     defaultBackdrop.edgeSize = Config.PixelMultiplexer
     self:SetBackdrop(defaultBackdrop)
-    self:SetBackdropColor(0, 0, 0, a)
+    self:SetBackdropColor(0.1, 0.1, 0.1, alpha)
     self:SetBackdropBorderColor(0, 0, 0)
-end
-
-function Core:CreateBDFrame(a, gradient)
-    local frame = self
-    if self:IsObjectType("Texture") then frame = self:GetParent() end
-    local lvl = frame:GetFrameLevel()
-
-    local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-    Core:SetOutside(bg, self)
-    bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
-    Core.CreateBD(bg, a)
-    if gradient then
-        self.__gradient = Core.CreateGradient(bg)
-    end
-
-    return bg
 end
 
 local x1, x2, y1, y2 = unpack(DB.TexCoord)
