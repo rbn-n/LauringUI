@@ -58,6 +58,7 @@ local function SetupUnitFrame(guiPage)
 			UF:UpdateFrameHealthTag(mainFrame)
 			UF:UpdateFramePowerTag(mainFrame)
 		end
+		UF:UpdateFrameNameVisibility(_G.oUF_Player)
 		UF:UpdateUFAuras()
 	end
 
@@ -76,6 +77,7 @@ local function SetupUnitFrame(guiPage)
 			G:SetUnitFrameSize(subFrame, UF)
 			UF:UpdateFrameHealthTag(subFrame)
 		end
+		UF:UpdateFrameNameVisibility(_G.oUF_Pet)
 	end
 
 	local function UpdateBossSize()
@@ -123,17 +125,23 @@ local function SetupUnitFrame(guiPage)
 			G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[value][3], offset-190, value.."PowerHeight", func)
 			local playerAndTarget = { "Player", "Target" }
 			for i, playerOrTarget in ipairs(playerAndTarget) do
-				local offsetExtender = i == 1 and 0 or 210
+				local offsetExtender = i == 1 and 0 or 240
 				G:CreateOptionTitle(parent, playerOrTarget, offset-240-offsetExtender)
 				G:CreateOptionDropdown(parent, L["HealthValueType"], offset-290-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."HPTag", defaultValues[value][4], func)
 				G:CreateOptionDropdown(parent, L["PowerValueType"], offset-360-offsetExtender, G.HealthValues, L["100PercentTip"], "UFs", playerOrTarget.."MPTag", defaultValues[value][5], func)
 				G:CreateOptionCheck(parent, offset-410-offsetExtender, "Hide"..playerOrTarget.."Power", "UFs", "Hide"..playerOrTarget.."Power", func)
+				if playerOrTarget == "Player" then
+					G:CreateOptionCheck(parent, offset-440-offsetExtender, "HidePlayerName", "UFs", "HidePlayerName", func)
+				end
 			end
 		elseif value ~= "Pet" and value ~= "ToT" and value ~= "FocusTarget" then
 			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)
 			G:CreateOptionCheck(parent, offset-260, "Hide"..value.."Power", "UFs", "Hide"..value.."Power", func)
 			G:CreateOptionDropdown(parent, L["PowerValueType"], offset-330, G.HealthValues, L["100PercentTip"], "UFs", value.."MPTag", defaultValues[value][5], func)
             G:CreateOptionSlider(parent, L["Power Height"], 0, 30, defaultValues[value][3], offset-400, value.."PowerHeight", func)
+		elseif value == "Pet" then
+			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)
+			G:CreateOptionCheck(parent, offset-220, L["HidePetName"], "UFs", "HidePetName", func)
 		else
 			G:CreateOptionDropdown(parent, L["HealthValueType"], offset-190, G.HealthValues, L["100PercentTip"], "UFs", value.."HPTag", defaultValues[value][4], func)
 		end

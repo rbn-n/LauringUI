@@ -63,11 +63,14 @@ function UF:UpdateFrameNameTag(frame)
 		frame:Tag(name, " "..colorNameTag)
 	elseif mystyle == "Arena" then
 		frame:Tag(name, colorNameTag)
+    elseif mystyle == "ToT" or mystyle == "FocusTarget" then
+        frame:Tag(name, "[color][abbrevname:short]")
 	else
 		frame:Tag(name, "[nplevel]"..colorNameTag)
 	end
 
 	name:UpdateTag()
+    UF:UpdateFrameNameVisibility(frame)
 end
 
 function UF:SetPartyAndRaidName(name, frame)
@@ -76,8 +79,6 @@ function UF:SetPartyAndRaidName(name, frame)
 end
 
 local function CreateNameText(frame, textFrame)
-    if frame.mystyle == "Player" and Config.DB["UFs"]["HidePlayerName"] then return end
-
     local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
     local name = Core.CreateFS(textFrame, fontSize)
     frame.nameText = name
@@ -92,6 +93,17 @@ local function CreateNameText(frame, textFrame)
     end
 
     UF:UpdateFrameNameTag(frame)
+end
+
+function UF:UpdateFrameNameVisibility(frame)
+    local hideFrameName = Config.DB["UFs"]["Hide"..frame.mystyle.."Name"]
+    if hideFrameName == nil then return end
+
+    if hideFrameName then
+        frame.nameText:Hide()
+    else
+        frame.nameText:Show()
+    end
 end
 
 function UF:UpdateFrameHealthTag(frame)

@@ -125,7 +125,7 @@ function Tooltip:OnTooltipSetUnit()
 		local relationship = UnitRealmRelationship(unit)
 
 		if realm and realm ~= "" then
-			if isShiftKeyDown or not Config.DB["Tooltip"]["HideRealm"] then
+			if isShiftKeyDown or not Config.DB["Tooltips"]["HideRealm"] then
 				name = name.."-"..realm
 			elseif relationship == LE_REALM_RELATION_COALESCED then
 				name = name..FOREIGN_SERVER_LABEL
@@ -156,7 +156,7 @@ function Tooltip:OnTooltipSetUnit()
 				guildName = guildName.."-"..guildRealm
 			end
 
-			if Config.DB["Tooltip"]["HideJunkGuild"] and not isShiftKeyDown then
+			if Config.DB["Tooltips"]["HideJunkGuild"] and not isShiftKeyDown then
 				if strlen(guildName) > 31 then guildName = "..." end
 			end
 			GameTooltipTextLeft2:SetText("<"..guildName.."> "..rank.."("..rankIndex..")")
@@ -318,12 +318,6 @@ function Tooltip:GameTooltip_ComparisonFix(anchorFrame, shoppingTooltip1, shoppi
 	end
 end
 
--- Tooltip skin
-local fakeBg = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-fakeBg:SetBackdrop({ bgFile = DB.BackgroundTexture, edgeFile = DB.BackgroundTexture, edgeSize = 1 })
-local function __GetBackdrop() return fakeBg:GetBackdrop() end
-local function __GetBackdropColor() return 0, 0, 0, .7 end
-local function __GetBackdropBorderColor() return 0, 0, 0 end
 
 function Tooltip:ReskinTooltip()
 	if not self then
@@ -340,12 +334,6 @@ function Tooltip:ReskinTooltip()
 
 		if self.StatusBar then
 			Tooltip.ReskinStatusBar(self)
-		end
-
-		if self.GetBackdrop then
-			self.GetBackdrop = __GetBackdrop
-			self.GetBackdropColor = __GetBackdropColor
-			self.GetBackdropBorderColor = __GetBackdropBorderColor
 		end
 
 		self.tipStyled = true
@@ -478,7 +466,7 @@ Tooltip:RegisterTooltips("LauringUI", function()
 
 	if SettingsTooltip then
 		Tooltip.ReskinTooltip(SettingsTooltip)
-		SettingsTooltip:SetScale(UIParent:GetScale())
+		SettingsTooltip:SetScale(UIParent:GetScale() / 2)
 	end
 
 	-- DropdownMenu

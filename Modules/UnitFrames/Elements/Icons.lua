@@ -23,11 +23,38 @@ function UF:CreateIcons(frame)
 		combat:SetTexCoord(0, .5, 0, .5)
 		combat:SetVertexColor(.8, 0, 0)
 		frame.CombatIndicator = combat
+
+		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
+		leaderIcon:SetPoint("TOPLEFT", frame, 0, 1)
+		leaderIcon:SetSize(12, 12)
+		frame.LeaderIndicator = leaderIcon
+
 	elseif mystyle == "Target" then
 		local quest = frame:CreateTexture(nil, "OVERLAY")
 		quest:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 8)
 		quest:SetSize(16, 16)
 		frame.QuestIndicator = quest
+	elseif UF.IsPartyOrRaid(frame)  then
+		local roleIcon = frame:CreateTexture(nil, "OVERLAY")
+		roleIcon:SetPoint("TOPRIGHT", frame, 0, 5)
+		roleIcon:SetSize(10, 10)
+		roleIcon.PostUpdate = PostUpdateRole
+		frame.GroupRoleIndicator = roleIcon
+
+		local masterlooterIcon = frame:CreateTexture(nil, "OVERLAY")
+		masterlooterIcon:SetPoint("RIGHT", frame, "RIGHT")
+		masterlooterIcon:SetSize(11, 11)
+		frame.MasterLooterIndicator = masterlooterIcon
+
+		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
+		leaderIcon:SetPoint("TOPLEFT", frame, 0, 8)
+		leaderIcon:SetSize(12, 12)
+		frame.LeaderIndicator = leaderIcon
+
+		local assistIcon = frame:CreateTexture(nil, "OVERLAY")
+		assistIcon:SetPoint("TOPLEFT", frame, -1, 8)
+		assistIcon:SetSize(12, 12)
+		frame.AssistantIndicator = assistIcon
 	end
 
 	local parentFrame = CreateFrame("Frame", nil, frame)
@@ -37,31 +64,6 @@ function UF:CreateIcons(frame)
 	phase:SetPoint("CENTER", frame.Health)
 	phase:SetSize(24, 24)
 	frame.PhaseIndicator = phase
-
-	local roleIcon = frame:CreateTexture(nil, "OVERLAY")
-    if UF.IsPartyOrRaid(frame)  then
-        roleIcon:SetPoint("TOPRIGHT", frame, 5, 5)
-    else
-        roleIcon:SetPoint("TOPRIGHT", frame, 0, 8)
-    end
-    roleIcon:SetSize(15, 15)
-    roleIcon.PostUpdate = PostUpdateRole
-    frame.GroupRoleIndicator = roleIcon
-
-	local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
-	leaderIcon:SetPoint("TOPLEFT", frame, 0, 1)
-	leaderIcon:SetSize(12, 12)
-	frame.LeaderIndicator = leaderIcon
-
-	local assistIcon = frame:CreateTexture(nil, "OVERLAY")
-	assistIcon:SetPoint("TOPLEFT", frame, -1, 8)
-	assistIcon:SetSize(12, 12)
-	frame.AssistantIndicator = assistIcon
-
-	local masterlooterIcon = frame:CreateTexture(nil, "OVERLAY")
-	masterlooterIcon:SetPoint("LEFT", frame, "RIGHT")
-	masterlooterIcon:SetSize(12, 12)
-	frame.MasterLooterIndicator = masterlooterIcon
 end
 
 function UF:CreateRaidIcons(frame)

@@ -49,7 +49,7 @@ local function PositionChatFrame(frame, anchorTo, offsetX, offsetY)
 	frame:SetHeight(Config.DB.Chat.Height)
 end
 
-local function WatchFrame(frame, frameToWatch, onHideAndShow)
+local function WatchFrame(frame, frameToWatch)
 	local function update()
 		frame:SetSize(frameToWatch:GetWidth(), frameToWatch:GetHeight())
 		frame:ClearAllPoints()
@@ -64,11 +64,6 @@ local function WatchFrame(frame, frameToWatch, onHideAndShow)
 
 	frameToWatch:HookScript("OnSizeChanged", update)
 	frameToWatch:HookScript("OnUpdate", update)
-
-	if onHideAndShow then
-		frameToWatch:HookScript("OnShow", function() frame:Show() update() end)
-		frameToWatch:HookScript("OnHide", function() frame:Hide() end)
-	end
 end
 
 function module:UpdateChatSize()
@@ -256,11 +251,118 @@ local function SetFontForExtraElementsInChatTabMenu()
 	end
 end
 
+local function ConfigureChatWindows()
+	local function GetChatFrameByName(name)
+		for i = 1, NUM_CHAT_WINDOWS do
+			if FCF_GetChatWindowInfo(i) == name then
+				return _G["ChatFrame" .. i]
+			end
+		end
+	end
+
+	local general = ChatFrame1
+	local removeGroups = {
+		"TRADE",
+		"COMBAT_XP_GAIN",
+		"COMBAT_HONOR_GAIN",
+		"COMBAT_FACTION_CHANGE",
+		"SKILL",
+		"LOOT",
+		"MONEY",
+		"TRADESKILLS",
+		"OPENING",
+		"PET_INFO",
+		"MISC_INFO"
+	}
+	for _, group in pairs(removeGroups) do
+		ChatFrame_RemoveMessageGroup(general, group)
+	end
+
+	if not GetChatFrameByName("Trade") then
+		local tradeFrame, _ = FCF_OpenNewWindow("Trade")
+		FCF_SetWindowName(tradeFrame, "Trade")
+		FCF_DockFrame(tradeFrame)
+
+		ChatFrame_RemoveAllMessageGroups(tradeFrame)
+		ChatFrame_RemoveAllChannels(tradeFrame)
+
+		ChatFrame_AddChannel(tradeFrame, "Trade")
+	end
+
+	if not GetChatFrameByName("LFG") then
+		local lfgFrame, _ = FCF_OpenNewWindow("LFG")
+		FCF_SetWindowName(lfgFrame, "LFG")
+		FCF_DockFrame(lfgFrame)
+
+		ChatFrame_RemoveAllMessageGroups(lfgFrame)
+		ChatFrame_RemoveAllChannels(lfgFrame)
+
+		ChatFrame_AddChannel(lfgFrame, "LookingForGroup")
+	end
+
+	if not GetChatFrameByName("LootFTW") then
+		local lootFrame, _ = FCF_OpenNewWindow("LootFTW")
+		FCF_SetWindowName(lootFrame, "LootFTW")
+		FCF_UnDockFrame(lootFrame)
+
+		ChatFrame_RemoveAllMessageGroups(lootFrame)
+		ChatFrame_RemoveAllChannels(lootFrame)
+
+		local lootGroups = {
+			"COMBAT_FACTION_CHANGE",
+			"SKILL",
+			"LOOT",
+			"MONEY"
+		}
+		for _, group in ipairs(lootGroups) do
+			ChatFrame_AddMessageGroup(lootFrame, group)
+		end
+	end
+
+	local lootChatFrame = GetChatFrameByName("LootFTW")
+	C_Timer.After(0.2, function()
+		if lootChatFrame then
+			local rightPanel = Core:GetModule("Infobars").RightBottomPanel
+			PositionChatFrame(lootChatFrame, rightPanel, 0, 6)
+
+			local rightChatPanel = StyleChatPanel("LauringUIChatPanelRight", lootChatFrame)
+			WatchFrame(rightChatPanel, lootChatFrame)
+
+
+			local minimizeButton = lootChatFrame.minimizeButton
+			if minimizeButton then
+				minimizeButton:Hide()
+				minimizeButton.Show = function() end
+			end
+		end
+	end)
+
+	local function EnsureChannelAssignment()
+		C_Timer.After(1, function()
+			local tradeFrame = GetChatFrameByName("Trade")
+			local lfgFrame = GetChatFrameByName("LFG")
+
+			if tradeFrame then
+				ChatFrame_RemoveAllChannels(tradeFrame)
+				ChatFrame_AddChannel(tradeFrame, "Trade")
+			end
+
+			if lfgFrame then
+				ChatFrame_RemoveAllChannels(lfgFrame)
+				ChatFrame_AddChannel(lfgFrame, "LookingForGroup")
+			end
+		end)
+	end
+
+	Core:RegisterEvent("PLAYER_ENTERING_WORLD", EnsureChannelAssignment)
+end
+
 function module:OnLogin()
+	ConfigureChatWindows()
 	self:ReskinChat()
 
 	SetCVar("chatStyle", "classic")
-	SetCVar("chatMouseScroll", 1) -- enable mousescroll
+	SetCVar("chatMouseScroll", 1)
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
 	SetChatClassColors()
@@ -271,21 +373,11 @@ function module:OnLogin()
 
 	self:UpdateChatSize()
 
+	SetFontForExtraElementsInChatTabMenu()
+
 	local cf1 = ChatFrame1
 	local leftPanel = Core:GetModule("Infobars").LeftBottomPanel
-	PositionChatFrame(cf1, leftPanel, 0, 6)
-
 	local leftChatPanel = StyleChatPanel("LauringUIChatPanelLeft", cf1)
+	PositionChatFrame(cf1, leftPanel, 0, 6)
 	WatchFrame(leftChatPanel, cf1)
-
-	local cf5 = ChatFrame5
-	if cf5 and cf5:IsShown() then
-		local rightPanel = Core:GetModule("Infobars").RightBottomPanel
-		PositionChatFrame(cf5, rightPanel, 0, 6)
-
-		local rightChatPanel = StyleChatPanel("LauringUIChatPanelRight", cf5)
-		WatchFrame(rightChatPanel, cf5, true)
-	end
-
-	SetFontForExtraElementsInChatTabMenu()
 end

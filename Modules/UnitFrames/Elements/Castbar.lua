@@ -60,6 +60,9 @@ local channelingTicks = {
 	[42843]	= 5, -- Arcane Missiles (Rank 12)
 	[42846]	= 5, -- Arcane Missiles (Rank 13)
 	[12051]	= 4, -- Evocation
+	-- Monk
+	[117952] = 4, -- Crackling Jade Lightning
+	[115175] = 8, -- Soothing Mist
 	-- Priest
 	[15407]	= 3, -- Mind Flay (Rank 1)
 	[17311]	= 3, -- Mind Flay (Rank 2)
@@ -132,6 +135,7 @@ local channelingTicks = {
 	[27213]	= 15, -- Hellfire (Rank 4)
 	[47823]	= 15, -- Hellfire (Rank 5)
 	[5138]	= 5, -- Drain Mana
+	[103103]= 4, -- Malefic Grasp
 	-- First Aid
 	[45544]	= 8, -- Heavy Frostweave Bandage
 	[45543]	= 8, -- Frostweave Bandage

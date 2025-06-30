@@ -10,7 +10,7 @@ Config.DataText = {
 Config.UIScale = 1
 
 Config.UFs = {
-	PlayerCastbar  = { "BOTTOM", UIParent, "BOTTOM", 0, 375 },
+	PlayerCastbar  = { "BOTTOM", UIParent, "BOTTOM", 0, 384 },
 	TargetCastbar  = { "BOTTOM", UIParent, "BOTTOM", 0, 606 },
 	FocusCastbar   = { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 918, 475 },
 

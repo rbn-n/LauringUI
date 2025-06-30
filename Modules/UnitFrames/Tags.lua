@@ -286,3 +286,27 @@ oUF.Tags.Methods["abbrevname"] = function(unit)
 end
 
 oUF.Tags.Events["abbrevname"] = "UNIT_NAME_UPDATE"
+
+oUF.Tags.Methods["abbrevname:short"] = function(unit)
+	local name = UnitName(unit)
+	if not name then return "" end
+
+	if #name <= 10 then
+		return name
+	end
+
+	local parts = {}
+	for word in name:gmatch("%S+") do
+		tinsert(parts, word)
+	end
+
+	local last = tremove(parts) -- Remove and save last word
+	for i, word in ipairs(parts) do
+		parts[i] = strsub(word, 1, 1) .. "."
+	end
+
+	tinsert(parts, last)
+	return table.concat(parts, " ")
+end
+
+oUF.Tags.Events["abbrevname:short"] = "UNIT_NAME_UPDATE"

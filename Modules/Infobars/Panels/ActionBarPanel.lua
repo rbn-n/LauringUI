@@ -11,18 +11,18 @@ local function UpdatePanel(panel, bar)
     panel:Show()
 
     local padding = 4
-    local width = (bar:GetWidth() * 2) + padding
-    local height = (bar:GetHeight() * 2) + padding
+    local width = ((bar:GetWidth() * 24) * 0.95) + padding
+    local height = ((bar:GetHeight() * 2) * 0.95) + padding
     panel:SetSize(width, height)
 
     panel:ClearAllPoints()
-    panel:SetPoint("TOPLEFT", bar, "TOPLEFT", -padding / 2, padding / 2)
+    panel:SetPoint("BOTTOMLEFT", bar, "BOTTOMLEFT", -(padding / 2), -(padding / 2))
 end
 
 function module:CreateActionBarPanel()
     if not C_AddOns.IsAddOnLoaded("Bartender4") then return end
 
-    local bar1 = _G["BT4Bar1"]
+    local bar1 = _G["BT4Button1"]
     if not bar1 then return end
 
     local panel = CreateFrame("Frame", "LauringUIActionBarPanel", UIParent)

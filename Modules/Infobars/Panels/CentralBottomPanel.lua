@@ -9,7 +9,7 @@ function module:CreateCentralBottomPanel()
     local panel = CreateFrame("Frame", "LauringUICentralBottomPanel", UIParent)
     panel:SetFrameStrata("LOW")
     panel:SetHeight(panelHeight)
-    panel:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 100)
+    panel:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 5)
 
     module:StylePanel(panel)
 
