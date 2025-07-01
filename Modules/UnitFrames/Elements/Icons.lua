@@ -17,7 +17,7 @@ function UF:CreateIcons(frame)
 	local mystyle = frame.mystyle
 	if mystyle == "Player" then
 		local combat = frame:CreateTexture(nil, "OVERLAY")
-		combat:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -1, -1)
+		combat:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, -1)
 		combat:SetSize(15, 15)
 		combat:SetTexture("Interface\\WORLDSTATEFRAME\\CombatSwords")
 		combat:SetTexCoord(0, .5, 0, .5)

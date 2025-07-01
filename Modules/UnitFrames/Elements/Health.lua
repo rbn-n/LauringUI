@@ -83,7 +83,7 @@ local function CreateNameText(frame, textFrame)
 	name:SetJustifyH("LEFT")
 
     if UF.IsPlayerOrTarget(frame) then
-        name:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, 0)
+        name:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", Config.DB.UFs.PlayerNameOffset, 0)
     elseif UF.IsPartyOrRaid(frame)  then
         UF:SetPartyAndRaidName(name, frame)
     else

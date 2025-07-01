@@ -77,6 +77,8 @@ G.DefaultSettings = {
 		Width = 575,
 		Height = 250,
 		ShowMenu = false,
+		UseChatPanels = true,
+		UsePredefinedChatConfig = false,
 		WhisperColor = true,
 		WhisperInvite = true,
 		WhisperInviteGuildOnly = true,
@@ -179,7 +181,7 @@ G.DefaultSettings = {
         PlayerWidth = 272,
         PlayerPowerHeight = 10,
         PlayerPowerOffset = 3,
-        PlayerNameOffset= 0,
+        PlayerNameOffset= 3,
 		HidePlayerPower = true,
         HidePlayerName = false,
 
