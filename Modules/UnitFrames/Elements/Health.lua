@@ -56,14 +56,12 @@ function UF:UpdateFrameNameTag(frame)
 	local colorNameTag = "[color][abbrevname]"
 
 	if mystyle == "Player" then
-		frame:Tag(name, " "..colorNameTag.."[afkdnd]")
+		frame:Tag(name, colorNameTag.."[afkdnd]")
 	elseif mystyle == "Target" then
-		frame:Tag(name, " [fulllevel] "..colorNameTag.."[afkdnd]")
-	elseif mystyle == "Focus" then
-		frame:Tag(name, " "..colorNameTag)
+		frame:Tag(name, "[fulllevel] "..colorNameTag.."[afkdnd]")
 	elseif mystyle == "Arena" then
 		frame:Tag(name, colorNameTag)
-    elseif mystyle == "ToT" or mystyle == "FocusTarget" then
+    elseif mystyle == "Focus"  or mystyle == "ToT" or mystyle == "FocusTarget" then
         frame:Tag(name, "[color][abbrevname:short]")
 	else
 		frame:Tag(name, "[nplevel]"..colorNameTag)
@@ -125,7 +123,7 @@ local function CreateHealthText(frame, textFrame)
         healthText = Core.CreateFS(textFrame, fontSize)
         healthText:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, 0)
     else
-        healthText = Core.CreateFS(textFrame, fontSize - 2)
+        healthText = Core.CreateFS(textFrame, fontSize)
         healthText:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
     end
 
@@ -151,18 +149,28 @@ function UF:CreateHealthAndNameText(frame)
 end
 
 function UF.HealthPostUpdate(element, unit, cur, max)
-    local color
     local self = element.__owner
+    local r, g, b
 
     if UnitIsPlayer(unit) then
         local class = select(2, UnitClass(unit))
-        color = self.colors.class[class]
+        local color = self.colors.class[class]
+        if color then
+            r, g, b = color[1], color[2], color[3]
+        end
+    else
+        local reaction = UnitReaction(unit, "player")
+        if reaction then
+            local color = self.colors.reaction[reaction]
+            if color then
+                r, g, b = color[1], color[2], color[3]
+            end
+        end
     end
 
-    local r, g, b = 1, 0, 0
-    if color and color[1] then
-        r, g, b = color[1], color[2], color[3]
+    if not r then
+        r, g, b = 1, 1, 1
     end
 
-    element.bg:SetVertexColor(r, g, b, 0.15)
+    element.bg:SetVertexColor(r, g, b, 0.35)
 end

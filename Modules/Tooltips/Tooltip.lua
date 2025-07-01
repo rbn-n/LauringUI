@@ -318,7 +318,6 @@ function Tooltip:GameTooltip_ComparisonFix(anchorFrame, shoppingTooltip1, shoppi
 	end
 end
 
-
 function Tooltip:ReskinTooltip()
 	if not self then
 		return
@@ -330,7 +329,7 @@ function Tooltip:ReskinTooltip()
 		if self.NineSlice then self.NineSlice:SetAlpha(0) end
 		if self.SetBackdrop then self:SetBackdrop(nil) end
 		self:DisableDrawLayer("BACKGROUND")
-		self.bg = Core.SetBD(self)
+		self.bg = Core.SetBD(self, 0.7)
 		Core:SetInside(self.bg, self)
 		self.bg:SetFrameLevel(self:GetFrameLevel())
 

@@ -61,7 +61,7 @@ G.DefaultSettings = {
         FocusHeight = 15,
         FocusWidth = 202,
         PlayerHeight = 24,
-        PlayerWidth = 390,
+        PlayerWidth = 400,
         TargetHeight = 20,
         TargetWidth = 250,
         ShowArena = true,
@@ -251,16 +251,16 @@ G.DefaultSettings = {
 
         PlayerFontSize = 15,
         TargetFontSize = 15,
-        ToTFontSize = 15,
+        ToTFontSize = 13,
         PartyFontSize = 15,
         PartyPetFontSize = 12,
         Raid10FontSize = 15,
         RaidFontSize = 15,
-        PetFontSize = 15,
+        PetFontSize = 13,
         ArenaFontSize = 15,
         BossFontSize = 15,
-        FocusFontSize = 15,
-        FocusTargetFontSize = 15,
+        FocusFontSize = 13,
+        FocusTargetFontSize = 13,
 
         --[[
             1
