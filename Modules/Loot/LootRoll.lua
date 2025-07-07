@@ -231,8 +231,7 @@ function Loot:CreateRollBar(name)
 	status:SetPoint("BOTTOMRIGHT", -Config.PixelMultiplexer, Config.PixelMultiplexer)
 	status:SetScript("OnUpdate", StatusUpdate)
 	status:SetFrameLevel(status:GetFrameLevel()-1)
-	--Core.CreateSB(status, true)
-    Core:StyleFrame(status)
+    Core.CreateSB(status, true)
 	status:SetStatusBarColor(.8, .8, .8, .9)
 	status.parent = bar
 	bar.status = status
@@ -318,7 +317,6 @@ function Loot:LootRoll_Start(rollID, rollTime)
 
 	if Config.DB["Loot"]["ItemQuality"] then
 		bar.button.bg:SetBackdropBorderColor(color.r, color.g, color.b)
-		bar.status__border:SetBackdropBorderColor(color.r, color.g, color.b)
 	else
 		bar.button.bg:SetBackdropBorderColor(0, 0, 0)
 	end

@@ -11,7 +11,7 @@ local function UpdatePanel(panel, bar)
     panel:Show()
 
     local padding = 4
-    local width = ((bar:GetWidth() * 24) * 0.95) + padding
+    local width = ((bar:GetWidth() * 30) * 0.95) + padding
     local height = ((bar:GetHeight() * 2) * 0.95) + padding
     panel:SetSize(width, height)
 

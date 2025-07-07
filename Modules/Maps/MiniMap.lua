@@ -11,6 +11,7 @@ local C_Timer_After = C_Timer.After
 local MiniMapTracking, MiniMapTrackingBackground, MiniMapTrackingButtonBorder, MiniMapTrackingIcon, MiniMapTrackingIconOverlay = MiniMapTracking, MiniMapTrackingBackground, MiniMapTrackingButtonBorder, MiniMapTrackingIcon, MiniMapTrackingIconOverlay
 local MiniMapTrackingButton, MiniMapLFGFrame, MiniMapLFGFrameBorder, MiniMapInstanceDifficulty, GuildInstanceDifficulty, Minimap_OnClick = MiniMapTrackingButton, MiniMapLFGFrame, MiniMapLFGFrameBorder, MiniMapInstanceDifficulty, GuildInstanceDifficulty, Minimap_OnClick
 local MiniMapBattlefieldFrame, MAX_BATTLEFIELD_QUEUES = MiniMapBattlefieldFrame, MAX_BATTLEFIELD_QUEUES
+local MiniMapMailFrame = MiniMapMailFrame
 
 function module:CombatPulse()
 	if not Config.DB["Minimap"]["Enable"] then return end
@@ -476,15 +477,19 @@ local function ReskinInstanceDifficulty()
 	end
 end
 
-local function ReskinInviteIcons()
-
+local function ReskinMail()
+	MiniMapMailFrame:ClearAllPoints()
+	MiniMapMailFrame:SetPoint("TOPLEFT", Minimap, "TOPLEFT", -5, 5)
+	MiniMapMailIcon:SetTexture(DB.MailTexture)
+	MiniMapMailIcon:SetSize(21, 21)
+	MiniMapMailIcon:SetVertexColor(1, 1, 0)
 end
 
 function module:Reskin()
 	ReskinTracking()
 	ReskinLFGFrame()
 	ReskinInstanceDifficulty()
-	ReskinInviteIcons()
+	ReskinMail()
 end
 
 function module:UpdateMinimapScale()
@@ -504,7 +509,6 @@ function module:OnLogin()
 	Minimap:ClearAllPoints()
 	Minimap:SetPoint("TOPRIGHT", UIParent, -5, -5)
 	self:UpdateMinimapScale()
-	Core:CreateBackdropFrame(Minimap)
 
 	self:HideDefaultFrames()
 	self:ShowCalendar()

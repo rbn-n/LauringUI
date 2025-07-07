@@ -38,6 +38,7 @@ local function CreateTarget(frame)
 	UF:CreateRaidMark(frame)
 	UF:CreateIcons(frame)
 	UF:CreateHealPrediction(frame)
+    UF:CreateDebuffHighlight(frame)
 	UF:CreateAuras(frame)
 end
 
@@ -287,7 +288,7 @@ function UF:SetupParty()
             party.groupType = "party"
             tinsert(UF.headers, party)
             RegisterStateDriver(party, "visibility", GetPartyVisibility())
-            partyMover = Core.Mover(party, L["PartyFrame"], "PartyFrame", { "LEFT", UIParent, 350, 0 })
+            partyMover = Core.Mover(party, L["PartyFrame"], "PartyFrame", Config.UFs.PartyPosition)
         end
 
         local moverWidth = index < 3 and partyWidth or (partyWidth + spacing) * 5 - spacing
@@ -465,7 +466,7 @@ function UF:SetupRaid()
             end
 
             if not raidMover and i == 1 then
-                raidMover = Core.Mover(groups[i], L["RaidFrame"], "RaidFrame", { "TOPLEFT", UIParent, 35, -50 })
+                raidMover = Core.Mover(groups[i], L["RaidFrame"], "RaidFrame", Config.UFs.RaidPosition)
             end
 
             local groupWidth = index < 5 and raidWidth + spacing or (raidWidth + spacing) * 5

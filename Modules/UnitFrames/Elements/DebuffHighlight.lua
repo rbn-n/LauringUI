@@ -17,7 +17,6 @@ local function GetPlayerDispellableTypes()
 
 	local _, _, _, _, role = GetSpecializationInfo(specIndex)
 
-	-- Define dispels based on class and role
 	if class == "PRIEST" then
 		dispels.MAGIC = true
 		dispels.DISEASE = true
@@ -50,7 +49,6 @@ local function GetPlayerDispellableTypes()
 		end
 	end
 
-	-- Filter with your color table
 	local filtered = {}
 	for debuffType in pairs(dispels) do
 		local color = DB.DebuffHighlightColors[debuffType]
@@ -62,19 +60,11 @@ local function GetPlayerDispellableTypes()
 	return filtered
 end
 
-function UF:PostUpdate_DebuffHighlight(object, debuffType, _, wasFiltered, _, color)
+local function PostUpdateDebuffHighlight(frame, debuffType, _, wasFiltered, _, color)
 	if debuffType and not wasFiltered and color then
-		if object.DBHGlow then
-			object.DBHGlow:SetBackdropBorderColor(color.r, color.g, color.b, color.a or 0.5)
-		else
-			object.DebuffHighlight:SetVertexColor(color.r, color.g, color.b, color.a or 0.5)
-		end
+		frame.DebuffHighlight:SetVertexColor(color.r, color.g, color.b, frame.DebuffHighlightAlpha or 0.5)
 	else
-		if object.DBHGlow then
-			object.DBHGlow:SetBackdropBorderColor(0, 0, 0, 0)
-		else
-			object.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
-		end
+		frame.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
 	end
 end
 
@@ -83,45 +73,30 @@ function UF:ToggleDebuffHighlight()
 		if frame.DebuffHighlight then
 			if Config.DB.UFs.EnableDebuffHighlight then
 				frame.DebuffHighlight:Show()
-				if frame.DBHGlow then frame.DBHGlow:Show() end
 			else
 				frame.DebuffHighlight:Hide()
-				if frame.DBHGlow then frame.DBHGlow:Hide() end
 			end
 		end
 	end
 end
 
 function UF:CreateDebuffHighlight(frame)
-    if not Config.DB.UFs.EnableDebuffHighlight then return end
+	if not Config.DB.UFs.EnableDebuffHighlight then return end
 
-    local debuffHighlight = frame.Health:CreateTexture(nil, "OVERLAY")
-    debuffHighlight:SetAllPoints(frame.Health)
-    debuffHighlight:SetTexture(DB.DebuffIconBorder)
-    debuffHighlight:SetBlendMode("ADD")
-    debuffHighlight:SetVertexColor(0, 0, 0, 0) -- start hidden
+	local dbh = frame.Health:CreateTexture(nil, "OVERLAY")
+	dbh:SetAllPoints(frame.Health)
+	dbh:SetTexture("Interface\\Buttons\\WHITE8x8")
+	dbh:SetBlendMode("ADD")
+	dbh:SetVertexColor(0, 0, 0, 0)
 
-    frame.DebuffHighlight = debuffHighlight
-    frame.DebuffHighlightAlpha = 0.5
-    frame.DebuffHighlightFilter = true
-    frame.DebuffHighlightFilterTable = GetPlayerDispellableTypes()
-    debuffHighlight.PostUpdate = UF.PostUpdate_DebuffHighlight
-
-    -- Optional glow
-    Core:CreateShadow(frame, 1)
-    local shadow = frame.__shadow
-    frame.__shadow = nil
-    shadow:Hide()
-    frame.DBHGlow = shadow
-
-    if frame.Health then
-        debuffHighlight:SetParent(frame.Health)
-        frame.DBHGlow:SetParent(frame.Health)
-    end
+	frame.DebuffHighlight = dbh
+	frame.DebuffHighlightAlpha = 0.5
+	frame.DebuffHighlightFilter = true
+	frame.DebuffHighlightFilterTable = GetPlayerDispellableTypes()
+	frame.DebuffHighlight.PostUpdate = PostUpdateDebuffHighlight
 
 	Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(unit)
 		if unit ~= "player" then return end
-
 		for _, oUFObject in pairs(oUF.objects) do
 			if oUFObject.DebuffHighlight then
 				oUFObject.DebuffHighlightFilterTable = GetPlayerDispellableTypes()

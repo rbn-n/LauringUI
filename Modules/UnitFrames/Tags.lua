@@ -52,6 +52,7 @@ end
 
 oUF.Tags.Methods["VariousHP"] = function(unit, _, arg1)
 	if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) or UnitIsFeignDeath(unit) then
+		if arg1 == "cleanpercent" then return "" end
 		return oUF.Tags.Methods["DDG"](unit)
 	end
 
@@ -117,7 +118,7 @@ oUF.Tags.Methods["color"] = function(unit)
 end
 oUF.Tags.Events["color"] = "UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE UNIT_FACTION UNIT_CONNECTION PLAYER_FLAGS_CHANGED"
 
-oUF.Tags.Methods["afkdnd"] = function(unit)
+local function IsAfkOrDnd(unit)
 	if UnitIsAFK(unit) then
 		return "|cffCFCFCF <"..AFK..">|r"
 	elseif UnitIsDND(unit) then
@@ -126,9 +127,13 @@ oUF.Tags.Methods["afkdnd"] = function(unit)
 		return ""
 	end
 end
+
+oUF.Tags.Methods["afkdnd"] = function(unit)
+	return IsAfkOrDnd(unit)
+end
 oUF.Tags.Events["afkdnd"] = "PLAYER_FLAGS_CHANGED"
 
-oUF.Tags.Methods["DDG"] = function(unit)
+local function IsDdg(unit)
 	if UnitIsFeignDeath(unit) then
 		return "|cff99ccff"..GetFeignDeathTag().."|r"
 	elseif UnitIsDead(unit) then
@@ -138,6 +143,10 @@ oUF.Tags.Methods["DDG"] = function(unit)
 	elseif not UnitIsConnected(unit) then
 		return "|cffCFCFCF"..PLAYER_OFFLINE.."|r"
 	end
+end
+
+oUF.Tags.Methods["DDG"] = function(unit)
+	return IsDdg(unit)
 end
 oUF.Tags.Events["DDG"] = "UNIT_HEALTH_FREQUENT UNIT_MAXHEALTH UNIT_NAME_UPDATE UNIT_CONNECTION PLAYER_FLAGS_CHANGED"
 
@@ -310,3 +319,27 @@ oUF.Tags.Methods["abbrevname:short"] = function(unit)
 end
 
 oUF.Tags.Events["abbrevname:short"] = "UNIT_NAME_UPDATE"
+
+oUF.Tags.Methods["nameOrCondition"] = function(unit)
+	local isDdg = IsDdg(unit)
+	if isDdg then
+		return isDdg
+	end
+
+	if UnitIsAFK(unit) then
+		return "|cffCFCFCF <"..AFK..">|r"
+	end
+
+	local color = oUF.Tags.Methods["color"](unit) or ""
+	local abbrev = oUF.Tags.Methods["abbrevname"](unit)
+	return color .. abbrev
+end
+
+oUF.Tags.Events["nameOrCondition"] = table.concat({
+	"PLAYER_FLAGS_CHANGED",
+	"UNIT_HEALTH_FREQUENT",
+	"UNIT_MAXHEALTH",
+	"UNIT_NAME_UPDATE",
+	"UNIT_CONNECTION",
+	"UNIT_FACTION",
+}, " ")

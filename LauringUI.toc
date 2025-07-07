@@ -7,9 +7,9 @@
 ## SavedVariablesPerCharacter: LauringUICharacterDB
 
 Init.lua
+Locales\Load_Locales.xml
 Libs\Load_Libs.xml
 Media\Load_Media.xml
-Locales\Load_Locales.xml
 Core\Load_Core.xml
 Config\Load_Config.xml
 Modules\Load_Modules.xml

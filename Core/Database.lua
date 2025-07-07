@@ -24,6 +24,7 @@ DB.DpsTexture = Media.."Textures\\DPS"
 DB.CloseTexture = Media.."Textures\\close"
 DB.SortTexture = Media.."Textures\\SortIcon"
 DB.CopyTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
+DB.MailTexture = "Interface\\Minimap\\Tracking\\Mailbox"
 
 DB.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 DB.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "

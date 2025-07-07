@@ -278,6 +278,12 @@ function Core:PixelIcon(texture, highlight)
     end
 end
 
+local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
+function Core:ClassIconTexCoord(class)
+    local tcoords = CLASS_ICON_TCOORDS[class]
+    self:SetTexCoord(tcoords[1] + .022, tcoords[2] - .025, tcoords[3] + .022, tcoords[4] - .025)
+end
+
 function Core:ReskinIcon(shadow)
     self:SetTexCoord(x1, x2, y1, y2)
     local bg = Core.CreateBDFrame(self, .25) -- exclude from opacity control
@@ -482,4 +488,25 @@ function Core:ReskinClose(parent, xOffset, yOffset, override)
 
     self:HookScript("OnEnter", Core.Texture_OnEnter)
     self:HookScript("OnLeave", Core.Texture_OnLeave)
+end
+
+function Core:CreateSB(spark, r, g, b)
+    self:SetStatusBarTexture(DB.StatusBarTexture2)
+    if r and g and b then
+        self:SetStatusBarColor(r, g, b)
+    else
+        self:SetStatusBarColor(DB.r, DB.g, DB.b)
+    end
+
+    local bg = Core.SetBD(self)
+    self.__shadow = bg.__shadow
+
+    if spark then
+        self.Spark = self:CreateTexture(nil, "OVERLAY")
+        self.Spark:SetTexture(DB.SparkTexture)
+        self.Spark:SetBlendMode("ADD")
+        self.Spark:SetAlpha(.8)
+        self.Spark:SetPoint("TOPLEFT", self:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
+        self.Spark:SetPoint("BOTTOMRIGHT", self:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
+    end
 end

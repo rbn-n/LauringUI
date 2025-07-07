@@ -17,7 +17,7 @@ function UF:CreateIcons(frame)
 	local mystyle = frame.mystyle
 	if mystyle == "Player" then
 		local combat = frame:CreateTexture(nil, "OVERLAY")
-		combat:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 0, -1)
+		combat:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", -9, 0)
 		combat:SetSize(15, 15)
 		combat:SetTexture("Interface\\WORLDSTATEFRAME\\CombatSwords")
 		combat:SetTexCoord(0, .5, 0, .5)
@@ -26,7 +26,7 @@ function UF:CreateIcons(frame)
 
 		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
 		leaderIcon:SetPoint("TOPLEFT", frame, 0, 1)
-		leaderIcon:SetSize(12, 12)
+		leaderIcon:SetSize(15, 15)
 		frame.LeaderIndicator = leaderIcon
 
 	elseif mystyle == "Target" then
@@ -37,7 +37,7 @@ function UF:CreateIcons(frame)
 	elseif UF.IsPartyOrRaid(frame)  then
 		local roleIcon = frame:CreateTexture(nil, "OVERLAY")
 		roleIcon:SetPoint("TOPRIGHT", frame, 0, 5)
-		roleIcon:SetSize(10, 10)
+		roleIcon:SetSize(13, 13)
 		roleIcon.PostUpdate = PostUpdateRole
 		frame.GroupRoleIndicator = roleIcon
 
@@ -48,7 +48,7 @@ function UF:CreateIcons(frame)
 
 		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
 		leaderIcon:SetPoint("TOPLEFT", frame, 0, 8)
-		leaderIcon:SetSize(12, 12)
+		leaderIcon:SetSize(15, 15)
 		frame.LeaderIndicator = leaderIcon
 
 		local assistIcon = frame:CreateTexture(nil, "OVERLAY")

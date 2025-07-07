@@ -17,7 +17,7 @@ function Infobars:CreateDataTexts()
     })
 
 	self:PositionRightPanelDataTexts({
-		"Mail", "Durability", "Bags", "Gold", "Time"
+		"Durability", "Bags", "Gold", "Time"
 	})
 end
 

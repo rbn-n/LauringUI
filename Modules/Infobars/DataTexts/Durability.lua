@@ -186,10 +186,6 @@ local function MerchantClose()
 end
 
 local function MerchantShow()
-	if not LauringUIAccountDB["Help"]["AutoRepair"] then
-		Core:ShowHelpTip(MerchantFrame, L["AutoRepairInfo"], "RIGHT", 20, 0, nil, "AutoRepair")
-	end
-
 	if IsShiftKeyDown() or LauringUIAccountDB["RepairType"] == 0 or not CanMerchantRepair() then return end
 	AutoRepair()
 	Core:RegisterEvent("UI_ERROR_MESSAGE", CheckBankFund)

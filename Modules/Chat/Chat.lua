@@ -74,8 +74,10 @@ function module:UpdateChatSize()
 end
 
 local function UpdateEditBoxAnchor(editBox)
-	local leftBottomPanel = Core:GetModule("Infobars").LeftBottomPanel
-	WatchFrame(editBox, leftBottomPanel)
+	editBox:SetSize(ChatFrame1:GetWidth(), 20)
+	editBox:ClearAllPoints()
+	editBox:SetPoint("BOTTOMLEFT", ChatFrame1, "TOPLEFT", 0, 25)
+	editBox:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 25)
 end
 
 local function UpdateEditboxFont(editbox)
@@ -86,7 +88,6 @@ end
 function module:ToggleEditBoxAnchor()
 	for _, editBox in pairs(chatEditboxes) do
 		UpdateEditboxFont(editBox)
-		--UpdateEditBoxAnchor(editBox)
 	end
 end
 
@@ -123,7 +124,8 @@ function module:SkinChatFrame()
 	editBox.__owner = self
 	UpdateEditBoxAnchor(editBox)
 	Core.RemoveBlizzTextures(editBox, 2)
-	Core:StyleFrame(editBox)
+	local bg = Core.SetBD(editBox)
+	bg.__bgTex:SetAlpha(0)
 	UpdateEditboxFont(editBox)
 	tinsert(chatEditboxes, editBox)
 

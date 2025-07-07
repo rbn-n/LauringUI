@@ -8,9 +8,7 @@ function G:SetUnitFrameSize(frame, UF)
     local unit = frame.mystyle
 
 	local healthHeight = UF:CalculateHealthHeight(frame)
-	local powerHeight = unit == "Target" and Config.DB["UFs"]["PlayerPowerHeight"] or Config.DB["UFs"][unit.."PowerHeight"]
 	local nameOffset = Config.DB["UFs"][unit.."NameOffset"]
-	local powerOffset = Config.DB["UFs"][unit.."PowerOffset"]
 
 	frame.Health:SetHeight(healthHeight)
 
@@ -19,6 +17,7 @@ function G:SetUnitFrameSize(frame, UF)
 		frame.nameText:SetWidth(frame:GetWidth()*(nameOffset == 0 and .55 or 1))
 	end
 
+	local powerHeight = unit == "Target" and Config.DB["UFs"]["PlayerPowerHeight"] or Config.DB["UFs"][unit.."PowerHeight"]
     if powerHeight == 0 or UF.HidePower(frame) then
 		if frame:IsElementEnabled("Power") then
 			frame:DisableElement("Power")
@@ -26,11 +25,14 @@ function G:SetUnitFrameSize(frame, UF)
 		end
 	else
 		if not frame:IsElementEnabled("Power") then
+			UF:CreatePowerBar(frame)
+			UF:CreatePowerText(frame)
 			frame:EnableElement("Power")
 			frame.Power:ForceUpdate()
 			if frame.powerText then frame.powerText:Show() end
 		end
 
+		local powerOffset = Config.DB["UFs"][unit.."PowerOffset"]
 		frame.Power:SetHeight(powerHeight)
 		if frame.powerText and powerOffset then
 			frame.powerText:SetPoint("RIGHT", -3, powerOffset)

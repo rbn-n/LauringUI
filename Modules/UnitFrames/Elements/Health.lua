@@ -59,6 +59,8 @@ function UF:UpdateFrameNameTag(frame)
 		frame:Tag(name, colorNameTag.."[afkdnd]")
 	elseif mystyle == "Target" then
 		frame:Tag(name, "[fulllevel] "..colorNameTag.."[afkdnd]")
+    elseif UF.IsPartyOrRaid(frame) then
+		frame:Tag(name, "[nameOrCondition]")
 	elseif mystyle == "Arena" then
 		frame:Tag(name, colorNameTag)
     elseif mystyle == "Focus"  or mystyle == "ToT" or mystyle == "FocusTarget" then
@@ -152,6 +154,24 @@ function UF.HealthPostUpdate(element, unit, cur, max)
     local self = element.__owner
     local r, g, b
 
+    local disconnected = not UnitIsConnected(unit)
+    local dead = UnitIsDead(unit)
+    local ghost = UnitIsGhost(unit)
+
+    if disconnected or dead or ghost then
+        element:SetValue(max)
+        if disconnected then
+            element:SetStatusBarColor(0, 0, 0, 0.6)
+        elseif ghost then
+            element:SetStatusBarColor(1, 1, 1, 0.6)
+        elseif dead then
+            element:SetStatusBarColor(1, 0, 0, 0.7)
+        end
+
+        element.bg:SetVertexColor(0.5, 0.5, 0.5, 0.3)
+        return
+    end
+
     if UnitIsPlayer(unit) then
         local class = select(2, UnitClass(unit))
         local color = self.colors.class[class]
@@ -172,5 +192,6 @@ function UF.HealthPostUpdate(element, unit, cur, max)
         r, g, b = 1, 1, 1
     end
 
+    element:SetStatusBarColor(.1, .1, .1, 0.7)
     element.bg:SetVertexColor(r, g, b, 0.35)
 end

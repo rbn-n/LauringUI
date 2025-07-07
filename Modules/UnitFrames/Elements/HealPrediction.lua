@@ -9,12 +9,12 @@ function UF:CreateHealPrediction(self)
 	local mhpb = frame:CreateTexture(nil, "BORDER", nil, 5)
 	mhpb:SetWidth(1)
 	mhpb:SetTexture(DB.StatusBarTexture)
-	mhpb:SetVertexColor(0, 1, 0.5, 0.25)
+	mhpb:SetVertexColor(0, 1, 0, .5)
 
 	local ohpb = frame:CreateTexture(nil, "BORDER", nil, 5)
 	ohpb:SetWidth(1)
 	ohpb:SetTexture(DB.StatusBarTexture)
-	ohpb:SetVertexColor(0, 1, 0, 0.25)
+	ohpb:SetVertexColor(0, 1, 1, .5)
 
 	self.HealPredictionAndAbsorb = {
 		myBar = mhpb,

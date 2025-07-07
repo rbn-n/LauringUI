@@ -10,7 +10,7 @@ function UF:CreateRaidMark(frame)
 		raidMark:SetPoint("TOP", frame, 0, 10)
 	elseif UF.IsPlayerOrTarget(frame) then
         size = 20
-        raidMark:SetPoint("CENTER", frame, "TOP")
+        raidMark:SetPoint("BOTTOM", frame, "BOTTOM", 0, 2)
     else
         raidMark:SetPoint("CENTER", frame, "TOP")
 	end

@@ -7,7 +7,6 @@
 	<Script file="Guild.lua"/>
 	<Script file="Latency.lua"/>
 	<Script file="Location.lua"/>
-	<Script file="Mail.lua"/>
 	<Script file="Spec.lua"/>
 	<Script file="System.lua"/>
 	<Script file="Time.lua"/>
