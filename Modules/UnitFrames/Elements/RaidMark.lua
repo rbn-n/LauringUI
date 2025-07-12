@@ -11,6 +11,9 @@ function UF:CreateRaidMark(frame)
 	elseif UF.IsPlayerOrTarget(frame) then
         size = 20
         raidMark:SetPoint("BOTTOM", frame, "BOTTOM", 0, 2)
+    elseif frame.mystyle == "nameplate" then
+        size = 32
+		raidMark:SetPoint("BOTTOMRIGHT", frame, "TOPLEFT", 0, 3)
     else
         raidMark:SetPoint("CENTER", frame, "TOP")
 	end

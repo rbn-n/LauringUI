@@ -210,6 +210,7 @@ local function ResetSpellTarget(self)
 end
 
 local function UpdateSpellTarget(self, unit)
+	if not Config.DB["Nameplates"]["CastTarget"] then return end
 	if not self.spellTarget then return end
 
 	local unitTarget = unit and unit.."target"
@@ -290,12 +291,21 @@ function UF:PostCastStart(unit)
 
 	UpdateCastBarColor(self, unit)
 
-	-- Fix for empty icon
 	if self.Icon then
 		local texture = self.Icon:GetTexture()
 		if not texture or texture == 136235 then
 			self.Icon:SetTexture(136243)
 		end
+	end
+
+	if self.__owner.mystyle == "nameplate" then
+		if Config.DB["Nameplates"]["CastbarGlow"] and UF.MajorSpells[self.spellID] then
+			Core.ShowOverlayGlow(self.glowFrame)
+		else
+			Core.HideOverlayGlow(self.glowFrame)
+		end
+
+		UpdateSpellTarget(self, unit)
 	end
 end
 
@@ -386,10 +396,40 @@ local function CreateBarMover(bar, text, value, anchor)
 	bar.mover = mover
 end
 
-function UF:CreateCastbar(frame)
-	if not Config.DB.Castbars.Enable then return end
+local function UpdateNameplateSpellTarget(self, _, unit)
+	UF.PostCastUpdate(self.Castbar, unit)
+end
 
+local function SetupNameplateSpecifics(frame, castbar, name, timer)
+	name:SetPoint("TOPLEFT", castbar, "LEFT", 0, -1)
+	timer:SetPoint("TOPRIGHT", castbar, "RIGHT", 0, -1)
+
+	local shield = castbar:CreateTexture(nil, "OVERLAY")
+	shield:SetAtlas("nameplates-InterruptShield")
+	shield:SetSize(18, 18)
+	shield:SetPoint("TOP", castbar, "CENTER", 0, -1)
+	castbar.Shield = shield
+
+	local iconSize = frame:GetHeight() * 2 + 5
+	castbar.Icon:SetSize(iconSize, iconSize)
+	castbar.Icon:SetPoint("BOTTOMRIGHT", castbar, "BOTTOMLEFT", -5, 0)
+	castbar.timeToHold = .5
+
+	castbar.glowFrame = Core.CreateGlowFrame(castbar, iconSize)
+	castbar.glowFrame:SetPoint("CENTER", castbar.Icon)
+
+	local spellTarget = Core.CreateFS(castbar, Config.DB["Nameplates"]["NameTextSize"] + 3)
+	spellTarget:ClearAllPoints()
+	spellTarget:SetJustifyH("LEFT")
+	spellTarget:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -2)
+	castbar.spellTarget = spellTarget
+
+	frame:RegisterEvent("UNIT_TARGET", UpdateNameplateSpellTarget)
+end
+
+function UF:CreateCastbar(frame)
 	local mystyle = frame.mystyle
+	if mystyle ~= "Nameplate" and not Config.DB.Castbars.Enable then return end
 
 	local castbar = CreateFrame("StatusBar", "oUF_Castbar"..mystyle, frame)
 	castbar:SetStatusBarTexture(DB.StatusBarTexture2)
@@ -401,13 +441,16 @@ function UF:CreateCastbar(frame)
 		castbar:SetPoint("TOPRIGHT", frame.Power, "BOTTOMRIGHT", 0, -3)
 		castbar:SetHeight(10)
 		castbar:SetWidth(frame:GetWidth() - 22)
+	elseif mystyle == "Nameplate" then
+		castbar:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 0, -5)
+		castbar:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 0, -5)
+		castbar:SetHeight(frame:GetHeight())
 	else
 		castbar:SetHeight(Config.DB.Castbars[mystyle.."Height"])
 		castbar:SetWidth(Config.DB.Castbars[mystyle.."Width"])
 		castbar:SetFrameLevel(10)
 		CreateBarMover(castbar, L[mystyle.." Castbar"], mystyle.."Castbar", Config.UFs[mystyle.."Castbar"])
 	end
-
 
 	local timer = Core.CreateFS(castbar, 12, "", false, "RIGHT", -2, 0)
 	local name = Core.CreateFS(castbar, 12, "", false, "LEFT", 2, 0)
@@ -416,10 +459,11 @@ function UF:CreateCastbar(frame)
 
 	CreateIcon(castbar)
 	Core:CreateBorder(castbar, 1)
-	--Core:CreateShadow(castbar, 5)
 
 	if mystyle == "Player" then
 		CreateSafeZone(castbar, frame)
+	elseif mystyle == "Nameplate" then
+		SetupNameplateSpecifics(frame, castbar, name, timer)
 	end
 
 	castbar.decimal = "%.1f"

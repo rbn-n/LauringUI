@@ -8,4 +8,6 @@
 	<Include file="Quests\Load_Quests.xml" />
 	<Include file="Tooltips\Load_Tooltips.xml" />
 	<Include file="UnitFrames\Load_UnitFrames.xml" />
+	<Include file="Nameplates\Load_Nameplates.xml" />
+	<Script file="UnitFrames\Elements\Auras.lua"/>
 </Ui>

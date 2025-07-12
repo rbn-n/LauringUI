@@ -9,6 +9,7 @@
     <Script file="GuiChat.lua"/>
     <Script file="GuiLoot.lua"/>
     <Script file="GuiMaps.lua"/>
+    <Script file="GuiNameplates.lua"/>
     <Script file="GuiQuests.lua"/>
     <Script file="GuiTooltips.lua"/>
     <Script file="GuiQualityOfLife.lua"/>

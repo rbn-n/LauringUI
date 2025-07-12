@@ -5,27 +5,40 @@ local Infobars = Core:RegisterModule("Infobars")
 Infobars.DataTexts = {}
 
 function Infobars:CreatePanels()
-    self:CreateLeftBottomPanel()
-    self:CreateRightBottomPanel()
-    self:CreateActionBarPanel()
-    self:CreateCentralBottomPanel()
+	self:CreateLeftBottomPanel()
+	self:CreateRightBottomPanel()
+	self:CreateActionBarPanel()
+	self:CreateCentralBottomPanel()
 end
 
 function Infobars:CreateDataTexts()
-    self:PositionBottomPanelDataTexts({
-        "Spec", "Guild", "Friends", "Latency", "Fps", "System"
-    })
+	C_Timer.After(0, function()
+		local bottomTexts = {
+			["Spec"]    = { position = 0.00, align = "LEFT" },
+			["Guild"]   = { position = 0.20, align = "LEFT" },
+			["Friends"] = { position = 0.35, align = "LEFT" },
+			["Latency"] = { position = 0.63, align = "RIGHT" },
+			["Fps"]     = { position = 0.78, align = "RIGHT" },
+			["System"]  = { position = 1.00, align = "RIGHT" },
+		}
 
-	self:PositionRightPanelDataTexts({
-		"Durability", "Bags", "Gold", "Time"
-	})
+		local rightTexts = {
+			["Durability"] = { position = 0.00, align = "LEFT" },
+			["Bags"]       = { position = 0.30, align = "LEFT" },
+			["Gold"]       = { position = 0.80, align = "RIGHT" },
+			["Time"]       = { position = 1.00, align = "RIGHT" },
+		}
+
+		self:PositionDataTexts(bottomTexts, self.CentralBottomPanel)
+		self:PositionDataTexts(rightTexts, self.RightBottomPanel)
+	end)
 end
 
 function Infobars:RegisterDataText(name, options)
 	local panel = options.panel
 
 	local frame = CreateFrame("Button", "LauringUIInfo_"..name, panel)
-	frame:SetSize(80, 20) -- Default size, adjust later
+	frame:SetSize(80, 20) -- Default size, can be overridden in placement
 
 	if options.onEvent then frame:SetScript("OnEvent", options.onEvent) end
 	if options.onMouseUp then frame:SetScript("OnMouseUp", options.onMouseUp) end
@@ -53,72 +66,31 @@ function Infobars:RegisterDataText(name, options)
 	return frame
 end
 
-function Infobars:PositionBottomPanelDataTexts(names)
-	local panel = Infobars.CentralBottomPanel
-
+function Infobars:PositionDataTexts(dataTexts, panel)
 	if not panel then
 		print("PositionDataTexts: panel is nil!")
 		return
 	end
 
-	local padding = 10
-	local total = #names
 	local panelWidth = panel:GetWidth()
-	local spacing = (panelWidth - padding * 2) / total
 
-	for i, name in ipairs(names) do
+	for name, config in pairs(dataTexts) do
 		local frame = self.DataTexts[name]
-		if frame then
 
+		if frame and config then
 			frame:ClearAllPoints()
 			frame:SetParent(panel)
-			frame:SetSize(spacing, panel:GetHeight())
-
-			if i == 1 then
-				frame:SetPoint("LEFT", panel, "LEFT", 15, 0)
-			else
-				local prev = self.DataTexts[names[i - 1]]
-				frame:SetPoint("LEFT", prev, "RIGHT", 0, 0)
-			end
+			frame:SetSize(frame.Text:GetStringWidth() + 10, panel:GetHeight())
+			frame:SetPoint(config.align, panel, "LEFT", panelWidth * config.position, 0)
 		else
-			print("Missing DataText:", name)
+			print("Missing DataText or offset for:", name)
 		end
-
-	end
-end
-
-function Infobars:PositionRightPanelDataTexts(names)
-	local panel = Infobars.RightBottomPanel
-
-	if not panel then
-		print("PositionDataTexts: panel is nil!")
-		return
-	end
-
-	for i, name in ipairs(names) do
-		local frame = self.DataTexts[name]
-		if frame then
-
-			frame:ClearAllPoints()
-			frame:SetParent(panel)
-			frame:SetSize(frame.Text:GetWidth(), panel:GetHeight())
-
-			if i == 1 then
-				frame:SetPoint("LEFT", panel, "LEFT", 5, 0)
-			else
-				local prev = self.DataTexts[names[i - 1]]
-				frame:SetPoint("LEFT", prev, "RIGHT", 50, 0)
-			end
-		else
-			print("Missing DataText:", name)
-		end
-
 	end
 end
 
 function Infobars:GetTooltipAnchor(info)
 	local _, height = info:GetCenter()
-	if height and height > GetScreenHeight()/2 then
+	if height and height > GetScreenHeight() / 2 then
 		return "TOP", "BOTTOM", -15
 	else
 		return "BOTTOM", "TOP", 15
@@ -130,9 +102,8 @@ function Infobars:StylePanel(panel)
 end
 
 function Infobars:OnLogin()
-	Infobars:CreatePanels()
-    Infobars:CreateDataTexts()
-	-- TopPanel is created together with Location in DataTexts/Location.lua
-	Infobars:CreateLocation()
-	Infobars:CreateExperienceBar()
+	self:CreatePanels()
+	self:CreateDataTexts()
+	self:CreateLocation()
+	self:CreateExperienceBar()
 end

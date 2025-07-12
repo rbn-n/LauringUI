@@ -28,3 +28,11 @@ Config.UFs = {
 Config.Tooltips = {
 	Position = { "BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -5, 305 },
 }
+
+Config.Nameplates = {
+	WhiteList = {},
+	BlackList = {},
+	MajorSpells = {},
+	CustomUnits = {},
+	PowerUnits = {},
+}

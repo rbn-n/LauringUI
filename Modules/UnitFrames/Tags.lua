@@ -245,6 +245,25 @@ oUF.Tags.Methods["pppower"] = function(unit)
 end
 oUF.Tags.Events["pppower"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_DISPLAYPOWER"
 
+oUF.Tags.Methods["npctitle"] = function(unit)
+	local isPlayer = UnitIsPlayer(unit)
+	if isPlayer and Config.DB["Nameplates"]["NameOnlyGuild"] then
+		local guildName = GetGuildInfo(unit)
+		if guildName then
+			return "<"..guildName..">"
+		end
+	elseif not isPlayer and Config.DB["Nameplates"]["NameOnlyTitle"] then
+		Core.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
+		Core.ScanTip:SetUnit(unit)
+
+		local title = _G[format("LauringUI_ScanTooltipTextLeft%d", GetCVarBool("colorblindmode") and 3 or 2)]:GetText()
+		if title and not strfind(title, "^"..LEVEL) then
+			return title
+		end
+	end
+end
+oUF.Tags.Events["npctitle"] = "UNIT_NAME_UPDATE"
+
 oUF.Tags.Methods["tarname"] = function(unit)
 	local tarUnit = unit.."target"
 	if UnitExists(tarUnit) then

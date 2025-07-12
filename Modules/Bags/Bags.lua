@@ -8,7 +8,7 @@ local ipairs, strmatch, unpack, ceil = ipairs, string.match, unpack, math.ceil
 local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_RARE = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_RARE
 local LE_ITEM_CLASS_QUIVER, LE_ITEM_CLASS_CONTAINER = LE_ITEM_CLASS_QUIVER, LE_ITEM_CLASS_CONTAINER
 local C_NewItems_IsNewItem, C_NewItems_RemoveNewItem = C_NewItems.IsNewItem, C_NewItems.RemoveNewItem
-local IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown, DeleteCursorItem
+local IsControlKeyDown, IsAltKeyDown, DeleteCursorItem = IsControlKeyDown, IsAltKeyDown, DeleteCursorItem
 local SortBankBags, SortBags, InCombatLockdown, ClearCursor = SortBankBags, SortBags, InCombatLockdown, ClearCursor
 local GetContainerItemID = C_Container.GetContainerItemID
 local GetContainerNumSlots = C_Container.GetContainerNumSlots
@@ -1135,7 +1135,7 @@ function module:OnLogin()
 	local INFO = Core:GetModule("Infobars")
 	if INFO.modules then
 		for _, info in pairs(INFO.modules) do
-			if info.name == "Gold" then
+			if info.name == "Bags" then
 				Backpack.OnOpen = function()
 					if not LauringUIAccountDB["ShowSlots"] then return end
 					info:onEvent()

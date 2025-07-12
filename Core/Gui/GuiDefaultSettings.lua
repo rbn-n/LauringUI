@@ -11,6 +11,7 @@ G.TabList = {
     [L["Chat"]] = {},
     [L["Loot"]] = {},
     [L["Maps"]] = {},
+    [L["Nameplates"]] = {},
     [L["Quests"]] = {},
     [L["Tooltips"]] = {},
     [L["Quality of Life"]] = {},
@@ -105,6 +106,83 @@ G.DefaultSettings = {
 		ShowWhoPings = true,
 		Scale = 1.8,
 		Size = 140,
+	},
+	Nameplates = {
+		Enable = true,
+		MaxAuras = 5,
+		PlateAuras = true,
+		AuraSize = 24,
+		FontSize = 14,
+		SizeRatio = .5,
+		AuraFilter = 2,
+		FriendlyCC = false,
+		HostileCC = true,
+		TankMode = true,
+		TargetIndicator = 4,
+		ShowCustomUnits = true,
+		CustomColor = {r=0, g=.8, b=.3},
+		CustomUnits = {},
+		ShowPowerUnits = true,
+		PowerUnits = {},
+		VerticalSpacing = .7,
+		NameType = 5,
+		HealthType = 5,
+		SecureColor = {r=.5, g=.2, b=.7},
+		TransColor = {r=1, g=.93, b=.43},
+		InsecureColor = {r=1, g=.3, b=.31},
+		OffTankThreat = true,
+		OffTankColor = {r=.2, g=.7, b=.5},
+		DPSRevertThreat = true,
+		Fadeout = true,
+		FadeoutAlpha = 0,
+		MinScale = 1,
+		MinAlpha = 1,
+		Desaturate = true,
+		DebuffColor = false,
+		QuestIndicator = true,
+		NameOnlyMode = false,
+		ExecuteRatio = 0,
+		ColoredTarget = false,
+		TargetColor = {r=0, g=.6, b=1},
+		ColoredFocus = false,
+		FocusColor = {r=1, g=.8, b=0},
+		CastbarGlow = true,
+		CastTarget = false,
+		Interruptor = true,
+		PlateRange = 41,
+		ClampTarget = true,
+		FriendPlate = false,
+		EnemyClickThrough = false,
+		FriendlyClickThrough = false,
+		BlockDBM = true,
+		DispellMode = 1,
+		UnitTargeted = false,
+		ColorByDot = false,
+		DotColor = {r=1, g=.5, b=.2},
+		DotSpells = {},
+		TargetName = false,
+		PlateWidth = 190,
+		PlateHeight = 8,
+		PlateCBHeight = 8,
+		PlateCBOffset = -1,
+		CBTextSize = 14,
+		NameTextSize = 14,
+		HealthTextSize = 16,
+		HealthTextOffset = 5,
+		FriendPlateWidth = 190,
+		FriendPlateHeight = 8,
+		FriendPlateCBHeight = 8,
+		FriendPlateCBOffset = -1,
+		FriendCBTextSize = 14,
+		FriendNameSize = 14,
+		FriendHealthSize = 16,
+		FriendHealthOffset = 5,
+		NameOnlyTextSize = 14,
+		NameOnlyTitleSize = 12,
+		NameOnlyTitle = true,
+		NameOnlyGuild = false,
+		CVarOnlyNames = false,
+		CVarShowNPCs = false,
 	},
 	QoL = {
 		AutoDismount = true,
@@ -363,6 +441,9 @@ G.AccountSettings = {
 	CustomJunkList = {},
 	IgnoredButtons = "",
 	ShowSlots = false,
+	MajorSpells = {},
+	NameplateWhite = {},
+	NameplateBlack = {},
 }
 
 
@@ -401,6 +482,21 @@ local loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", function(self, _, addon)
     if addon ~= "LauringUI" then return end
+
+	if LauringUIAccountDB["NameplateFilter"] then
+		if LauringUIAccountDB["NameplateFilter"][1] then
+			if not LauringUIAccountDB["NameplateWhite"] then LauringUIAccountDB["NameplateWhite"] = {} end
+			for spellID, value in pairs(LauringUIAccountDB["NameplateFilter"][1]) do
+				LauringUIAccountDB["NameplateWhite"][spellID] = value
+			end
+		end
+		if LauringUIAccountDB["NameplateFilter"][2] then
+			if not LauringUIAccountDB["NameplateBlack"] then LauringUIAccountDB["NameplateBlack"] = {} end
+			for spellID, value in pairs(LauringUIAccountDB["NameplateFilter"][2]) do
+				LauringUIAccountDB["NameplateBlack"][spellID] = value
+			end
+		end
+	end
 
     InitialSettings(G.AccountSettings, LauringUIAccountDB)
 	if not next(LauringUICharacterDB) then

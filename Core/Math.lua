@@ -2,6 +2,11 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local floor = math.floor
 
+local GOLD_AMOUNT_SYMBOL = format("|cffffd700%s|r", GOLD_AMOUNT_SYMBOL)
+local SILVER_AMOUNT_SYMBOL = format("|cffd0d0d0%s|r", SILVER_AMOUNT_SYMBOL)
+local COPPER_AMOUNT_SYMBOL = format("|cffc77050%s|r", COPPER_AMOUNT_SYMBOL)
+
+
 local day, hour, minute = 86400, 3600, 60
 
 function Core.Numb(n)

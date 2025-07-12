@@ -801,3 +801,20 @@ function Core:ReskinMenuButton()
     self:HookScript("OnMouseUp", Menu_OnMouseUp)
     self:HookScript("OnMouseDown", Menu_OnMouseDown)
 end
+
+function G:CreateBarWidgets(parent, texture)
+	local icon = CreateFrame("Frame", nil, parent)
+	icon:SetSize(22, 22)
+	icon:SetPoint("LEFT", 5, 0)
+	Core.PixelIcon(icon, texture, true)
+
+	local close = CreateFrame("Button", nil, parent)
+	close:SetSize(20, 20)
+	close:SetPoint("RIGHT", -5, 0)
+	close.Icon = close:CreateTexture(nil, "ARTWORK")
+	close.Icon:SetAllPoints()
+	close.Icon:SetTexture("Interface\\BUTTONS\\UI-GroupLoot-Pass-Up")
+	close:SetHighlightTexture(close.Icon:GetTexture())
+
+	return icon, close
+end

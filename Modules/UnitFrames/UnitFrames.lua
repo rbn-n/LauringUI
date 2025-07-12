@@ -38,7 +38,6 @@ local function CreateTarget(frame)
 	UF:CreateRaidMark(frame)
 	UF:CreateIcons(frame)
 	UF:CreateHealPrediction(frame)
-    UF:CreateDebuffHighlight(frame)
 	UF:CreateAuras(frame)
 end
 

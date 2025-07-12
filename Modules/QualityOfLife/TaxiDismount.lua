@@ -2,7 +2,7 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local QoL = Core:GetModule("QoL")
 
-local C_Timer_After = C_Timer_After
+local C_Timer_After = C_Timer.After
 
 function QoL:UpdateTaxiDismount()
 	local lastTaxiIndex

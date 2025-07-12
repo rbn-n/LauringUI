@@ -1,5 +1,8 @@
 local _, ns = ...
-local B, C, L, DB = unpack(ns)
+local Core, Config, L, DB = unpack(ns)
+
+local GetSpecialization = GetSpecialization or C_SpecializationInfo.GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo or C_SpecializationInfo.GetSpecializationInfo
 
 local CUSTOM_CLASS_COLORS = CUSTOM_CLASS_COLORS
 local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON
@@ -18,6 +21,8 @@ DB.SparkTexture = "Interface\\CastingBar\\UI-CastingBar-Spark"
 DB.DebuffIconBorder = Media.."Textures\\iconborder"
 DB.GearTexture = "Interface\\WorldMap\\Gear_64"
 DB.ArrowUpTexture = Media.."Textures\\arrow"
+DB.ArrowTexture = Media.."Textures\\TargetArrow"
+DB.StarTexture = Media.."Textures\\star"
 DB.TankTexture = Media.."Textures\\Tank"
 DB.HealTexture = Media.."Textures\\Healer"
 DB.DpsTexture = Media.."Textures\\DPS"
@@ -25,6 +30,8 @@ DB.CloseTexture = Media.."Textures\\close"
 DB.SortTexture = Media.."Textures\\SortIcon"
 DB.CopyTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
 DB.MailTexture = "Interface\\Minimap\\Tracking\\Mailbox"
+DB.QuestTexture = "adventureguide-microbutton-alert"
+DB.ObjectTexture = "Warfronts-BaseMapIcons-Horde-Barracks-Minimap"
 
 DB.LeftButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:230:307|t "
 DB.RightButton = " |TInterface\\TUTORIALFRAME\\UI-TUTORIAL-FRAME:13:11:0:-1:512:512:12:66:333:411|t "
@@ -98,3 +105,17 @@ LE_ITEM_CLASS_MISCELLANEOUS = LE_ITEM_CLASS_MISCELLANEOUS or Enum.ItemClass.Misc
 LE_ITEM_CLASS_GLYPH = LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph
 LE_ITEM_CLASS_BATTLEPET = LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet
 LE_ITEM_CLASS_WOW_TOKEN = LE_ITEM_CLASS_WOW_TOKEN or Enum.ItemClass.WoWToken
+
+local function CheckRole()
+	local specIndex = GetSpecialization()
+	if not specIndex then
+		DB.Role = nil
+		return
+	end
+
+	local _, _, _, _, role = GetSpecializationInfo(specIndex)
+	DB.Role = role
+end
+
+Core:RegisterEvent("PLAYER_LOGIN", CheckRole)
+Core:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)

@@ -3,19 +3,13 @@ local Core, Config, L, DB = unpack(ns)
 local UF = Core:GetModule("UnitFrames")
 local oUF = ns.oUF
 
-local GetSpecialization = GetSpecialization or C_SpecializationInfo.GetSpecialization
-local GetSpecializationInfo = GetSpecializationInfo or C_SpecializationInfo.GetSpecializationInfo
-
 local function GetPlayerDispellableTypes()
-	local _, class = UnitClass("player")
-	if not class then return {} end
+	if not DB.MyClass then return {} end
+	if not DB.Role then return {} end
+	local class = DB.MyClass
+	local role = DB.Role
 
 	local dispels = {}
-
-	local specIndex = GetSpecialization()
-	if not specIndex then return dispels end
-
-	local _, _, _, _, role = GetSpecializationInfo(specIndex)
 
 	if class == "PRIEST" then
 		dispels.MAGIC = true

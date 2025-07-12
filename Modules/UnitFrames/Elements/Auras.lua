@@ -1,6 +1,8 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
+local oUF = ns.oUF
 local UF = Core:GetModule("UnitFrames")
+local Nameplates = Core:GetModule("Nameplates")
 
 local x1, x2, y1, y2 = unpack(DB.TexCoord)
 
@@ -122,7 +124,11 @@ function UF.PostUpdateIcon(element, unit, button, _, _, duration, expiration, de
 	if duration then button.iconbg:Show() end
 
 	local style = element.__owner.mystyle
-	button:SetSize(element.size, element.size)
+	if style == "Nameplate" then
+		button:SetSize(element.size, element.size * Config.DB["Nameplates"]["SizeRatio"])
+	else
+		button:SetSize(element.size, element.size)
+	end
 
 	if element.desaturateDebuff and button.isDebuff and filteredStyle[style] and not button.isPlayer then
 		button.icon:SetDesaturated(true)
@@ -153,9 +159,56 @@ function UF.PostUpdateIcon(element, unit, button, _, _, duration, expiration, de
 	end
 end
 
+local IsCasterPlayer = {
+	["player"] = true,
+	["pet"] = true,
+	["vehicle"] = true,
+}
+
+function UF.CustomFilter(element, unit, button, name, _, _, debuffType, _, _, caster, isStealable, _, spellID, _, _, _, nameplateShowAll)
+	local style = element.__owner.mystyle
+
+	if style == "Nameplate" or style == "Boss" or style == "Arena" then
+		if Config.DB["Nameplates"]["ColorByDot"] and IsCasterPlayer[caster] and Config.DB["Nameplates"]["DotSpells"][spellID] then
+			element.hasTheDot = true
+		end
+
+		if element.__owner.plateType == "NameOnly" then
+			return Nameplates.NameplateWhite[spellID]
+		elseif Nameplates.NameplateBlack[spellID] then
+			return false
+		elseif (element.showStealableBuffs and isStealable or element.alwaysShowStealable and dispellType[debuffType]) and not UnitIsPlayer(unit) and (not button.isDebuff) then
+			return true
+		elseif Nameplates.NameplateWhite[spellID] then
+			return true
+		else
+			local auraFilter = Config.DB["Nameplates"]["AuraFilter"]
+			return (auraFilter == 3 and nameplateShowAll) or (auraFilter ~= 1 and IsCasterPlayer[caster])
+		end
+	else
+		return (element.onlyShowPlayer and button.isPlayer) or (not element.onlyShowPlayer and name)
+	end
+end
+
+function UF.UnitCustomFilter(element, _, button, name, _, _, _, _, _, _, isStealable)
+	local value = element.__value
+	if button.isDebuff then
+		if Config.DB["UFs"][value.."DebuffType"] == 2 then
+			return name
+		elseif Config.DB["UFs"][value.."DebuffType"] == 3 then
+			return button.isPlayer
+		end
+	else
+		if Config.DB["UFs"][value.."BuffType"] == 2 then
+			return name
+		elseif Config.DB["UFs"][value.."BuffType"] == 3 then
+			return isStealable
+		end
+	end
+end
+
 function UF:CreateAuras(frame)
 	local mystyle = frame.mystyle
-    if not auraUFs[mystyle] then return end
 
     local auras = CreateFrame("Frame", nil, frame)
 	auras:SetFrameLevel(frame:GetFrameLevel() + 2)
@@ -165,10 +218,26 @@ function UF:CreateAuras(frame)
 	auras.spacing = 3
 	auras.tooltipAnchor = "ANCHOR_BOTTOMLEFT"
 
-    auras.__value = auraUFs[mystyle]
-    UF:ConfigureAuras(auras)
-    UF:UpdateAuraDirection(frame, auras)
-    auras.FilterAura = UF.UnitCustomFilter
+	if auraUFs[mystyle] then
+		auras.__value = auraUFs[mystyle]
+		UF:ConfigureAuras(auras)
+		UF:UpdateAuraDirection(frame, auras)
+		auras.CustomFilter = UF.UnitCustomFilter
+	elseif mystyle == "Nameplate" then
+		auras.initialAnchor = "BOTTOMLEFT"
+		auras["growth-y"] = "UP"
+		auras:SetPoint("BOTTOMLEFT", frame.nameText, "TOPLEFT", 0, 5)
+		auras.numTotal = Config.DB["Nameplates"]["MaxAuras"]
+		auras.size = Config.DB["Nameplates"]["AuraSize"]
+		auras.fontSize = Config.DB["Nameplates"]["FontSize"]
+		auras.showDebuffType = Config.DB["Nameplates"]["DebuffColor"]
+		auras.desaturateDebuff = Config.DB["Nameplates"]["Desaturate"]
+		auras.gap = false
+		auras.disableMouse = true
+		auras.disableCooldown = true
+		auras.spacing = 5
+		auras.CustomFilter = UF.CustomFilter
+	end
 
 	UF:UpdateAuraContainer(frame, auras, auras.numTotal or auras.numBuffs + auras.numDebuffs)
 	auras.showStealableBuffs = true

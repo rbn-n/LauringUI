@@ -64,6 +64,7 @@ local orderedTabs = {
     L["Chat"],
     L["Loot"],
     L["Maps"],
+    L["Nameplates"],
     L["Quests"],
     L["Tooltips"],
     L["Quality of Life"],

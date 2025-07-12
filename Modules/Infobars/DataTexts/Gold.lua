@@ -4,15 +4,12 @@ local module = Core:GetModule("Infobars")
 
 local profit, spent, oldMoney = 0, 0, 0
 local showSession = false
+local myRealm, myName, myClass = DB.MyRealm, DB.MyName, DB.MyClass
 
-local function UpdateStoredGold()
-	local realm, name, class = DB.MyRealm, DB.MyName, DB.MyClass
-	LauringUIDB.gold = LauringUIDB.gold or {}
-	LauringUIDB.gold[realm] = LauringUIDB.gold[realm] or {}
-	LauringUIDB.gold[realm][name] = {
-		money = GetMoney(),
-		class = class,
-	}
+local function UpdateStoredGold(money)
+	LauringUIAccountDB.TotalGold = LauringUIAccountDB.TotalGold or {}
+	LauringUIAccountDB.TotalGold[myRealm] = LauringUIAccountDB.TotalGold[myRealm] or {}
+	LauringUIAccountDB.TotalGold[myRealm][myName] = {money, myClass}
 end
 
 local function ResetSession()
@@ -20,36 +17,44 @@ local function ResetSession()
 end
 
 local function WipeGoldData()
-	local realm, name, class = DB.MyRealm, DB.MyName, DB.MyClass
-	local current = {
-		money = GetMoney(),
-		class = class,
-	}
-
-	LauringUIDB.gold = {}
-	LauringUIDB.gold[realm] = {}
-	LauringUIDB.gold[realm][name] = current
+	LauringUIAccountDB.TotalGold = {}
+	LauringUIAccountDB.TotalGold[myRealm] = {}
+	LauringUIAccountDB.TotalGold[myRealm][myName] = {GetMoney(), myClass}
 end
 
-local function OnEvent(self)
-	local newMoney = GetMoney()
+local firstUpdateDone = false
 
-	if not oldMoney then
-		oldMoney = newMoney
-		UpdateStoredGold()
-	else
-		local change = newMoney - oldMoney
+local function UpdateText(self)
+	local money = GetMoney()
+	local displayAmount = showSession and (profit - spent) or money
+	self.Text:SetText(Core:FormatGold(displayAmount, true))
+end
+
+local function OnEvent(self, event)
+	if event == "PLAYER_ENTERING_WORLD" then
+		oldMoney = GetMoney()
+		UpdateStoredGold(oldMoney)
+		UpdateText(self) -- <=== Force show gold now
+		self:UnregisterEvent(event)
+		return
+	end
+
+	local money = GetMoney()
+	local change = money - oldMoney
+
+	if firstUpdateDone then
 		if change > 0 then
 			profit = profit + change
 		elseif change < 0 then
 			spent = spent - change
 		end
-
-		oldMoney = newMoney
-		UpdateStoredGold()
+	else
+		firstUpdateDone = true
 	end
 
-	self.Text:SetText(showSession and Core:FormatGold(profit - spent) or Core:FormatGold(newMoney))
+	oldMoney = money
+	UpdateStoredGold(money)
+	UpdateText(self)
 end
 
 local function OnEnter(self)
@@ -57,28 +62,26 @@ local function OnEnter(self)
 	GameTooltip:SetOwner(self, "ANCHOR_" .. anchor, 0, offset)
 	GameTooltip:ClearLines()
 
-	GameTooltip:AddLine("Gold", 0.6, 0.8, 1)
+	GameTooltip:AddLine(CURRENCY, 0.6, 0.8, 1)
 	GameTooltip:AddLine(" ")
 
-	GameTooltip:AddLine("Session", 0.8, 0.8, 0.8)
-	GameTooltip:AddDoubleLine("Earned:", Core:FormatGold(profit), 1, 1, 1)
-	GameTooltip:AddDoubleLine("Spent:", Core:FormatGold(spent), 1, 1, 1)
+	GameTooltip:AddLine(L["Session"], 0.6, 0.8, 1)
+	GameTooltip:AddDoubleLine(L["Earned"], Core:FormatGold(profit, true), 1, 1, 1, 1, 1, 1)
+	GameTooltip:AddDoubleLine(L["Spent"], Core:FormatGold(spent, true), 1, 1, 1, 1, 1, 1)
 
-	local net = profit - spent
-	if net >= 0 then
-		GameTooltip:AddDoubleLine("Profit:", Core:FormatGold(net), 0, 1, 0)
-	else
-		GameTooltip:AddDoubleLine("Deficit:", Core:FormatGold(-net), 1, 0, 0)
+	if profit > spent then
+		GameTooltip:AddDoubleLine(L["Profit"], Core:FormatGold(profit - spent, true), 0, 1, 0, 1, 1, 1)
+	elseif spent > profit then
+		GameTooltip:AddDoubleLine(L["Deficit"], Core:FormatGold(spent - profit, true), 1, 0, 0, 1, 1, 1)
 	end
 
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddLine("Characters", 0.8, 0.8, 0.8)
+	GameTooltip:AddLine(L["RealmCharacter"], 0.6, 0.8, 1)
 
 	local total = 0
-	for realm, players in pairs(LauringUIDB.gold or {}) do
-		for name, data in pairs(players) do
-			local class = data.class
-			local money = data.money
+	for realm, chars in pairs(LauringUIAccountDB.TotalGold or {}) do
+		for name, data in pairs(chars) do
+			local money, class = unpack(data)
 			local color = DB.ClassColors[class] or { r = 1, g = 1, b = 1 }
 			GameTooltip:AddDoubleLine(name .. " - " .. realm, Core:FormatGold(money), color.r, color.g, color.b, 1, 1, 1)
 			total = total + money
@@ -86,11 +89,10 @@ local function OnEnter(self)
 	end
 
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine("Total:", Core:FormatGold(total), 0.6, 0.8, 1, 1, 1, 1)
-
+	GameTooltip:AddDoubleLine(TOTAL .. ":", Core:FormatGold(total), 0.6, 0.8, 1, 1, 1, 1)
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddDoubleLine(DB.LeftButton .. "+ALT " .. "Reset All Character Gold", "", 0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
-	GameTooltip:AddDoubleLine(DB.RightButton .. "+ALT " .. "Reset Session", "", 0.7, 0.7, 0.7, 0.7, 0.7, 0.7)
+	GameTooltip:AddDoubleLine(DB.LeftButton .. "+ALT " .. L["Reset Gold"], "", 0.7, 0.7, 0.7)
+	GameTooltip:AddDoubleLine(DB.RightButton .. "+ALT " .. L["Reset Session"], "", 0.7, 0.7, 0.7)
 
 	GameTooltip:Show()
 end
@@ -103,20 +105,27 @@ local function OnMouseUp(self, button)
 	if button == "RightButton" then
 		if IsAltKeyDown() then
 			ResetSession()
+		else
+			showSession = not showSession
 		end
 		OnEvent(self)
-	elseif button == "LeftButton" then
-		if IsAltKeyDown() then
-			WipeGoldData()
-			OnEvent(self)
-		end
+	elseif button == "LeftButton" and IsAltKeyDown() then
+		WipeGoldData()
+		OnEvent(self)
 	end
 end
 
 module:RegisterDataText("Gold", {
 	panel = module.RightBottomPanel,
-	anchor = "LEFT",
-	events = { "PLAYER_MONEY", "PLAYER_ENTERING_WORLD" },
+	anchor = "RIGHT",
+	events = {
+		"PLAYER_MONEY",
+		"SEND_MAIL_MONEY_CHANGED",
+		"SEND_MAIL_COD_CHANGED",
+		"PLAYER_TRADE_MONEY",
+		"TRADE_MONEY_CHANGED",
+		"PLAYER_ENTERING_WORLD",
+	},
 	onEvent = OnEvent,
 	onEnter = OnEnter,
 	onLeave = OnLeave,

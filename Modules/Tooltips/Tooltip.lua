@@ -182,16 +182,15 @@ function Tooltip:OnTooltipSetUnit()
 
 		local diff = GetCreatureDifficultyColor(level)
 		local classify = UnitClassification(unit)
-		local textLevel = format("%s%s%s|r", Core.HexRGB(diff), boss or format("%d", level), classification[classify] or "")
+		local textLevel = format("%s%s%s|r", Core.HexRGB(diff), boss or format("%d", level),
+			classification[classify] or "")
 		local tiptextLevel = Tooltip.GetLevelLine(self)
 		if tiptextLevel then
-			local reaction = UnitReaction(unit, "player")
-			local standingText = not isPlayer and reaction and hexColor.._G["FACTION_STANDING_LABEL"..reaction].."|r " or ""
-
 			local pvpFlag = isPlayer and UnitIsPVP(unit) and format(" |cffff0000%s|r", PVP) or ""
-			local unitClass = isPlayer and format("%s %s", UnitRace(unit) or "", hexColor..(UnitClass(unit) or "").."|r") or UnitCreatureType(unit) or ""
+			local unitClass = isPlayer and format("%s %s", UnitRace(unit) or "", hexColor ..
+			(UnitClass(unit) or "") .. "|r") or UnitCreatureType(unit) or ""
 
-			tiptextLevel:SetFormattedText(("%s%s %s %s"), textLevel, pvpFlag, standingText..unitClass, (not alive and "|cffCCCCCC"..DEAD.."|r" or ""))
+			tiptextLevel:SetFormattedText(("%s%s %s %s"), textLevel, pvpFlag, unitClass,(not alive and "|cffCCCCCC" .. DEAD .. "|r" or ""))
 		end
 	end
 
