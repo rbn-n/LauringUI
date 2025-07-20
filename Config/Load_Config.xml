@@ -1,4 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="Config.lua"/>
     <Script file="AurasTable.lua"/>
+    <Script file="GroupFrameAuras.lua"/>
+    <Include file="RaidAuras\Load_RaidAuras.xml"/>
 </Ui>

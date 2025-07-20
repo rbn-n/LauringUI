@@ -1,8 +1,32 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
+local module = Core:RegisterModule("AurasTable")
+
+local pairs, next = pairs, next
 local GetSpellInfo = GetSpellInfo
 
-local module = Core:RegisterModule("AurasTable")
+local RaidDebuffs = {}
+function module:RegisterDebuff(_, instID, _, spellID, level)
+	local instName = EJ_GetInstanceInfo(instID)
+
+	if not RaidDebuffs[instName] then RaidDebuffs[instName] = {} end
+	if not level then level = 2 end
+	if level > 6 then level = 6 end
+
+	RaidDebuffs[instName][spellID] = level
+end
+
+local function CheckCornerSpells()
+	if not LauringUIAccountDB["CornerSpells"][DB.MyClass] then LauringUIAccountDB["CornerSpells"][DB.MyClass] = {} end
+	local data = Config.CornerBuffs[DB.MyClass]
+	if not data then return end
+
+	for spellID, value in pairs(LauringUIAccountDB["CornerSpells"][DB.MyClass]) do
+		if not next(value) and Config.CornerBuffs[DB.MyClass][spellID] == nil then
+			LauringUIAccountDB["CornerSpells"][DB.MyClass][spellID] = nil
+		end
+	end
+end
 
 local function CheckMajorSpells()
 	for spellID in pairs(Config.Nameplates.MajorSpells) do
@@ -28,8 +52,6 @@ local function CheckNameplateFilter(list, key)
 			if LauringUIAccountDB[key][spellID] then
 				LauringUIAccountDB[key][spellID] = nil
 			end
-		else
-			if DB.isDeveloper then print("Invalid nameplate filter ID: "..spellID) end
 		end
 	end
 
@@ -61,6 +83,23 @@ function module:CheckNameplateFilters()
 end
 
 function module:OnLogin()
+	for instName, value in pairs(RaidDebuffs) do
+		for spell, priority in pairs(value) do
+			if LauringUIAccountDB["RaidDebuffs"][instName] and LauringUIAccountDB["RaidDebuffs"][instName][spell] and LauringUIAccountDB["RaidDebuffs"][instName][spell] == priority then
+				LauringUIAccountDB["RaidDebuffs"][instName][spell] = nil
+			end
+		end
+	end
+	for instName, value in pairs(LauringUIAccountDB["RaidDebuffs"]) do
+		if not next(value) then
+			LauringUIAccountDB["RaidDebuffs"][instName] = nil
+		end
+	end
+
+	RaidDebuffs[0] = {} -- OTHER spells
+	Config.RaidDebuffs = RaidDebuffs
+
+	CheckCornerSpells()
 	CheckMajorSpells()
 	module:CheckNameplateFilters()
 end

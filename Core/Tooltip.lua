@@ -2,19 +2,20 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 
 local tip = CreateFrame("GameTooltip", "LauringUI_ScanTooltip", nil, "GameTooltipTemplate")
-tip:SetOwner(UIParent, "ANCHOR_NONE")
-
-for i = 1, 10 do
-    local left = tip:CreateFontString("$parentTextLeft"..i, nil, "GameTooltipText")
-    local right = tip:CreateFontString("$parentTextRight"..i, nil, "GameTooltipText")
-    tip:AddFontStrings(left, right)
-end
-
-for i = 1, 5 do
-    tip["Texture"..i] = tip:CreateTexture("LauringUI_ScanTooltipTexture"..i, "ARTWORK")
-end
-
 Core.ScanTip = tip
+-- tip:SetOwner(UIParent, "ANCHOR_NONE")
+
+-- for i = 1, 10 do
+--     local left = tip:CreateFontString("$parentTextLeft"..i, nil, "GameTooltipText")
+--     local right = tip:CreateFontString("$parentTextRight"..i, nil, "GameTooltipText")
+--     tip:AddFontStrings(left, right)
+-- end
+
+-- for i = 1, 5 do
+--     tip["Texture"..i] = tip:CreateTexture("LauringUI_ScanTooltipTexture"..i, "ARTWORK")
+-- end
+
+-- Core.ScanTip = tip
 
 
 function Core:HideTooltip()

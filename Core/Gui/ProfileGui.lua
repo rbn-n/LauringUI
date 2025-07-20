@@ -2,6 +2,19 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
 
+local spellBooleanValues = {
+	["RaidBuffsWhite"] = true,
+	["RaidDebuffsBlack"] = true,
+	["NameplateWhite"] = true,
+	["NameplateBlack"] = true,
+}
+
+local booleanTable = {
+	["CustomUnits"] = true,
+	["PowerUnits"] = true,
+	["DotSpells"] = true,
+}
+
 function G:CreateProfileIcon(bar, index, texture, title, description)
 	local button = CreateFrame("Button", nil, bar)
 	button:SetSize(32, 32)
@@ -271,12 +284,6 @@ local accountStrValues = {
 	["IgnoredButtons"] = true,
 }
 
-local booleanTable = {
-	["CustomUnits"] = true,
-	["PowerUnits"] = true,
-	["DotSpells"] = true,
-}
-
 function G:ExportGUIData()
 	local text = "LauringUISettings:"..DB.MyName..":"..DB.MyClass
 	for KEY, VALUE in pairs(Config.DB) do
@@ -316,10 +323,35 @@ function G:ExportGUIData()
 	end
 
 	for KEY, VALUE in pairs(LauringUIAccountDB) do
-		if KEY == "ProfileIndex" or KEY == "ProfileNames" then
+		if spellBooleanValues[KEY] then
+			text = text..";ACCOUNT:"..KEY
+			for spellID, value in pairs(VALUE) do
+				text = text..":"..spellID..":"..tostring(value)
+			end
+		elseif KEY == "RaidDebuffs" then
+			for instName, value in pairs(VALUE) do
+				for spellID, prio in pairs(value) do
+					text = text..";ACCOUNT:"..KEY..":"..instName..":"..spellID..":"..prio
+				end
+			end
+		elseif KEY == "ProfileIndex" or KEY == "ProfileNames" then
 			text = text..";ACCOUNT:"..KEY
 			for k, v in pairs(VALUE) do
 				text = text..":"..k..":"..v
+			end
+		elseif KEY == "CornerSpells" then
+			text = text..";ACCOUNT:"..KEY
+			for class, value in pairs(VALUE) do
+				if class == DB.MyClass then
+					text = text..":"..class
+					for spellID, data in pairs(value) do
+						if not bloodlustFilter[spellID] then
+							local anchor, filter = unpack(data)
+							anchor = anchor or ""
+							text = text..":"..spellID..":"..anchor..":"..tostring(filter or false)
+						end
+					end
+				end
 			end
 		elseif VALUE == true or VALUE == false or accountStrValues[KEY] then
 			text = text..";ACCOUNT:"..KEY..":"..tostring(VALUE)
@@ -406,7 +438,32 @@ function G:ImportGUIData()
 				Config.DB[key][value] = arg1
 			end
 		elseif key == "ACCOUNT" then
-			if value == "ProfileIndex" then
+			if spellBooleanValues[value] then
+				local results = {select(3, strsplit(":", option))}
+				for j = 1, #results, 2 do
+					LauringUIAccountDB[value][tonumber(results[j])] = toBoolean(results[j+1])
+				end
+			elseif value == "RaidDebuffs" then
+				local instName, spellID, priority = select(3, strsplit(":", option))
+				if not LauringUIAccountDB[value][instName] then LauringUIAccountDB[value][instName] = {} end
+				LauringUIAccountDB[value][instName][tonumber(spellID)] = tonumber(priority)
+			elseif value == "CornerSpells" then
+				local results = {select(3, strsplit(":", option))}
+				local class = results[1]
+				if class == DB.MyClass then
+					for j = 2, #results, 6 do
+						local spellID, anchor, filter = results[j], results[j + 1], results[j + 2]
+						spellID = tonumber(spellID)
+						filter = toBoolean(filter)
+						if not LauringUIAccountDB[value][class] then LauringUIAccountDB[value][class] = {} end
+						if anchor == "" then
+							LauringUIAccountDB[value][class][spellID] = {}
+						else
+							LauringUIAccountDB[value][class][spellID] = {anchor, filter}
+						end
+					end
+				end
+			elseif value == "ProfileIndex" then
 				local results = {select(3, strsplit(":", option))}
 				for j = 1, #results, 2 do
 					LauringUIAccountDB[value][results[j]] = tonumber(results[j + 1])

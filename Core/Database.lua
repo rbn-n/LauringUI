@@ -119,3 +119,4 @@ end
 
 Core:RegisterEvent("PLAYER_LOGIN", CheckRole)
 Core:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
+Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", CheckRole)

@@ -140,6 +140,7 @@ local function CreateGroup(frame)
     UF:CreateDebuffHighlight(frame)
 	UF:CreateHealPrediction(frame)
 	UF:CreateThreatBorder(frame)
+    UF:CreateRaidAuras(frame)
 end
 
 local function CreateParty(frame)
@@ -580,8 +581,12 @@ function UF:OnLogin()
     UF:ToggleUFClassPower()
     UF:ToggleAllAuras()
     UF:CheckPowerBars()
+    UF:UpdateRaidInfo()
 
     SetCVar("predictedHealth", 1)
+    UF:UpdateCornerSpells()
+    UF:UpdateRaidBuffsWhite()
+    UF:UpdateRaidDebuffsBlack()
     Core:HideDefaultRaidFrame()
 
     UF.headers = {}

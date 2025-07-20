@@ -16,6 +16,14 @@ function G:ToggleExtraGUI(guiName)
 	return extraGUIs
 end
 
+function G:SortBars(barTable)
+	local num = 1
+	for _, bar in pairs(barTable) do
+		bar:SetPoint("TOPLEFT", 10, -10 - 35*(num-1))
+		num = num + 1
+	end
+end
+
 local function HideExtraGUIs()
 	for _, frame in pairs(extraGUIs) do
 		frame:Hide()

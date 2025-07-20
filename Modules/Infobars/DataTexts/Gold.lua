@@ -76,15 +76,26 @@ local function OnEnter(self)
 	end
 
 	GameTooltip:AddLine(" ")
-	GameTooltip:AddLine(L["RealmCharacter"], 0.6, 0.8, 1)
+	GameTooltip:AddLine("Gold on " .. myRealm, 0.6, 0.8, 1)
 
 	local total = 0
-	for realm, chars in pairs(LauringUIAccountDB.TotalGold or {}) do
-		for name, data in pairs(chars) do
+	local realmData = LauringUIAccountDB.TotalGold and LauringUIAccountDB.TotalGold[myRealm]
+	if realmData then
+		local charList = {}
+
+		for name, data in pairs(realmData) do
 			local money, class = unpack(data)
-			local color = DB.ClassColors[class] or { r = 1, g = 1, b = 1 }
-			GameTooltip:AddDoubleLine(name .. " - " .. realm, Core:FormatGold(money), color.r, color.g, color.b, 1, 1, 1)
-			total = total + money
+			table.insert(charList, { name = name, money = money, class = class })
+		end
+
+		table.sort(charList, function(a, b)
+			return a.money > b.money
+		end)
+
+		for _, char in ipairs(charList) do
+			local color = DB.ClassColors[char.class] or { r = 1, g = 1, b = 1 }
+			GameTooltip:AddDoubleLine(char.name, Core:FormatGold(char.money), color.r, color.g, color.b, 1, 1, 1)
+			total = total + char.money
 		end
 	end
 

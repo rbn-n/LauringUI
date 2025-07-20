@@ -1,0 +1,4 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Cata\CataDungeons.lua"/>
+	<Script file="Cata\DragonSoul.lua"/>
+</Ui>

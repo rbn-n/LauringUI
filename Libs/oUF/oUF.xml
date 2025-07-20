@@ -36,6 +36,7 @@
 	<Script file="elements\threatindicator.lua"/>
 
 	<Script file="Plugins\DebuffHighlight.lua"/>
+	<Script file="Plugins\RaidAuras.lua"/>
 
 	<Script file="finalize.lua"/>
 </Ui>

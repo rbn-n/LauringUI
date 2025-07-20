@@ -34,6 +34,26 @@ local function Button_OnLeave(self)
     Core.SetBorderColor(self.__bg)
 end
 
+local function LabelOnEnter(self)
+	GameTooltip:ClearLines()
+	GameTooltip:SetOwner(self:GetParent(), "ANCHOR_RIGHT", 0, 3)
+	GameTooltip:AddLine(self.text)
+	GameTooltip:AddLine(self.tip, .6,.8,1, 1)
+	GameTooltip:Show()
+end
+
+local function CreateLabel(parent, text, tip)
+	local label = Core.CreateFS(parent, 14, text, "system", "CENTER", 0, 25)
+	if not tip then return end
+	local frame = CreateFrame("Frame", nil, parent)
+	frame:SetAllPoints(label)
+	frame.text = text
+	frame.tip = tip
+	frame:SetScript("OnEnter", LabelOnEnter)
+	frame:SetScript("OnLeave", Core.HideTooltip)
+end
+
+
 local blizzRegions = {
     "Left",
     "Middle",
@@ -111,6 +131,15 @@ function Core:CreateEditBox(width, height)
 
     editBox.Type = "EditBox"
     return editBox
+end
+
+function G:CreateEditbox(parent, text, x, y, tip, width, height)
+	local eb = Core.CreateEditBox(parent, width or 90, height or 30)
+	eb:SetPoint("TOPLEFT", x, y)
+	eb:SetMaxLetters(255)
+	CreateLabel(eb, text, tip)
+
+	return eb
 end
 
 function Core:CreateButton(width, height, text, fontSize)
@@ -506,25 +535,6 @@ local function AddTextureToOption(parent, index)
 	tex:SetVertexColor(DB.r, DB.g, DB.b)
 end
 
-local function LabelOnEnter(self)
-	GameTooltip:ClearLines()
-	GameTooltip:SetOwner(self:GetParent(), "ANCHOR_RIGHT", 0, 3)
-	GameTooltip:AddLine(self.text)
-	GameTooltip:AddLine(self.tip, .6,.8,1, 1)
-	GameTooltip:Show()
-end
-
-local function CreateLabel(parent, text, tip)
-	local label = Core.CreateFS(parent, 14, text, "system", "CENTER", 0, 25)
-	if not tip then return end
-	local frame = CreateFrame("Frame", nil, parent)
-	frame:SetAllPoints(label)
-	frame.text = text
-	frame.tip = tip
-	frame:SetScript("OnEnter", LabelOnEnter)
-	frame:SetScript("OnLeave", Core.HideTooltip)
-end
-
 function G:CreateDropdown(parent, text, x, y, data, tip, width, height)
 	local dd = Core.CreateDropDown(parent, width or 90, height or 30, data)
 	dd:SetPoint("TOPLEFT", x, y)
@@ -817,4 +827,18 @@ function G:CreateBarWidgets(parent, texture)
 	close:SetHighlightTexture(close.Icon:GetTexture())
 
 	return icon, close
+end
+
+function G:ClearEdit(element)
+	if element.Type == "EditBox" then
+		element:ClearFocus()
+		element:SetText("")
+	elseif element.Type == "CheckBox" then
+		element:SetChecked(false)
+	elseif element.Type == "DropDown" then
+		element.Text:SetText("")
+		for i = 1, #element.options do
+			element.options[i].selected = false
+		end
+	end
 end

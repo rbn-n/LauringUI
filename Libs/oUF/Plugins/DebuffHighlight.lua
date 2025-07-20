@@ -47,7 +47,7 @@ local function Enable(self)
 
 		return true
 	end
-	
+
 end
 
 local function Disable(self)

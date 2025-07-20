@@ -29,7 +29,7 @@ local function GetCurrentTime()
 end
 
 function module:UpdateChannelNames(text, ...)
-	if strfind(text, INTERFACE_ACTION_BLOCKED) and not DB.isDeveloper then return end
+	if strfind(text, INTERFACE_ACTION_BLOCKED) then return end
 
 	local r, g, b = ...
 	if Config.DB["Chat"]["WhisperColor"] and strfind(text, L["Tell"].." |H[BN]*player.+%]") then

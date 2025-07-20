@@ -4,14 +4,6 @@ local G = Core:GetModule("GUI")
 
 local GetSpellInfo, GetSpellTexture = GetSpellInfo, GetSpellTexture
 
-local function SortBars(barTable)
-	local num = 1
-	for _, bar in pairs(barTable) do
-		bar:SetPoint("TOPLEFT", 10, -10 - 35*(num-1))
-		num = num + 1
-	end
-end
-
 local function RefreshNameplateFilters()
 	Core:GetModule("Nameplates"):RefreshFilters()
 end
@@ -61,7 +53,7 @@ local function SetupNameplateFilter(parent)
                 end
             end
             frameData[index].barList[spellID] = nil
-            SortBars(frameData[index].barList)
+            G:SortBars(frameData[index].barList)
         end)
 
         local spellName = Core.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
@@ -69,7 +61,7 @@ local function SetupNameplateFilter(parent)
         spellName:SetJustifyH("LEFT")
         if index == 2 then spellName:SetTextColor(1, 0, 0) end
 
-        SortBars(frameData[index].barList)
+        G:SortBars(frameData[index].barList)
     end
 
     local function addClick(parent, index)
@@ -162,7 +154,7 @@ local function NameplateColorDots(parent)
 			bar:Hide()
 			barTable[spellID] = nil
 			Config.DB["Nameplates"]["DotSpells"][spellID] = nil
-			SortBars(barTable)
+			G:SortBars(barTable)
 		end)
 
 		local name = Core.CreateFS(bar, 14, spellName, false, "LEFT", 30, 0)
@@ -170,7 +162,7 @@ local function NameplateColorDots(parent)
 		name:SetJustifyH("LEFT")
 		if isNew then name:SetTextColor(0, 1, 0) end
 
-		SortBars(barTable)
+		G:SortBars(barTable)
 	end
 
 	local frame = panel.bg
@@ -253,7 +245,7 @@ local function NameplateUnitFilter(parent)
 			else
 				Config.DB["Nameplates"]["CustomUnits"][text] = nil
 			end
-			SortBars(barTable)
+			G:SortBars(barTable)
 		end)
 
 		local name = Core.CreateFS(bar, 14, text, false, "LEFT", 30, 0)
@@ -269,7 +261,7 @@ local function NameplateUnitFilter(parent)
 			end)
 		end
 
-		SortBars(barTable)
+		G:SortBars(barTable)
 	end
 
 	local frame = panel.bg
@@ -355,7 +347,7 @@ local function NameplatePowerUnits(parent)
 			else
 				Config.DB["Nameplates"]["PowerUnits"][text] = nil
 			end
-			SortBars(barTable)
+			G:SortBars(barTable)
 		end)
 
 		local name = Core.CreateFS(bar, 14, text, false, "LEFT", 30, 0)
@@ -371,7 +363,7 @@ local function NameplatePowerUnits(parent)
 			end)
 		end
 
-		SortBars(barTable)
+		G:SortBars(barTable)
 	end
 
 	local frame = panel.bg
@@ -497,14 +489,14 @@ local function PlateCastbarGlow(parent)
 			else
 				LauringUIAccountDB["MajorSpells"][spellID] = nil
 			end
-			SortBars(barTable)
+			G:SortBars(barTable)
 		end)
 
 		local name = Core.CreateFS(bar, 14, spellName, false, "LEFT", 30, 0)
 		name:SetWidth(120)
 		name:SetJustifyH("LEFT")
 
-		SortBars(barTable)
+		G:SortBars(barTable)
 	end
 
 	local frame = panel.bg

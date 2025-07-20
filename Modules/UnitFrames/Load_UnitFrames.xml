@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
 	<Script file="Tags.lua"/>
 	<Script file="Functions.lua"/>
-	<Include file="Elements\Load_Elements.xml"/>
 	<Script file="UnitFrames.lua"/>
+	<Include file="Elements\Load_Elements.xml"/>
 </Ui>

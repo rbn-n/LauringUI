@@ -134,9 +134,6 @@ Core:RegisterEvent("PLAYER_LOGIN", function()
 
     C_CVar.RegisterCVar("addonProfilerEnabled", 1)
 	C_CVar.SetCVar("addonProfilerEnabled", 0)
-
-	C_CVar.RegisterCVar("nameplateShowOnlyNames")
-	C_CVar.SetCVar("nameplateShowOnlyNames", 1)
 end)
 
 _G[addonName] = ns

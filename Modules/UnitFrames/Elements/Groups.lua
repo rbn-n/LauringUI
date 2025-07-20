@@ -73,11 +73,6 @@ function UF:CreateThreatBorder(frame)
 	frame.ThreatIndicator.Override = UF.UpdateThreatBorder
 end
 
-function UF:UpdateRaidInfo()
-	--checkSpecs()
-	--B:RegisterEvent("PLAYER_TALENT_UPDATE", checkSpecs)
-end
-
 function UF:UpdateRaidTextScale()
 	local scale = Config.DB["UFs"]["RaidTextScale"]
 	for _, frame in pairs(oUF.objects) do

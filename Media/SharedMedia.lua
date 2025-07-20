@@ -21,6 +21,8 @@ for _, font in ipairs(fonts) do
     LSM:Register(MediaType_FONT, font.name, font.path, font.locales)
 end
 
+LSM:Register(MediaType_SOUND, "MSBT - Cooldown", [[Interface\Addons\LauringUI\Media\Sounds\MSBT - Cooldown.ogg]])
+
 local sounds = {
     "Lauring - 1", "Lauring - 2", "Lauring - 3", "Lauring - 4", "Lauring - 5",
     "Lauring - 6", "Lauring - 7", "Lauring - 8", "Lauring - 9", "Lauring - Add",
