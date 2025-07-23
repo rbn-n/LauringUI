@@ -31,8 +31,8 @@ Config.CornerBuffs = {
 		[45438]  = {"BOTTOMLEFT", true},        -- Ice Block
 	},
 	["WARRIOR"] = {
-		[871]     = {"TOPLEFT", true},			-- Shield Wall
-		[118038]  = {"TOPLEFT", true},			-- Die by the Sword
+		[871]     = {"BOTTOMLEFT", true},			-- Shield Wall
+		[84159]  = {"BOTTOMLEFT", true},			-- Die by the Sword
 	},
 	["SHAMAN"] = {
 		[974]    = {"TOPLEFT"},              	-- Earth Shield

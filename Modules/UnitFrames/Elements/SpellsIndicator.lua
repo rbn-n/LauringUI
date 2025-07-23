@@ -17,21 +17,36 @@ UF.CornerSpellsByName = {}
 function UF:UpdateCornerSpells()
 	wipe(UF.CornerSpells)
 
-	for spellID, value in pairs(Config.CornerBuffs[DB.MyClass]) do
-		local modData = LauringUIAccountDB["CornerSpells"][DB.MyClass]
-		if not (modData and modData[spellID]) then
-			UF.CornerSpells[spellID] = {value[1], value[2]}
+	-- Always include "true"-flagged spells from any class
+	for class, spells in pairs(Config.CornerBuffs) do
+		for spellID, value in pairs(spells) do
+			local anchor, alwaysShow = unpack(value)
+			if alwaysShow == true then
+				UF.CornerSpells[spellID] = {anchor, true}
+			end
 		end
 	end
 
-	for spellID, value in pairs(LauringUIAccountDB["CornerSpells"][DB.MyClass]) do
+	-- Then include player's class spells (overwrites above if same spellID)
+	local classBuffs = Config.CornerBuffs[DB.MyClass]
+	if classBuffs then
+		for spellID, value in pairs(classBuffs) do
+			local modData = LauringUIAccountDB["CornerSpells"][DB.MyClass]
+			if not (modData and modData[spellID]) then
+				UF.CornerSpells[spellID] = {value[1], value[2]}
+			end
+		end
+	end
+
+	-- Apply user overrides (stored in SavedVariables)
+	for spellID, value in pairs(LauringUIAccountDB["CornerSpells"][DB.MyClass] or {}) do
 		if next(value) then
 			UF.CornerSpells[spellID] = {value[1], value[2]}
 		end
 	end
 
+	-- Convert to name-based lookup
 	wipe(UF.CornerSpellsByName)
-
 	for spellID, value in pairs(UF.CornerSpells) do
 		local name = GetSpellInfo(spellID)
 		if name then

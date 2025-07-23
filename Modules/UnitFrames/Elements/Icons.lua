@@ -25,8 +25,8 @@ function UF:CreateIcons(frame)
 		frame.CombatIndicator = combat
 
 		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
-		leaderIcon:SetPoint("TOPLEFT", frame, 0, 1)
-		leaderIcon:SetSize(15, 15)
+		leaderIcon:SetPoint("TOPLEFT", frame, 0, 3)
+		leaderIcon:SetSize(13, 13)
 		frame.LeaderIndicator = leaderIcon
 
 	elseif mystyle == "Target" then
