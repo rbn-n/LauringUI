@@ -4,12 +4,15 @@ local type, select, unpack = type, select, unpack
 local format = string.format
 
 function Core.HexRGB(r, g, b)
-    if r then
-        if type(r) == "table" then
-            if r.r then r, g, b = r.r, r.g, r.b else r, g, b = unpack(r) end
-        end
-        return format("|cff%02x%02x%02x", r*255, g*255, b*255)
-    end
+	if r then
+		if type(r) == "table" then
+			if r.r then r, g, b = r.r, r.g, r.b else r, g, b = unpack(r) end
+		end
+		if r and g and b then
+			return format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
+		end
+	end
+	return "|cffffffff"
 end
 
 function Core:ClassColor(class)

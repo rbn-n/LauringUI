@@ -110,9 +110,10 @@ function UF.PostCreateIcon(element, button)
 end
 
 local filteredStyle = {
-	["target"] = true,
-	["boss"] = true,
-	["arena"] = true,
+	["Target"] = true,
+	["Nameplate"] = true,
+	["Boss"] = true,
+	["Arena"] = true,
 }
 
 local dispellType = {

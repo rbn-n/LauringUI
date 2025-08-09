@@ -138,9 +138,10 @@ function UF:CreateAurasIndicator(frame)
 	local auraSize = 18
 	local spacing = 4
 	local numButtons = 2
+	local totalWidth = (auraSize + spacing) * (numButtons - 1) + auraSize
 
 	local auraFrame = CreateFrame("Frame", nil, frame)
-	auraFrame:SetSize((auraSize + spacing) * numButtons, auraSize)
+	auraFrame:SetSize(totalWidth, auraSize)
 	auraFrame:SetPoint("BOTTOM", frame.Health, "BOTTOM", 0, 3)
 	auraFrame:SetFrameLevel(frame:GetFrameLevel() + 5)
 	auraFrame.instAura = Config.DB["UFs"]["ShowInstanceAuras"]
@@ -170,19 +171,13 @@ function UF:CreateAurasIndicator(frame)
 		auraFrame.buttons[i] = button
 	end
 
-	-- Position buttons centered horizontally in auraFrame
+	local half = (numButtons - 1) / 2
 	for i = 1, numButtons do
 		local button = auraFrame.buttons[i]
 		button:ClearAllPoints()
 
-		if numButtons % 2 == 1 then
-			local centerIndex = math.ceil(numButtons / 2)
-			local offset = (i - centerIndex) * (auraSize + spacing)
-			button:SetPoint("CENTER", auraFrame, "CENTER", offset, 0)
-		else
-			local centerOffset = ((i - (numButtons / 2 + 0.5)) + 0.5) * (auraSize + spacing)
-			button:SetPoint("CENTER", auraFrame, "CENTER", centerOffset, 0)
-		end
+		local offset = (i - 1 - half) * (auraSize + spacing)
+		button:SetPoint("CENTER", auraFrame, "CENTER", offset, 0)
 	end
 
 	frame.AurasIndicator = auraFrame

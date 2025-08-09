@@ -7,7 +7,6 @@ local UnitGUID, GetItemInfo = UnitGUID, C_Item.GetItemInfo
 local GetContainerItemLink = C_Container.GetContainerItemLink
 local GetInventoryItemLink = GetInventoryItemLink
 local GetTradePlayerItemLink, GetTradeTargetItemLink = GetTradePlayerItemLink, GetTradeTargetItemLink
-local InspectModelFrameRotateRightButton = InspectModelFrameRotateRightButton
 
 local inspectSlots = {
 	"Head",

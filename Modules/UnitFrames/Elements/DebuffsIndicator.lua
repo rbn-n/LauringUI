@@ -102,8 +102,8 @@ function UF:CreateDebuffsIndicator(frame)
 	local spacing = 2
 	local maxButtons = 3
 
-	-- Position frame inside Health, slightly above bottom
-	debuffFrame:SetSize((size + spacing) * maxButtons, size)
+	local totalWidth = (size + spacing) * (maxButtons - 1) + size
+	debuffFrame:SetSize(totalWidth, size)
 	debuffFrame:SetPoint("BOTTOM", frame.Health, "BOTTOM", 0, 2)
 	debuffFrame:SetFrameLevel(frame:GetFrameLevel() + 5)
 
@@ -131,19 +131,13 @@ function UF:CreateDebuffsIndicator(frame)
 		debuffFrame.buttons[i] = button
 	end
 
-	-- Center buttons horizontally inside debuffFrame
+	local half = (maxButtons - 1) / 2
 	for i = 1, maxButtons do
 		local button = debuffFrame.buttons[i]
 		button:ClearAllPoints()
 
-		if maxButtons % 2 == 1 then -- odd total buttons
-			local centerIndex = math.ceil(maxButtons / 2)
-			local offset = (i - centerIndex) * (size + spacing)
-			button:SetPoint("CENTER", debuffFrame, "CENTER", offset, 0)
-		else -- even number of buttons
-			local centerOffset = ((i - (maxButtons / 2 + 0.5)) + 0.5) * (size + spacing)
-			button:SetPoint("CENTER", debuffFrame, "CENTER", centerOffset, 0)
-		end
+		local offset = (i - 1 - half) * (size + spacing)
+		button:SetPoint("CENTER", debuffFrame, "CENTER", offset, 0)
 	end
 
 	frame.DebuffsIndicator = debuffFrame
