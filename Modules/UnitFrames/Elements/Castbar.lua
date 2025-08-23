@@ -298,8 +298,8 @@ function UF:PostCastStart(unit)
 		end
 	end
 
-	if self.__owner.mystyle == "nameplate" then
-		if Config.DB["Nameplates"]["CastbarGlow"] and UF.MajorSpells[self.spellID] then
+	if self.__owner.mystyle == "Nameplate" then
+		if Config.DB["Nameplates"]["CastbarGlow"] and Config.Nameplates.MajorSpells[self.spellID] then
 			Core.ShowOverlayGlow(self.glowFrame)
 		else
 			Core.HideOverlayGlow(self.glowFrame)

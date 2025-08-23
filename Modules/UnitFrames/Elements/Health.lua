@@ -60,7 +60,7 @@ function UF:UpdateFrameNameTag(frame)
 	elseif mystyle == "Target" then
 		frame:Tag(name, "[fulllevel] "..colorNameTag.."[afkdnd]")
     elseif UF.IsPartyOrRaid(frame) then
-		frame:Tag(name, "[nameOrCondition]")
+		frame:Tag(name, colorNameTag)
 	elseif mystyle == "Arena" then
 		frame:Tag(name, colorNameTag)
     elseif mystyle == "Focus"  or mystyle == "ToT" or mystyle == "FocusTarget" then
@@ -116,16 +116,20 @@ function UF:UpdateFrameHealthTag(frame)
 end
 
 local function CreateHealthText(frame, textFrame)
-    if UF.IsPartyOrRaid(frame) then return end
+    --if UF.IsPartyOrRaid(frame) then return end
 
     local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
-    local healthText
+    local healthText = Core.CreateFS(textFrame, fontSize)
 
     if UF.IsPlayerOrTarget(frame) then
-        healthText = Core.CreateFS(textFrame, fontSize)
         healthText:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, 0)
+    elseif UF.IsPartyOrRaid(frame) then
+        frame:Tag(healthText, "[raidhp]")
+        healthText:ClearAllPoints()
+        healthText:SetPoint("BOTTOM", 0, 1)
+        healthText:SetJustifyH("CENTER")
+        healthText:SetScale(Config.DB["UFs"]["RaidTextScale"])
     else
-        healthText = Core.CreateFS(textFrame, fontSize)
         healthText:SetPoint("RIGHT", frame, "RIGHT", 0, 0)
     end
 

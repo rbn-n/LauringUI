@@ -153,7 +153,7 @@ G.DefaultSettings = {
 		InsecureColor = {r=1, g=.3, b=.31},
 		Interruptor = true,
 		MaxAuras = 5,
-		MinAlpha = 1,
+		MinAlpha = 0.7,
 		MinScale = 1,
 		NameOnlyGuild = false,
 		NameOnlyMode = true,

@@ -184,6 +184,30 @@ function G:UpdateCurrentProfile()
 	end
 end
 
+StaticPopupDialogs["LAURINGUI_DELETE_UNIT_PROFILE"] = {
+	text = "",
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(self)
+		local name, realm = strsplit("-", self.text.text_arg1)
+		if LauringUIAccountDB["TotalGold"][realm] and LauringUIAccountDB["TotalGold"][realm][name] then
+			LauringUIAccountDB["TotalGold"][realm][name] = nil
+		end
+		LauringUIAccountDB["ProfileIndex"][self.text.text_arg1] = nil
+	end,
+	OnShow = function(self)
+		local r, g, b
+		local class = self.text.text_arg2
+		if class == "NONE" then
+			r, g, b = .5, .5, .5
+		else
+			r, g, b = Core.ClassColor(class)
+		end
+		self.text:SetText(format(L["Delete unit profile?"], Core.HexRGB(r, g, b), self.text.text_arg1))
+	end,
+	whileDead = 1,
+}
+
 function G:Delete_OnEnter()
 	local text = self:GetText()
 	if not text or text == "" then return end
