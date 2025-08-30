@@ -2,7 +2,6 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local oUF = ns.oUF
 local UF = Core:GetModule("UnitFrames")
-local AltPowerBar = AltPowerBar
 
 -- Custom colors
 oUF.colors.smooth = {1, 0, 0, .85, .8, .45, .1, .1, .1}
@@ -13,6 +12,11 @@ local function ReplacePowerColor(name, index, color)
 	oUF.colors.power[index] = oUF.colors.power[name]
 end
 ReplacePowerColor("MANA", 0, {0, .4, 1})
+ReplacePowerColor("SOUL_SHARDS", 7, {.58, .51, .79})
+ReplacePowerColor("HOLY_POWER", 9, {.88, .88, .06})
+ReplacePowerColor("CHI", 12, {0, 1, .59})
+ReplacePowerColor("ARCANE_CHARGES", 16, {.41, .8, .94})
+ReplacePowerColor("SHADOW_ORBS", 28, {.61, .38, 1})
 
 function UF:UpdatePowerBarColor(frame, force)
 	local power = frame.Power
@@ -39,7 +43,6 @@ function UF:UpdatePowerBarColor(frame, force)
 	power:SetStatusBarColor(r, g, b, alpha)
 
 	if power.bg then
-		--power.bg:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 0.15)
 		power.bg:SetVertexColor(r, g, b, 0.15)
 	end
 end

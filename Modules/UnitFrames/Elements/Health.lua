@@ -116,8 +116,6 @@ function UF:UpdateFrameHealthTag(frame)
 end
 
 local function CreateHealthText(frame, textFrame)
-    --if UF.IsPartyOrRaid(frame) then return end
-
     local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
     local healthText = Core.CreateFS(textFrame, fontSize)
 

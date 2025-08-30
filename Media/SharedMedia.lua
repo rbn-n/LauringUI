@@ -29,23 +29,23 @@ local sounds = {
     "Adds", "AMS", "AOE", "Avoid", "Banner",
     "Beam", "Big Add", "Black", "Bloodlust", "Blue",
     "Bomb", "Break", "Breath", "Buff", "CC",
-    "CCd", "Charge", "Clear", "Dance", "Dance inc",
-    "Dark", "Debuff", "Defensive", "Disoriented", "Dispell",
-    "Dodge", "Dodge inc", "Dont Move", "Dot", "Down",
+    "CCd", "Charge", "Clear", "Click", "Dance", "Dance soon",
+    "Dark", "Debuff", "Defensive", "Disarmed", "Disoriented", "Dispell",
+    "Dodge", "Dodge soon", "Dont Move", "Dot", "Down",
     "Enrage", "Enrage Inc", "Execute", "Fear", "Feared",
     "Fixate", "Frontal", "Gloves", "Green", "Healthstone",
     "Hide", "High Stacks", "Immune", "In", "Inside",
-    "Intermission", "Interrupt", "Jump", "Kick", "Kite",
-    "Left", "Light", "LoS", "MC", "Middle",
+    "Intermission", "Interrupt", "Jump", "Kick", "Kite", "Knockback",
+    "Left", "Light", "Link", "LoS", "MC", "Middle",
     "Move", "Next", "Nitro", "Nuke", "On you",
     "Orange", "Orb", "Orbs", "Out", "Outrange",
     "Outside", "Personal", "Phase change", "Pot", "Proc",
     "Purple", "Push", "Racial", "Ready", "Red",
-    "Right", "Rooted", "Shield", "Silenced", "Smash",
-    "Smash inc", "Soak", "Spread", "Stack", "Stay",
-    "Stop", "Stopcast", "Stunned", "Switch", "Taunt",
+    "Right", "Rooted", "Shield", "Shield soon", "Silenced", "Smash",
+    "Smash soon", "Soak", "Spread", "Stack", "Stay",
+    "Stomp", "Stop", "Stopcast", "Stunned", "Switch", "Taunt",
     "Throw", "Totem", "Trap", "Trinket", "Turn",
-    "Up", "Watch Feet", "Weapon", "White", "Yellow"
+    "Up", "Watch your feet", "Weapon", "White", "Yellow"
 }
 
 for _, sound in ipairs(sounds) do

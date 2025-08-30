@@ -560,7 +560,7 @@ function UF:OnLogin()
         local moverWidth, moverHeight = boss[i]:GetWidth(), boss[i]:GetHeight()+8
         local title = i > 5 and "Boss"..i or L["BossFrame"]..i
         if i == 1 then
-            boss[i].mover = Core.Mover(boss[i], title, "Boss1", {"RIGHT", UIParent, "RIGHT", -350, -90}, moverWidth, moverHeight)
+            boss[i].mover = Core.Mover(boss[i], title, "Boss1", {"BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -775, 620}, moverWidth, moverHeight)
         elseif i == 6 then
             boss[i].mover = Core.Mover(boss[i], title, "Boss"..i, {"BOTTOMLEFT", boss[1].mover, "BOTTOMRIGHT", 50, 0}, moverWidth, moverHeight)
         else
