@@ -442,7 +442,6 @@ function Loot:LootRollTest()
 		testFrame.fsbind:SetVertexColor(bop and 1 or .3, bop and .3 or 1, bop and .1 or .3)
 
 		testFrame.status:SetStatusBarColor(color.r, color.g, color.b, .7)
-		testFrame.status.__border:SetBackdropBorderColor(color.r, color.g, color.b)
 		testFrame.status:SetMinMaxValues(0, 100)
 		testFrame.status:SetValue(80)
 
@@ -482,7 +481,7 @@ function Loot:UpdateLootRollTest()
 	testFrame.button.ilvl:SetText(Config.DB["Loot"]["ItemLevel"] and itemLevel or "")
 	testFrame.button.ilvl:SetFont(DB.Font[1], height / 2 - 2, DB.Font[3])
 
-	if Config.DB["Loot"]["ItemQuality"] then
+	if Config.DB["Loot"]["ItemQuality"] and color then
 		testFrame.button.bg:SetBackdropBorderColor(color.r, color.g, color.b)
 	else
 		testFrame.button.bg:SetBackdropBorderColor(0, 0, 0)

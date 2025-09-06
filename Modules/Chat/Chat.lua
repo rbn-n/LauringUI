@@ -104,6 +104,32 @@ function module:ToggleChatFrameTextures(frame)
 	frame:DisableDrawLayer("BACKGROUND")
 end
 
+local function GradientBackground(self)
+    local frame = CreateFrame("Frame", nil, self)
+    frame:SetPoint("TOPLEFT", self.Background)
+    frame:SetPoint("BOTTOMRIGHT", 26, -7)
+    frame:SetFrameLevel(0)
+
+    local windowName = FCF_GetChatWindowInfo(self:GetID())
+    if windowName == "LootFTW" then
+        local tex = Core.SetGradient(frame, "H", 0, 0, 0, 0, .7)
+        Core:SetOutside(tex)
+
+        local line = Core.SetGradient(frame, "H", DB.r, DB.g, DB.b, 0, .5, nil, Config.PixelMultiplexer + 1)
+        line:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
+        line:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT")
+    else
+        local tex = Core.SetGradient(frame, "H", 0, 0, 0, .7, 0)
+        Core:SetOutside(tex)
+
+        local line = Core.SetGradient(frame, "H", DB.r, DB.g, DB.b, .5, 0, nil, Config.PixelMultiplexer + 1)
+        line:SetPoint("BOTTOMLEFT", frame, "TOPLEFT")
+        line:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT")
+    end
+
+    return frame
+end
+
 function module:SkinChatFrame()
 	if not self or self.styled then return end
 
@@ -117,6 +143,8 @@ function module:SkinChatFrame()
 	if self:GetMaxLines() < maxLines then
 		self:SetMaxLines(maxLines)
 	end
+
+	self.__gradient = GradientBackground(self)
 
 	local editBox = _G[name.."EditBox"]
 	editBox:SetAltArrowKeyMode(false)
@@ -144,12 +172,8 @@ function module:SkinChatFrame()
 
 	local minimize = _G[name.."MinimizeButton"]
 	if minimize then
-		Core.ReskinCollapse(minimize)
-		minimize:GetNormalTexture():SetAlpha(0)
-		minimize:GetPushedTexture():SetAlpha(0)
-		minimize.__texture:DoCollapse(false)
-		minimize:ClearAllPoints()
-		minimize:SetPoint("CENTER", self, "TOPLEFT", -2, -3)
+		minimize:Hide()
+		minimize.Show = function() end
 	end
 
 	self.buttonFrame:SetAlpha(0)
@@ -186,18 +210,6 @@ function module:ReskinChat()
 	end)
 end
 
-local function SetChatClassColors()
-	for _, info in pairs(CHAT_CONFIG_CHAT_LEFT) do
-		if info.type then
-			SetChatColorNameByClass(info.type, true)
-		end
-	end
-	local channels = {GetChannelList()}
-	for i = 1, #channels, 3 do
-		SetChatColorNameByClass("CHANNEL"..channels[i], true)
-	end
-end
-
 local whisperList = {}
 function module:UpdateWhisperKeywords()
 	Core.SplitList(whisperList, Config.DB["Chat"]["WhisperInviteKeywords"], true)
@@ -232,9 +244,7 @@ function module:WhisperInvite()
 end
 
 local function SetFontForExtraElementsInChatTabMenu()
-	-- Extra elements in chat tab menu
 	do
-		-- Font size
 		local function IsSelected(height)
 			local _, fontHeight = FCF_GetCurrentChatFrame():GetFont()
 			return height == floor(fontHeight + .5)
@@ -360,14 +370,13 @@ local function ConfigureChatWindows()
 end
 
 function module:OnLogin()
-	ConfigureChatWindows()
+	--ConfigureChatWindows()
 	self:ReskinChat()
 
 	SetCVar("chatStyle", "classic")
 	SetCVar("chatMouseScroll", 1)
 	CombatLogQuickButtonFrame_CustomTexture:SetTexture(nil)
 
-	SetChatClassColors()
 	module:ChannelRename()
 	module:ChatCopy()
 	module:UrlCopy()
@@ -377,9 +386,9 @@ function module:OnLogin()
 
 	SetFontForExtraElementsInChatTabMenu()
 
-	local cf1 = ChatFrame1
-	local leftPanel = Core:GetModule("Infobars").LeftBottomPanel
-	local leftChatPanel = StyleChatPanel("LauringUIChatPanelLeft", cf1)
-	PositionChatFrame(cf1, leftPanel, 0, 6)
-	WatchFrame(leftChatPanel, cf1)
+	--local cf1 = ChatFrame1
+	--local leftPanel = Core:GetModule("Infobars").LeftBottomPanel
+	--local leftChatPanel = StyleChatPanel("LauringUIChatPanelLeft", cf1)
+	--PositionChatFrame(cf1, leftPanel, 0, 6)
+	--WatchFrame(leftChatPanel, cf1)
 end

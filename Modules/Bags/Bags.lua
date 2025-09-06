@@ -1132,7 +1132,7 @@ function module:OnLogin()
 	Core:RegisterEvent("AUCTION_HOUSE_CLOSED", module.CloseBags)
 
 	-- Update infobar slots
-	local INFO = Core:GetModule("Infobars")
+	local INFO = Core:GetModule("Infobar")
 	if INFO.modules then
 		for _, info in pairs(INFO.modules) do
 			if info.name == "Bags" then

@@ -2,8 +2,10 @@
 	<Script file="QualityOfLife.lua"/>
 
     <Script file="AutoSellJunk.lua"/>
+    <Script file="DeleteHelper.lua"/>
 	<Script file="EnhancedColorPicker.lua"/>
 	<Script file="ErrorFilter.lua"/>
+	<Script file="ExperienceBar.lua"/>
 	<Script file="ItemLevel.lua"/>
 	<Script file="LootFaster.lua"/>
 	<Script file="Mail.lua"/>

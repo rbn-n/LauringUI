@@ -133,7 +133,7 @@ function Quests:OnLogin()
 	-- Mover for quest tracker
 	local frame = CreateFrame("Frame", "LauringQuestMover", UIParent)
 	frame:SetSize(240, 50)
-	Core.Mover(frame, L["QuestTracker"], "QuestTracker", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", -70, -55})
+	Core.Mover(frame, L["QuestTracker"], "QuestTracker", {"RIGHT", UIParent, "RIGHT", -507, 220})
 
 	WatchFrame:ClearAllPoints()
 	WatchFrame:SetPoint("TOPRIGHT", frame)

@@ -17,7 +17,7 @@ function module:CombatPulse()
 	if not Config.DB["Minimap"]["Enable"] then return end
 	if not Config.DB["Minimap"]["ShowCombatPulse"] then return end
 
-	local bg = Core:CreateBackdropFrame(Minimap)
+	local bg = Core.SetBD(Minimap)
 	bg:SetFrameStrata("BACKGROUND")
 
 	local anim = bg:CreateAnimationGroup()

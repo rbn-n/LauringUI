@@ -97,6 +97,12 @@ G.DefaultSettings = {
 		ItemLevel = true,
 		ItemQuality = true,
 	},
+	Infobar = {
+		FontSize = 17,
+		InfoStringLeft = "[guild][friend][ping][fps][zone]",
+		InfoStringRight = "[spec][dura][gold][time]",
+		MaxAddOns = 12,
+	},
 	Minimap = {
 		Enable = true,
 		EnableEasyVolume = true,
@@ -297,7 +303,7 @@ G.DefaultSettings = {
 		EnableRaidFrame = true,
 		Raid10PowerHeight = 2,
 		RaidWidth = 162,
-		RaidHeight = 50,
+		RaidHeight = 55,
         Raid10Width = 80,
 		Raid10Height = 32,
 		Raid40Width = 80,
