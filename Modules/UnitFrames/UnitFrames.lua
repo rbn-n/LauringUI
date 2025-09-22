@@ -124,7 +124,7 @@ local function CreateArena(frame)
 	UF:CreateDebuffs(frame)
 end
 
-local UFRangeAlpha = {insideAlpha = 1, outsideAlpha = .4}
+local UFRangeAlpha = {insideAlpha = 1, outsideAlpha = .3}
 local function CreateGroup(frame)
     frame.Range = UFRangeAlpha
 	frame.disableTooltip = Config.DB["UFs"]["Hide"..frame.mystyle.."Tooltip"]
@@ -550,7 +550,7 @@ function UF:OnLogin()
 
     oUF:SetActiveStyle("FocusTarget")
     local focustarget = oUF:Spawn("focustarget", "oUF_FocusTarget")
-    Core.Mover(focustarget, L["FotUF"], "FotUF", {"TOPLEFT", oUF_Focus, "TOPRIGHT", 5, 0})
+    Core.Mover(focustarget, L["FotUF"], "FotUF", Config.UFs.FocusTargetPosition)
 
     oUF:RegisterStyle("Boss", CreateBoss)
     oUF:SetActiveStyle("Boss")

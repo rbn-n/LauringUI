@@ -12,8 +12,6 @@ local UnitClassification, UnitExists, InCombatLockdown, UnitCanAttack = UnitClas
 local UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName, UnitHealth, UnitHealthMax = UnitGUID, GetPlayerInfoByGUID, Ambiguate, UnitName, UnitHealth, UnitHealthMax
 local SetCVar, UIFrameFadeIn, UIFrameFadeOut = SetCVar, UIFrameFadeIn, UIFrameFadeOut
 local C_NamePlate_GetNamePlateForUnit = C_NamePlate.GetNamePlateForUnit
-local C_NamePlate_SetNamePlateEnemyClickThrough = C_NamePlate.SetNamePlateEnemyClickThrough
-local C_NamePlate_SetNamePlateFriendlyClickThrough = C_NamePlate.SetNamePlateFriendlyClickThrough
 local INTERRUPTED = INTERRUPTED
 local _QuestieTooltips, _QuestiePlayer
 
@@ -32,22 +30,12 @@ function Nameplates:UpdateCVars()
 	SetCVar("nameplateMaxAlpha", Config.DB["Nameplates"]["MinAlpha"])
 	SetCVar("nameplateNotSelectedAlpha", Config.DB["Nameplates"]["MinAlpha"])
 	SetCVar("nameplateOverlapV", Config.DB["Nameplates"]["VerticalSpacing"])
-	SetCVar("nameplateShowOnlyNames", Config.DB["Nameplates"]["CVarOnlyNames"] and 1 or 0)
-	SetCVar("nameplateShowFriendlyNPCs", Config.DB["Nameplates"]["CVarShowNPCs"] and 1 or 0)
-end
-
-function Nameplates:UpdatePlateClickThrough()
-	if InCombatLockdown() then return end
-
-	C_NamePlate_SetNamePlateEnemyClickThrough(Config.DB["Nameplates"]["EnemyClickThrough"])
-	C_NamePlate_SetNamePlateFriendlyClickThrough(Config.DB["Nameplates"]["FriendlyClickThrough"])
 end
 
 local function SetupCVars()
 	Nameplates:UpdateCVars()
 	SetCVar("nameplateOverlapH", .8)
 	SetCVar("nameplateSelectedAlpha", 1)
-	Nameplates:UpdatePlateClickThrough()
 
 	SetCVar("nameplateSelectedScale", 1)
 	SetCVar("nameplateLargerScale", 1)
@@ -109,18 +97,6 @@ end
 Nameplates.CustomUnits = {}
 function Nameplates:CreateUnitTable()
 	RefreshUnits("CustomUnits")
-end
-
-Nameplates.PowerUnits = {}
-function Nameplates:CreatePowerUnitTable()
-	RefreshUnits("PowerUnits")
-end
-
-local function UpdateUnitPower(frame)
-	local unitName = frame.unitName
-	local npcID = frame.npcID
-	local shouldShowPower = Nameplates.PowerUnits[unitName] or Nameplates.PowerUnits[npcID]
-	frame.powerText:SetShown(shouldShowPower)
 end
 
 -- Off-tank threat color
@@ -187,8 +163,6 @@ function Nameplates:UpdateColor(_, unit)
 	local insecureColor = Config.DB["Nameplates"]["InsecureColor"]
     local revertThreat = Config.DB["Nameplates"]["DPSRevertThreat"]
 	local offTankColor = Config.DB["Nameplates"]["OffTankColor"]
-	local executeRatio = Config.DB["Nameplates"]["ExecuteRatio"]
-	local healthPerc = UnitHealth(unit) / (UnitHealthMax(unit) + .0001) * 100
 	local targetColor = Config.DB["Nameplates"]["TargetColor"]
 	local focusColor = Config.DB["Nameplates"]["FocusColor"]
 	local dotColor = Config.DB["Nameplates"]["DotColor"]
@@ -258,11 +232,7 @@ function Nameplates:UpdateColor(_, unit)
 		end
 	end
 
-	if executeRatio > 0 and healthPerc <= executeRatio then
-		self.nameText:SetTextColor(1, 0, 0)
-	else
-		self.nameText:SetTextColor(1, 1, 1)
-	end
+	self.nameText:SetTextColor(1, 1, 1)
 end
 
 function Nameplates:UpdateThreatColor(_, unit)
@@ -291,95 +261,30 @@ function Nameplates:UpdateTargetChange()
 	local element = self.TargetIndicator
 	local unit = self.unit
 
-	if Config.DB["Nameplates"]["TargetIndicator"] ~= 1 then
-		if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") then
-			element:Show()
-			if element.Arrow:IsShown() and not element.ArrowAnimGroup:IsPlaying() then
-				element.ArrowAnimGroup:Play()
-			end
-		else
-			element:Hide()
-			if element.ArrowAnimGroup:IsPlaying() then
-				element.ArrowAnimGroup:Stop()
-			end
-		end
+	if UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "player") then
+		element:Show()
+	else
+		element:Hide()
 	end
+
 	if Config.DB["Nameplates"]["ColoredTarget"] then
 		Nameplates.UpdateThreatColor(self, _, unit)
 	end
 end
 
-local points = {-15, -5, 0, 5, 0}
-
-local function UpdateTargetIndicator(frame)
-	local style = Config.DB["Nameplates"]["TargetIndicator"]
+local function UpdateTargetGlow(frame)
 	local element = frame.TargetIndicator
 	local isNameOnly = frame.plateType == "NameOnly"
-	if style == 1 then
-		element:Hide()
+
+	if isNameOnly then
+		element.Glow:Hide()
+		element.nameGlow:Show()
 	else
-		if style == 2 then
-			element.Arrow:ClearAllPoints()
-			element.Arrow:SetPoint("BOTTOM", element, "TOP", 0, 20)
-			element.Arrow:SetRotation(0)
-			element.Arrow:Show()
-			for i = 1, 5 do
-				element.ArrowAnim.points[i]:SetOffset(0, points[i])
-			end
-			element.Glow:Hide()
-			element.nameGlow:Hide()
-		elseif style == 3 then
-			element.Arrow:ClearAllPoints()
-			element.Arrow:SetPoint("LEFT", element, "RIGHT", 3, 0)
-			element.Arrow:SetRotation(rad(-90))
-			element.Arrow:Show()
-			for i = 1, 5 do
-				element.ArrowAnim.points[i]:SetOffset(points[i], 0)
-			end
-			element.Glow:Hide()
-			element.nameGlow:Hide()
-		elseif style == 4 then
-			element.Arrow:Hide()
-			if isNameOnly then
-				element.Glow:Hide()
-				element.nameGlow:Show()
-			else
-				element.Glow:Show()
-				element.nameGlow:Hide()
-			end
-		elseif style == 5 then
-			element.Arrow:ClearAllPoints()
-			element.Arrow:SetPoint("BOTTOM", element, "TOP", 0, 20)
-			element.Arrow:SetRotation(0)
-			element.Arrow:Show()
-			for i = 1, 5 do
-				element.ArrowAnim.points[i]:SetOffset(0, points[i])
-			end
-			if isNameOnly then
-				element.Glow:Hide()
-				element.nameGlow:Show()
-			else
-				element.Glow:Show()
-				element.nameGlow:Hide()
-			end
-		elseif style == 6 then
-			element.Arrow:ClearAllPoints()
-			element.Arrow:SetPoint("LEFT", element, "RIGHT", 3, 0)
-			element.Arrow:SetRotation(rad(-90))
-			element.Arrow:Show()
-			for i = 1, 5 do
-				element.ArrowAnim.points[i]:SetOffset(points[i], 0)
-			end
-			if isNameOnly then
-				element.Glow:Hide()
-				element.nameGlow:Show()
-			else
-				element.Glow:Show()
-				element.nameGlow:Hide()
-			end
-		end
-		element:Show()
+		element.Glow:Show()
+		element.nameGlow:Hide()
 	end
+
+	element:Show()
 end
 
 local function AddTargetIndicator(frame)
@@ -388,24 +293,8 @@ local function AddTargetIndicator(frame)
 	targetIndicator:SetFrameLevel(0)
 	targetIndicator:Hide()
 
-    targetIndicator.Arrow = targetIndicator:CreateTexture(nil, "BACKGROUND", nil, -5)
-	targetIndicator.Arrow:SetSize(50, 50)
-	targetIndicator.Arrow:SetTexture(DB.ArrowTexture)
-
-	local animGroup = targetIndicator.Arrow:CreateAnimationGroup()
-	animGroup:SetLooping("REPEAT")
-	local anim = animGroup:CreateAnimation("Path")
-	anim:SetDuration(1)
-	anim.points = {}
-	for i = 1, 5 do
-		anim.points[i] = anim:CreateControlPoint()
-		anim.points[i]:SetOrder(i)
-	end
-	targetIndicator.ArrowAnim = anim
-	targetIndicator.ArrowAnimGroup = animGroup
-
 	targetIndicator.Glow = Core.CreateSD(targetIndicator, 8, true)
-    Core:SetOutside(targetIndicator.Glow, frame.backdrop, 8, 8)
+	Core:SetOutside(targetIndicator.Glow, frame.backdrop, 8, 8)
 	targetIndicator.Glow:SetBackdropBorderColor(1, 1, 1)
 	targetIndicator.Glow:SetFrameLevel(0)
 
@@ -417,8 +306,9 @@ local function AddTargetIndicator(frame)
 	targetIndicator.nameGlow:SetPoint("CENTER", frame, "BOTTOM")
 
 	frame.TargetIndicator = targetIndicator
-	frame:RegisterEvent("PLAYER_TARGET_CHANGED", Nameplates.UpdateTargetChange, true)
-	UpdateTargetIndicator(frame)
+	frame:RegisterEvent("PLAYER_TARGET_CHANGED", function() UpdateTargetGlow(frame) end, true)
+
+	UpdateTargetGlow(frame)
 end
 
 -- Quest progress
@@ -782,10 +672,6 @@ function Nameplates:Create()
 
 	self.Auras.showStealableBuffs = Config.DB["Nameplates"]["DispellMode"] == 1
 	self.Auras.alwaysShowStealable = Config.DB["Nameplates"]["DispellMode"] == 2
-	self.powerText = Core.CreateFS(self, 22)
-	self.powerText:ClearAllPoints()
-	self.powerText:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -4)
-	self:Tag(self.powerText, "[nppp]")
 
 	local title = Core.CreateFS(self, Config.DB["Nameplates"]["NameTextSize"]-1)
 	title:ClearAllPoints()
@@ -813,7 +699,7 @@ local function ToggleAuras(frame)
 		end
 	else
 		if frame:IsElementEnabled("Auras") then
-			seframelf:DisableElement("Auras")
+			frame:DisableElement("Auras")
 		end
 	end
 end
@@ -824,11 +710,7 @@ function Nameplates:UpdateAuras()
 	if not Config.DB["Nameplates"]["PlateAuras"] then return end
 
 	local element = self.Auras
-	if Config.DB["Nameplates"]["TargetPower"] then
-		element:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 10 + Config.DB["Nameplates"]["PPBarHeight"])
-	else
-		element:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
-	end
+	element:SetPoint("BOTTOMLEFT", self.nameText, "TOPLEFT", 0, 5)
 	element.numTotal = Config.DB["Nameplates"]["maxAuras"]
 	element.size = Config.DB["Nameplates"]["AuraSize"]
 	element.fontSize = Config.DB["Nameplates"]["FontSize"]
@@ -901,7 +783,7 @@ function Nameplates:RefreshAll()
 		UpdateSize(nameplate)
 		Nameplates.UpdateUnitClassify(nameplate)
 		Nameplates.UpdateAuras(nameplate)
-		UpdateTargetIndicator(nameplate)
+		UpdateTargetGlow(nameplate)
 		Nameplates.UpdateTargetChange(nameplate)
 	end
 end
@@ -951,7 +833,7 @@ local function UpdateByType(frame)
 	end
 
 	UpdateSize(frame)
-	UpdateTargetIndicator(frame)
+	UpdateTargetGlow(frame)
 	ToggleAuras(frame)
 end
 
@@ -1068,7 +950,6 @@ function Nameplates:PostUpdate(event, unit)
 	end
 
 	if event ~= "NAME_PLATE_UNIT_REMOVED" then
-		UpdateUnitPower(self)
 		Nameplates.UpdateTargetChange(self)
 		--UF.UpdateQuestUnit(self, event, unit)
 		Nameplates.UpdateQuestIndicator(self)
@@ -1085,14 +966,10 @@ function Nameplates:Visibility(event)
 	if (event == "PLAYER_REGEN_DISABLED" or InCombatLockdown()) and UnitIsUnit("player", self.unit) then
 		UIFrameFadeIn(self.Health, .3, self.Health:GetAlpha(), 1)
 		UIFrameFadeIn(self.Health.bg, .3, self.Health.bg:GetAlpha(), 1)
-		UIFrameFadeIn(self.Power, .3, self.Power:GetAlpha(), 1)
-		UIFrameFadeIn(self.Power.bg, .3, self.Power.bg:GetAlpha(), 1)
 		UIFrameFadeIn(self.predicFrame, .3, self:GetAlpha(), 1)
 	else
 		UIFrameFadeOut(self.Health, 2, self.Health:GetAlpha(), alpha)
 		UIFrameFadeOut(self.Health.bg, 2, self.Health.bg:GetAlpha(), alpha)
-		UIFrameFadeOut(self.Power, 2, self.Power:GetAlpha(), alpha)
-		UIFrameFadeOut(self.Power.bg, 2, self.Power.bg:GetAlpha(), alpha)
 		UIFrameFadeOut(self.predicFrame, 2, self:GetAlpha(), alpha)
 	end
 end
@@ -1172,7 +1049,6 @@ function Nameplates:OnLogin()
     SetupCVars()
     BlockAddons()
     Nameplates:CreateUnitTable()
-    Nameplates:CreatePowerUnitTable()
     Nameplates:UpdateGroupRoles()
     Nameplates:QuestIconCheck()
     Nameplates:RefreshByEvents()

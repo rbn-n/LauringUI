@@ -2,6 +2,9 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 
 Config.CornerBuffs = {
+	["ALL"] = {
+		[94794]     = {"BOTTOMRIGHT", true},    -- Rocket Fuel Leak
+	},
 	["PRIEST"] = {
 		[17]     = {"TOPLEFT"},            		-- Power Word: Shield
 		[139]    = {"TOPLEFT"},           		-- Renew
@@ -29,6 +32,7 @@ Config.CornerBuffs = {
 	},
 	["MAGE"] = {
 		[45438]  = {"BOTTOMLEFT", true},        -- Ice Block
+		[86949]  = {"BOTTOMRIGHT", true},       -- Cauterize
 	},
 	["WARRIOR"] = {
 		[871]     = {"BOTTOMLEFT", true},			-- Shield Wall

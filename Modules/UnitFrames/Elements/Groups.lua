@@ -65,7 +65,7 @@ function UF:CreateThreatBorder(frame)
 	local threatIndicator = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	threatIndicator:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
 	threatIndicator:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
-	threatIndicator:SetBackdrop(backdrop)
+	threatIndicator:SetBackdrop({edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2})
 	threatIndicator:SetFrameLevel(1)
 	threatIndicator:Hide()
 

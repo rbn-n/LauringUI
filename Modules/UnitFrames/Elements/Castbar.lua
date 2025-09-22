@@ -362,10 +362,16 @@ local function CreateSpark(castbar)
 	castbar.Spark:SetPoint("BOTTOMRIGHT", castbar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
 end
 
-local function CreateIcon(castbar)
+local function CreateIcon(castbar, mystyle)
 	castbar.Icon = castbar:CreateTexture(nil, "ARTWORK")
-	castbar.Icon:SetSize(castbar:GetHeight(), castbar:GetHeight())
-	castbar.Icon:SetPoint("BOTTOMRIGHT", castbar, "BOTTOMLEFT", -3, 0)
+	if mystyle == "Focus" then
+		castbar.Icon:SetSize(50, 50)
+		castbar.Icon:SetPoint("BOTTOMLEFT", castbar, "BOTTOMRIGHT", 4, 0)
+	else
+		castbar.Icon:SetSize(castbar:GetHeight(), castbar:GetHeight())
+		castbar.Icon:SetPoint("BOTTOMRIGHT", castbar, "BOTTOMLEFT", -3, 0)
+	end
+
 	castbar.Icon:SetTexCoord(x1, x2, y1, y2)
 	Core.SetBD(castbar.Icon)
 end
@@ -457,7 +463,7 @@ function UF:CreateCastbar(frame)
 	name:SetPoint("RIGHT", timer, "LEFT", -5, 0)
 	name:SetJustifyH("LEFT")
 
-	CreateIcon(castbar)
+	CreateIcon(castbar, mystyle)
 	Core:CreateBorder(castbar, 1)
 
 	if mystyle == "Player" then

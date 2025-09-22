@@ -79,7 +79,6 @@ function module:CheckNameplateFilters()
 	CheckNameplateFilter(Config.Nameplates.WhiteList, "NameplateWhite")
 	CheckNameplateFilter(Config.Nameplates.BlackList, "NameplateBlack")
 	CleanupNameplateUnits("CustomUnits")
-	CleanupNameplateUnits("PowerUnits")
 end
 
 function module:OnLogin()

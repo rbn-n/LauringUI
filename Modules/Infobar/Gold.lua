@@ -111,21 +111,35 @@ function RebuildCharList()
 		if menuList[i] then wipe(menuList[i]) end
 	end
 
-	local index = 1
+	local charList = {}
 	for _, realm in pairs(crossRealms) do
 		if LauringUIAccountDB["TotalGold"][realm] then
 			for name, value in pairs(LauringUIAccountDB["TotalGold"][realm]) do
 				if not (realm == myRealm and name == myName) then
-					index = index + 1
-					if not menuList[index] then menuList[index] = {} end
-					menuList[index].text = Core.HexRGB(Core.ClassColor(value[2]))..Ambiguate(name.."-"..realm, "none")
-					menuList[index].notCheckable = true
-					menuList[index].arg1 = realm
-					menuList[index].arg2 = name
-					menuList[index].func = clearCharGold
+					table.insert(charList, {
+						realm = realm,
+						name = name,
+						gold = value[1],
+						class = value[2],
+					})
 				end
 			end
 		end
+	end
+
+	table.sort(charList, function(a, b)
+		return a.gold > b.gold
+	end)
+
+	local index = 1
+	for _, entry in ipairs(charList) do
+		index = index + 1
+		if not menuList[index] then menuList[index] = {} end
+		menuList[index].text = Core.HexRGB(Core.ClassColor(entry.class))..Ambiguate(entry.name.."-"..entry.realm, "none")
+		menuList[index].notCheckable = true
+		menuList[index].arg1 = entry.realm
+		menuList[index].arg2 = entry.name
+		menuList[index].func = clearCharGold
 	end
 end
 
@@ -181,20 +195,36 @@ INFO.onEnter = function(self)
 	end
 	GameTooltip:AddLine(" ")
 
-	local totalGold = 0
-	GameTooltip:AddLine(L["RealmCharacter"], .6,.8,1)
+	local charList, totalGold = {}, 0
 	for _, realm in pairs(crossRealms) do
 		local thisRealmList = LauringUIAccountDB["TotalGold"][realm]
 		if thisRealmList then
-			for k, v in pairs(thisRealmList) do
-				local name = Ambiguate(k.."-"..realm, "none")
+			for name, v in pairs(thisRealmList) do
 				local gold, class = unpack(v)
-				local r, g, b = Core.ClassColor(class)
-				GameTooltip:AddDoubleLine(getClassIcon(class)..name, module:GetMoneyString(gold), r,g,b, 1,1,1)
+				table.insert(charList, {
+					fullName = Ambiguate(name.."-"..realm, "none"),
+					gold = gold,
+					class = class,
+				})
 				totalGold = totalGold + gold
 			end
 		end
 	end
+
+	table.sort(charList, function(a, b)
+		return a.gold > b.gold -- highest first
+	end)
+
+	GameTooltip:AddLine(L["RealmCharacter"], .6,.8,1)
+	for _, entry in ipairs(charList) do
+		local r, g, b = Core.ClassColor(entry.class)
+		GameTooltip:AddDoubleLine(
+			getClassIcon(entry.class)..entry.fullName,
+			module:GetMoneyString(entry.gold),
+			r,g,b, 1,1,1
+		)
+	end
+
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine(TOTAL..":", module:GetMoneyString(totalGold), .6,.8,1, 1,1,1)
 
@@ -206,7 +236,7 @@ INFO.onEnter = function(self)
 		end
 		if name and count then
 			local total = C_CurrencyInfo_GetCurrencyInfo(currencyID).maxQuantity
-			icon = replacedTextures[icon] or icon -- replace classic honor icons
+			icon = replacedTextures[icon] or icon
 			local iconTexture = " |T"..icon..":13:15:0:0:50:50:4:46:4:46|t"
 			if total > 0 then
 				GameTooltip:AddDoubleLine(name, count.."/"..total..iconTexture, 1,1,1, 1,1,1)
@@ -215,6 +245,7 @@ INFO.onEnter = function(self)
 			end
 		end
 	end
+
 	GameTooltip:AddDoubleLine(" ", DB.LineString)
 	GameTooltip:AddDoubleLine(" ", DB.RightButton..L["Switch Mode"].." ", 1,1,1, .6,.8,1)
 	GameTooltip:AddDoubleLine(" ", DB.ScrollButton..L["AutoSell Junk"]..": "..(LauringUIAccountDB["AutoSell"] and "|cff55ff55"..VIDEO_OPTIONS_ENABLED or "|cffff5555"..VIDEO_OPTIONS_DISABLED).." ", 1,1,1, .6,.8,1)

@@ -317,100 +317,6 @@ local function UpdatePowerUnitList()
 	Core:GetModule("Nameplates"):CreatePowerUnitTable()
 end
 
-local function NameplatePowerUnits(parent)
-	local guiName = "LauringUI_NameplatePowerUnits"
-	local exatraGuis = G:ToggleExtraGUI(guiName)
-	if exatraGuis[guiName] then return end
-
-	local panel = G:CreateExtraGUI(parent, guiName, L["ShowPowerList"].."*", true)
-	panel:SetScript("OnHide", UpdatePowerUnitList)
-
-	local barTable = {}
-
-	local function createBar(barParent, text, isNew)
-		local npcID = tonumber(text)
-
-		local bar = CreateFrame("Frame", nil, barParent, "BackdropTemplate")
-		bar:SetSize(220, 30)
-		Core.CreateBD(bar, .25)
-		barTable[text] = bar
-
-		local icon, close = G:CreateBarWidgets(bar, npcID and 136243 or 132288)
-		if npcID then
-			Core.AddTooltip(icon, "ANCHOR_RIGHT", "ID: "..npcID, "system")
-		end
-		close:SetScript("OnClick", function()
-			bar:Hide()
-			barTable[text] = nil
-			if Config.Nameplates.PowerUnits[text] then
-				Config.DB["Nameplates"]["PowerUnits"][text] = false
-			else
-				Config.DB["Nameplates"]["PowerUnits"][text] = nil
-			end
-			G:SortBars(barTable)
-		end)
-
-		local name = Core.CreateFS(bar, 14, text, false, "LEFT", 30, 0)
-		name:SetWidth(190)
-		name:SetJustifyH("LEFT")
-		if isNew then name:SetTextColor(0, 1, 0) end
-		if npcID then
-			Core.GetNPCName(npcID, function(npcName)
-				name:SetText(npcName)
-				if npcName == UNKNOWN then
-					name:SetTextColor(1, 0, 0)
-				end
-			end)
-		end
-
-		G:SortBars(barTable)
-	end
-
-	local frame = panel.bg
-
-	local scroll = G:CreateScroll(frame, 240, 485)
-	scroll.box = Core.CreateEditBox(frame, 160, 25)
-	scroll.box:SetPoint("TOPLEFT", 10, -10)
-	Core.AddTooltip(scroll.box, "ANCHOR_TOPRIGHT", L["NPCID or Name"], "info", true)
-
-	local function addClick(button)
-		local owner = button.__owner
-		local text = tonumber(owner.box:GetText()) or owner.box:GetText()
-		if text and text ~= "" then
-			local modValue = Config.DB["Nameplates"]["PowerUnits"][text]
-			if modValue or modValue == nil and Config.Nameplates.PowerUnits[text] then UIErrorsFrame:AddMessage(DB.InfoColor..L["Existing ID"]) return end
-			Config.DB["Nameplates"]["PowerUnits"][text] = true
-			createBar(owner.child, text, true)
-			owner.box:SetText("")
-		end
-	end
-	scroll.add = Core.CreateButton(frame, 45, 25, ADD)
-	scroll.add:SetPoint("TOPRIGHT", -8, -10)
-	scroll.add.__owner = scroll
-	scroll.add:SetScript("OnClick", addClick)
-
-	scroll.reset = Core.CreateButton(frame, 45, 25, RESET)
-	scroll.reset:SetPoint("RIGHT", scroll.add, "LEFT", -5, 0)
-	StaticPopupDialogs["RESET_LAURINGUI_POWERUNITS"] = {
-		text = L["Reset to default list"],
-		button1 = YES,
-		button2 = NO,
-		OnAccept = function()
-			Config.DB["Nameplates"]["PowerUnits"] = {}
-			ReloadUI()
-		end,
-		whileDead = 1,
-	}
-	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_LAURINGUI_POWERUNITS")
-	end)
-
-	local UF = Core:GetModule("UnitFrames")
-	for npcID in pairs(UF.PowerUnits) do
-		createBar(scroll.child, npcID)
-	end
-end
-
 local function SetupNameplateSize(parent)
 	local guiName = "LauringUI_PlateSizeSetup"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
@@ -544,16 +450,13 @@ local function PlateCastbarGlow(parent)
 	end
 end
 
+
 local function UpdatePlateCVars()
 	Core:GetModule("Nameplates"):UpdateCVars()
 end
 
 local function RefreshPlateByEvents()
 	Core:GetModule("Nameplates"):RefreshPlateByEvents()
-end
-
-local function UpdateClickThrough()
-	Core:GetModule("Nameplates"):UpdatePlateClickThrough()
 end
 
 local function RefreshNameplates()
@@ -570,10 +473,6 @@ end
 
 local function SetupNameplateUnitFilterFunc()
 	NameplateUnitFilter(G.GuiPage["Nameplates"])
-end
-
-local function SetupNameplatePowerUnitsFunc()
-	NameplatePowerUnits(G.GuiPage["Nameplates"])
 end
 
 local function SetupNameplateSizeFunc()
@@ -605,12 +504,8 @@ local options = {
 		{3, "Nameplates", "MaxAuras", L["Max Auras"].."*", false, {1, 20, 1}, RefreshNameplates},
 		{3, "Nameplates", "AuraSize", L["Auras Size"].."*", true, {18, 60, 1}, RefreshNameplates},
 		{},--blank
-		{4, "Nameplates", "TargetIndicator", L["TargetIndicator"].."*", nil, {DISABLE, L["TopArrow"], L["RightArrow"], L["TargetGlow"], L["TopNGlow"], L["RightNGlow"]}, RefreshNameplates},
-		{3, "Nameplates", "ExecuteRatio", L["ExecuteRatio"].."*", true, {0, 90, 1}, nil, L["ExecuteRatioTip"]},
 		{1, "Nameplates", "FriendlyCC", L["Friendly CC"].."*"},
 		{1, "Nameplates", "HostileCC", L["Hostile CC"].."*", true},
-		{1, "Nameplates", "FriendlyThru", "|cffff0000"..L["Friendly ClickThru"].."*", nil, nil, UpdateClickThrough, L["PlateClickThruTip"]},
-		{1, "Nameplates", "EnemyThru", "|cffff0000"..L["Enemy ClickThru"].."*", true, nil, UpdateClickThrough, L["PlateClickThruTip"]},
 		{1, "Nameplates", "UnitTargeted", L["Show TargetedBy"].."*", nil, nil, RefreshPlateByEvents, L["TargetedByTip"]},
 		{1, "Nameplates", "CastTarget", L["PlateCastTarget"].."*", true, nil, nil, L["PlateCastTargetTip"]},
 		{1, "Nameplates", "ClampTarget", L["ClampTargetPlate"].."*", nil, nil, UpdatePlateCVars, L["ClampTargetPlateTip"]},
@@ -626,7 +521,6 @@ local options = {
 		{1, "Nameplates", "ColorByDot", G.HeaderTag..L["ColorByDot"].."*", nil, SetupNameplateColorDotsFunc, nil, L["ColorByDotTip"]},
 		{1, "Nameplates", "CastbarGlow", G.HeaderTag..L["PlateCastbarGlow"].."*", true, SetupPlateCastbarGlowFunc, nil, L["PlateCastbarGlowTip"]},
 		{1, "Nameplates", "ShowCustomUnits", G.HeaderTag..L["ShowCustomUnits"].."*", nil, SetupNameplateUnitFilterFunc, RefreshUnitTable, L["CustomUnitsTip"]},
-		{1, "Nameplates", "ShowPowerUnits", G.HeaderTag..L["ShowPowerUnits"].."*", true, SetupNameplatePowerUnitsFunc, UpdatePowerUnitList, L["PowerUnitsTip"]},
 		{},--blank
 		{1, "Nameplates", "TankMode", G.HeaderTag..L["Tank Mode"].."*", nil, nil, nil, L["TankModeTip"]},
 		{1, "Nameplates", "DPSRevertThreat", L["DPS Revert Threat"].."*", true, nil, nil, L["RevertThreatTip"]},
@@ -636,8 +530,6 @@ local options = {
 		{5, "Nameplates", "InsecureColor", L["Insecure Color"].."*", 2},
 		{5, "Nameplates", "OffTankColor", L["OffTank Color"].."*", 3},
 		{},--blank
-		{1, "Nameplates", "CVarOnlyNames", L["CVarOnlyNames"], nil, nil, UpdatePlateCVars, L["CVarOnlyNamesTip"]},
-		{1, "Nameplates", "CVarShowNPCs", L["CVarShowNPCs"].."*", true, nil, UpdatePlateCVars, L["CVarShowNPCsTip"]},
 		{3, "Nameplates", "PlateRange", L["PlateRange"].."*", nil, {0, 41, 1}, UpdatePlateCVars},
 		{3, "Nameplates", "VerticalSpacing", L["NP VerticalSpacing"].."*", true, {.5, 1.5, .1}, UpdatePlateCVars},
 		{3, "Nameplates", "MinScale", L["Nameplate MinScale"].."*", false, {.5, 1, .1}, UpdatePlateCVars},
