@@ -3,7 +3,6 @@ local Core, Config, L, DB = unpack(ns)
 local G = Core:GetModule("GUI")
 
 local spellBooleanValues = {
-	["RaidBuffsWhite"] = true,
 	["RaidDebuffsBlack"] = true,
 	["NameplateWhite"] = true,
 	["NameplateBlack"] = true,

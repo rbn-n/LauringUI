@@ -8,7 +8,6 @@ local invalidPrio = -1
 function UF:CreateRaidAuras(frame)
 	UF:CreateAurasIndicator(frame)
 	UF:CreateSpellsIndicator(frame)
-	UF:CreateBuffsIndicator(frame)
 	UF:CreateDebuffsIndicator(frame)
 
 	local raidAuras = CreateFrame("Frame", nil, frame)
@@ -24,10 +23,9 @@ function UF.RaidAurasPostUpdate(element, unit)
 	local auras = self.AurasIndicator
 	local spells = self.SpellsIndicator
 	local debuffs = self.DebuffsIndicator
-	local buffs = self.BuffsIndicator
 
 	local enableSpells = Config.DB["UFs"]["RaidBuffIndicator"]
-	local auraIndex, debuffIndex, buffIndex = 0, 0, 0
+	local auraIndex, debuffIndex = 0, 0
 	local numBuffs = element.buffList.num
 	local numDebuffs = element.debuffList.num
 
@@ -87,13 +85,12 @@ function UF.RaidAurasPostUpdate(element, unit)
 					end
 				end
 			end
-		elseif buffs.enable and buffIndex < 4 and UF.BuffsIndicator_Filter(element, aura) then
-			buffIndex = buffIndex + 1
-			UF.BuffsIndicator_UpdateButton(self, buffIndex, aura)
 		end
 	end
 
-	UF.BuffsIndicator_HideButtons(self, buffIndex + 1, 3)
+	if self.DebuffHighlight and Config.DB.UFs.EnableDebuffHighlight then
+		UF:CheckForDispellableAura(self, unit)
+	end
 end
 
 
@@ -103,7 +100,6 @@ function UF:RaidAuras_UpdateOptions()
 			UF.AurasIndicator_UpdateOptions(frame)
 			UF.SpellsIndicator_UpdateOptions(frame)
 			UF.DebuffsIndicator_UpdateOptions(frame)
-			UF.BuffsIndicator_UpdateOptions(frame)
 		end
 	end
 end

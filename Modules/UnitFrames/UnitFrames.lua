@@ -20,7 +20,7 @@ local function CreatePlayer(frame)
 	UF:CreateAdditionalPower(frame)
 	UF:CreateClassPower(frame)
 	UF:CreateAuras(frame)
-	UF:CreateDebuffHighlight(frame)
+	UF:CreateDebuffHighlight(frame, true)
 	UF:CreateEclipseBar(frame)
     UF:ReskinMirrorBars()
 end
@@ -585,7 +585,6 @@ function UF:OnLogin()
 
     SetCVar("predictedHealth", 1)
     UF:UpdateCornerSpells()
-    UF:UpdateRaidBuffsWhite()
     UF:UpdateRaidDebuffsBlack()
     Core:HideDefaultRaidFrame()
 

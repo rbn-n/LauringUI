@@ -99,28 +99,6 @@ StaticPopupDialogs["RESET_LAURINGUI_DEBUFFS_BLACK"] = {
 	whileDead = 1,
 }
 
-StaticPopupDialogs["RESET_LAURINGUI_RaidBuffsWhite"] = {
-	text = L["Reset to default list"],
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function()
-		wipe(LauringUIAccountDB["CornerSpells"][DB.MyClass])
-		ReloadUI()
-	end,
-	whileDead = 1,
-}
-
-StaticPopupDialogs["RESET_LAURINGUI_BUFFS_WHITE"] = {
-	text = L["Reset to default list"],
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function()
-		wipe(LauringUIAccountDB["RaidBuffsWhite"])
-		ReloadUI()
-	end,
-	whileDead = 1,
-}
-
 StaticPopupDialogs["RESET_LAURINGUI_RAIDDEBUFFS"] = {
 	text = L["Reset to default list"],
 	button1 = YES,

@@ -12,6 +12,5 @@
 	<Script file="RaidAuras.lua"/>
 	<Script file="AurasIndicator.lua"/>
 	<Script file="SpellsIndicator.lua"/>
-	<Script file="BuffsIndicator.lua"/>
 	<Script file="DebuffsIndicator.lua"/>
 </Ui>

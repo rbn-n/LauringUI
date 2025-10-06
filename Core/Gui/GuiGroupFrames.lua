@@ -16,10 +16,6 @@ local function UpdateCornerSpells()
 	Core:GetModule("UnitFrames"):UpdateCornerSpells()
 end
 
-local function RefreshBuffsIndicator()
-	Core:GetModule("UnitFrames"):UpdateRaidBuffsWhite()
-end
-
 local function UpdateRaidDebuffs()
 	Core:GetModule("UnitFrames"):UpdateRaidDebuffs()
 end
@@ -349,103 +345,6 @@ local function SetupSpellsIndicator(parent)
 	end
 end
 
-local function SetupBuffsIndicator(parent)
-	local guiName = "LauringUI_BuffsIndicator"
-	local exatraGuis = G:ToggleExtraGUI(guiName)
-	if exatraGuis[guiName] then return end
-
-	local panel = G:CreateExtraGUI(parent, guiName, L["WhiteList"].."*")
-	panel:SetScript("OnHide", RefreshBuffsIndicator)
-
-	local barList = {}
-
-	local function createBar(parent, spellID, isNew)
-		local name, _, texture = GetSpellInfo(spellID)
-		local bar = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-		bar:SetSize(220, 30)
-		Core.CreateBD(bar, .25)
-		barList[spellID] = bar
-
-		local icon, close = G:CreateBarWidgets(bar, texture)
-		Core.AddTooltip(icon, "ANCHOR_RIGHT", spellID)
-		close:SetScript("OnClick", function()
-			bar:Hide()
-			if Config.RaidBuffsWhite[spellID] then
-				LauringUIAccountDB["RaidBuffsWhite"][spellID] = false
-			else
-				LauringUIAccountDB["RaidBuffsWhite"][spellID] = nil
-			end
-			barList[spellID] = nil
-			G:SortBars(barList)
-		end)
-
-		local spellName = Core.CreateFS(bar, 14, name, false, "LEFT", 30, 0)
-		spellName:SetWidth(180)
-		spellName:SetJustifyH("LEFT")
-		if isNew then spellName:SetTextColor(0, 1, 0) end
-
-		G:SortBars(barList)
-	end
-
-	local function isAuraExisted(spellID)
-		local modValue = LauringUIAccountDB["RaidBuffsWhite"][spellID]
-		local locValue = Config.RaidBuffsWhite[spellID]
-		return modValue or (modValue == nil and locValue)
-	end
-
-	local function addClick(parent)
-		local spellID = tonumber(parent.box:GetText())
-		if not spellID or not GetSpellInfo(spellID) then UIErrorsFrame:AddMessage(DB.InfoColor..L["Incorrect SpellID"]) return end
-		if isAuraExisted(spellID) then UIErrorsFrame:AddMessage(DB.InfoColor..L["Existing ID"]) return end
-
-		LauringUIAccountDB["RaidBuffsWhite"][spellID] = true
-		createBar(parent.child, spellID, true)
-		parent.box:SetText("")
-	end
-
-
-	local frame = CreateFrame("Frame", nil, panel, "BackdropTemplate")
-	frame:SetSize(280, 540)
-	frame:SetPoint("TOPLEFT", 10, -50)
-	Core.CreateBD(frame, .25)
-
-	local scroll = G:CreateScroll(frame, 240, 485)
-	scroll.box = Core.CreateEditBox(frame, 160, 25)
-	scroll.box:SetPoint("TOPLEFT", 10, -10)
-	Core.AddTooltip(scroll.box, "ANCHOR_TOPRIGHT", L["ID Intro"], "info", true)
-
-	scroll.add = Core.CreateButton(frame, 45, 25, ADD)
-	scroll.add:SetPoint("TOPRIGHT", -8, -10)
-	scroll.add:SetScript("OnClick", function()
-		addClick(scroll)
-	end)
-
-	scroll.reset = Core.CreateButton(frame, 45, 25, RESET)
-	scroll.reset:SetPoint("RIGHT", scroll.add, "LEFT", -5, 0)
-	scroll.reset:SetScript("OnClick", function()
-		StaticPopup_Show("RESET_LAURINGUI_BUFFS_WHITE")
-	end)
-
-	local UF = Core:GetModule("UnitFrames")
-	for spellID, value in pairs(UF.RaidBuffsWhite) do
-		if value then
-			createBar(scroll.child, spellID)
-		end
-	end
-
-	local box = Core.CreateCheckBox(frame)
-	box:SetPoint("BOTTOMRIGHT", frame, "TOPRIGHT", 0, 5)
-	box:SetChecked(Config.DB["UFs"]["AutoBuffs"])
-	box:SetHitRectInsets(-50, 0, 0, 0)
-	box:SetScript("OnClick", function()
-		Config.DB["UFs"]["AutoBuffs"] = box:GetChecked()
-	end)
-	local text = Core.CreateFS(box, 24, "|cffff0000???")
-	text:ClearAllPoints()
-	text:SetPoint("RIGHT", box, "LEFT")
-	Core.AddTooltip(box, "ANCHOR_TOPRIGHT", L["AutoBuffsTip"], "info", true)
-end
-
 local function AddNewDungeon(dungeons, dungeonID)
 	local name = EJ_GetInstanceInfo(dungeonID)
 	if name then
@@ -717,10 +616,6 @@ local function UpdateRaidAurasOptions()
 	Core:GetModule("UnitFrames"):RaidAuras_UpdateOptions()
 end
 
-local function SetupBuffsIndicatorFunc()
-	SetupBuffsIndicator(G.GuiPage["GroupFrames"])
-end
-
 local function SetupSpellsIndicatorFunc()
 	SetupSpellsIndicator(G.GuiPage["GroupFrames"])
 end
@@ -748,28 +643,24 @@ end
 
 local options = {
     {1, "UFs", "EnableRaidFrame", G.HeaderTag..L["UFs Raid"], nil, SetupRaidFrameFunc, nil, L["RaidFrameTip"]},
-    {1, "UFs", "EnablePartyFrame", L["UFs Party"], nil, SetupPartyFrameFunc, nil, L["PartyFrameTip"]},
-    {1, "UFs", "EnablePartyPetFrame", L["UFs PartyPet"], true, SetupPartyPetFrameFunc, nil, L["PartyPetTip"]},
-    {},--blank
-	{1, "UFs", "ShowBlizzardDebuff", L["ShowBlizzardDebuff"].."*", nil, SetupDebuffsIndicatorFunc, UpdateRaidAurasOptions, L["ShowBlizzardDebuffTip"]},
-	{1, "UFs", "ShowRaidBuff", L["ShowRaidBuff"].."*", true, SetupBuffsIndicatorFunc, UpdateRaidAurasOptions, L["ShowRaidBuffTip"]},
-	{1, "UFs", "DebuffClickThrough", L["DebuffClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
-	{1, "UFs", "BuffClickThrough", L["BuffClickThrough"].."*", true, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
-	{3, "UFs", "BlizzardDebuffSize", L["BlizzardDebuffSize"].."*", nil, {5, 30, 1}, UpdateRaidAurasOptions},
-	{3, "UFs", "RaidBuffSize", L["RaidBuffSize"].."*", true, {5, 30, 1}, UpdateRaidAurasOptions},
-	{},--blank
-	{1, "UFs", "RaidBuffIndicator", G.HeaderTag..L["RaidBuffIndicator"].."*", nil, SetupSpellsIndicatorFunc, UpdateRaidAurasOptions, L["RaidBuffIndicatorTip"]},
-	{3, "UFs", "BuffIndicatorScale", L["BuffIndicatorScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions},
-	{},--blank
-	{1, "UFs", "ShowInstanceAuras", G.HeaderTag..L["Instance Auras"].."*", nil, SetupRaidDebuffsFunc, UpdateRaidAurasOptions, L["InstanceAurasTip"]},
-	{1, "UFs", "InstanceAuraClickThrough", L["InstanceAuras ClickThrough"].."*", true, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
-	{4, "UFs", "InstanceAuraDispellType", L["Dispellable"].."*", nil, {L["Always"], L["Filter"], DISABLE}, UpdateRaidAurasOptions, L["DispellTypeTip"]},
-	{3, "UFs", "InstanceAuraScale", L["InstanceAuraScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions},
-	{},--blank
-    {1, "UFs", "FrequentHealth", G.HeaderTag..L["FrequentHealth"].."*", nil, nil, UpdateRaidHealthMethod, L["FrequentHealthTip"]},
+    {1, "UFs", "EnablePartyFrame", L["UFs Party"], true, SetupPartyFrameFunc, nil, L["PartyFrameTip"]},
+    {1, "UFs", "EnablePartyPetFrame", L["UFs PartyPet"], nil, SetupPartyPetFrameFunc, nil, L["PartyPetTip"]},
+	{1, "UFs", "FrequentHealth", G.HeaderTag..L["FrequentHealth"].."*", nil, nil, UpdateRaidHealthMethod, L["FrequentHealthTip"]},
     {3, "UFs", "HealthFrequency", L["HealthFrequency"].."*", true, {.1, .5, .05}, UpdateRaidHealthMethod, L["HealthFrequencyTip"], nil, true},
     {},--blank
-    --{4, "UFs", "RaidHPMode", L["HealthValueType"].."*", nil, {DISABLE, L["ShowHealthPercent"], L["ShowHealthCurrent"], L["ShowHealthLoss"], L["ShowHealthLossPercent"]}, UpdateRaidTextScale, L["100PercentTip"]},
+	{1, "UFs", "ShowBlizzardDebuff", L["ShowBlizzardDebuff"].."*", nil, SetupDebuffsIndicatorFunc, UpdateRaidAurasOptions, L["ShowBlizzardDebuffTip"]},
+	{3, "UFs", "BlizzardDebuffSize", L["BlizzardDebuffSize"].."*", true, {5, 30, 1}, UpdateRaidAurasOptions, nil, nil, true},
+	{1, "UFs", "DebuffClickThrough", L["DebuffClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
+
+	{4, "UFs", "InstanceAuraDispellType", L["Dispellable"].."*", nil, {L["Always"], L["Filter"], DISABLE}, UpdateRaidAurasOptions, L["DispellTypeTip"]},
+
+	{1, "UFs", "ShowInstanceAuras", G.HeaderTag..L["Instance Auras"].."*", nil, SetupRaidDebuffsFunc, UpdateRaidAurasOptions, L["InstanceAurasTip"]},
+	{3, "UFs", "InstanceAuraScale", L["InstanceAuraScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
+	{1, "UFs", "InstanceAuraClickThrough", L["InstanceAuras ClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
+	{},--blank
+	{1, "UFs", "RaidBuffIndicator", G.HeaderTag..L["RaidBuffIndicator"].."*", nil, SetupSpellsIndicatorFunc, UpdateRaidAurasOptions, L["RaidBuffIndicatorTip"]},
+	{3, "UFs", "BuffIndicatorScale", L["BuffIndicatorScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
+    {},--blank
     {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], nil, {ALL, DISABLE, L["HideDPSRole"]}},
     {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateRaidTextScale},
     {1, "UFs", "ShowSolo", L["ShowSolo"].."*", nil, nil, UpdateAllHeaders, L["ShowSoloTip"]},

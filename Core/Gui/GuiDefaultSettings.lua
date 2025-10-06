@@ -59,8 +59,8 @@ G.DefaultSettings = {
         Enable = true,
         CastingColor = {r=.3, g=.7, b=1},
         NotInterruptColor = {r=1, g=.5, b=.5},
-        FocusHeight = 15,
-        FocusWidth = 202,
+        FocusHeight = 20,
+        FocusWidth = 150,
         PlayerHeight = 24,
         PlayerWidth = 400,
         TargetHeight = 20,
@@ -318,9 +318,7 @@ G.DefaultSettings = {
 		BuffClickThrough = false,
 		DebuffClickThrough = false,
 		BuffIndicatorScale = 1,
-		ShowRaidBuff = false,
 		ShowBlizzardDebuff = true,
-		RaidBuffSize = 12,
 		BlizzardDebuffSize = 12,
 
 		SmartRaid = true,
@@ -451,7 +449,6 @@ G.AccountSettings = {
 	NameplateWhite = {},
 	NameplateBlack = {},
 	CornerSpells = {},
-	RaidBuffsWhite = {},
 	RaidDebuffsBlack = {},
 }
 

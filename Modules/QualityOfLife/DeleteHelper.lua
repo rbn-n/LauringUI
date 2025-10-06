@@ -7,7 +7,7 @@ function QoL:DeleteHelper()
 	if deleteDialog.OnShow then
 		hooksecurefunc(deleteDialog, "OnShow", function(self)
 			if Config.DB["QoL"]["DeleteHelper"] then
-				self.editBox:SetText(DELETE_ITEM_CONFIRM_STRING)
+				self.EditBox:SetText(DELETE_ITEM_CONFIRM_STRING)
 			end
 		end)
 	end

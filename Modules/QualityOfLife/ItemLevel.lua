@@ -108,8 +108,9 @@ function QoL:RefreshButtonInfo()
 		for index, slotFrame in pairs(pending) do
 			local link = GetInventoryItemLink(unit, index)
 			if link then
-				local quality, level = select(3, GetItemInfo(link))
-				if quality then
+				local level = Core.GetItemLevel(link, unit, index)
+				if level ~= "tooSoon" then
+					local quality = select(3, GetItemInfo(link))
 					local color = DB.QualityColors[quality]
 					QoL:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
 					if Config.DB["QoL"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
@@ -154,15 +155,15 @@ function QoL:ItemLevel_SetupLevel(frame, strType, unit)
 			if itemTexture then
 				local link = GetInventoryItemLink(unit, index)
 				if link then
-					local quality, level = select(3, GetItemInfo(link))
-					if quality then
+					local level = Core.GetItemLevel(link, unit, index)
+					if level ~= "tooSoon" then
+						local quality = select(3, GetItemInfo(link))
 						local color = DB.QualityColors[quality]
 						QoL:ItemBorderSetColor(slotFrame, color.r, color.g, color.b)
 						if Config.DB["QoL"]["ShowItemLevel"] and level and level > 1 and quality > 1 then
 							slotFrame.iLvlText:SetText(level)
 							slotFrame.iLvlText:SetTextColor(color.r, color.g, color.b)
 						end
-
 					else
 						pending[index] = slotFrame
 						QoL.QualityUpdater:Show()
@@ -184,7 +185,7 @@ local function GetItemSlotLevel(unit, index)
 	local level
 	local itemLink = GetInventoryItemLink(unit, index)
 	if itemLink then
-		level = select(4, GetItemInfo(itemLink))
+		level = Core.GetItemLevel(itemLink, unit, index)
 	end
 	return tonumber(level) or 0
 end
@@ -194,13 +195,13 @@ end
 -- P3 200,226,239,252
 -- P4 200,246,259,272
 local function GetILvlTextColor(level)
-	if level >= 372 then
+	if level >= 510 then
 		return 1, .5, 0
-	elseif level >= 359 then
+	elseif level >= 489 then
 		return .63, .2, .93
 	elseif level >= 346 then
 		return 0, .43, .87
-	elseif level >= 272 then
+	elseif level >= 463 then
 		return .12, 1, 0
 	else
 		return 1, 1, 1
@@ -272,6 +273,7 @@ end
 
 local function GetItemQualityAndLevel(link)
 	local _, _, quality, level, _, _, _, _, _, _, _, classID = GetItemInfo(link)
+	level = Core.GetItemLevel(link) or level
 	if quality and quality > 1 and level and level > 1 and DB.iLvlClassIDs[classID] then
 		return quality, level
 	end
@@ -312,7 +314,7 @@ function QoL.ItemLevel_ReplaceItemLink(link, name)
 
 	local modLink = itemCache[link]
 	if not modLink then
-		local itemLevel = select(4, GetItemInfo(link))
+		local itemLevel = Core.GetItemLevel(link)
 		if itemLevel then
 			modLink = gsub(link, "|h%[(.-)%]|h", "|h("..itemLevel..CHAT.IsItemWithGem(link)..")"..name.."|h")
 			itemCache[link] = modLink
@@ -360,27 +362,18 @@ function QoL:ItemLevel_FlyoutUpdate(bag, slot, quality)
 
 	if quality and quality <= 1 then return end
 
-	local link
+	local link, level
 	if bag then
 		link = GetContainerItemLink(bag, slot)
+		level = Core.GetItemLevel(link, bag, slot)
 	else
 		link = GetInventoryItemLink("player", slot)
-	end
-	local quality, level = select(3, GetItemInfo(link))
-
-	local color = DB.QualityColors[quality or 0]
-	self.iLvl:SetText(level)
-	self.iLvl:SetTextColor(color.r, color.g, color.b)
-	QoL:ItemBorderSetColor(self, color.r, color.g, color.b)
-end
-
-function QoL:ItemLevel_FlyoutUpdateByID(id)
-	if not self.iLvl then
-		self.iLvl = Core.CreateFS(self, DB.Font[2]+1, "", false, "BOTTOMLEFT", 1, 1)
+		level = Core.GetItemLevel(link, "player", slot)
 	end
 
-	local quality, level = select(3, GetItemInfo(id))
-	if quality and quality <= 1 then return end
+	if not quality then
+		quality = select(3, GetItemInfo(link))
+	end
 
 	local color = DB.QualityColors[quality or 0]
 	self.iLvl:SetText(level)

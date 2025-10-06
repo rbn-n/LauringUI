@@ -110,6 +110,7 @@ function Tooltip:GetUnitItemLevel(unit)
 
 
 						if unit ~= "player" then
+							level = Core.GetItemLevel(itemLink) or level
 							if i < 16 then
 								total = total + level
 							elseif i == 16 then

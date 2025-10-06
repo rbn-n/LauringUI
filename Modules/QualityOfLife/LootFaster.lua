@@ -1,6 +1,7 @@
 local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 local QoL = Core:GetModule("QoL")
+local GetLootMethod = C_PartyInfo.GetLootMethod
 
 local lootDelay = 0
 function QoL:LootFaster()

@@ -85,11 +85,3 @@ Config.RaidDebuffsBlack = {
 	[36901] = true, -- Soul Split: Good
 	[36940] = true, -- Teleporter Malfunction
 }
-
--- Buff indicator whitelist for raid frames (important cooldowns / survivals)
-Config.RaidBuffsWhite = {
-	[642] = true,     -- Divine Shield
-	[871] = true,     -- Shield Wall
-	[1022] = true,    -- Blessing of Protection
-	[27827] = true,   -- Spirit of Redemption
-}

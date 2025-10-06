@@ -12,34 +12,34 @@ local function GetPlayerDispellableTypes()
 	local dispels = {}
 
 	if class == "PRIEST" then
-		dispels.MAGIC = true
-		dispels.DISEASE = true
+		dispels.Magic = true
+		dispels.Disease = true
 
 	elseif class == "PALADIN" then
-		dispels.POISON = true
-		dispels.DISEASE = true
+		dispels.Poison = true
+		dispels.Disease = true
 		if role == "HEALER" then
-			dispels.MAGIC = true
+			dispels.Magic = true
 		end
 
 	elseif class == "SHAMAN" then
-		dispels.CURSE = true
+		dispels.Curse = true
 		if role == "HEALER" then
-			dispels.MAGIC = true
+			dispels.Magic = true
 		end
 
 	elseif class == "DRUID" then
-		dispels.CURSE = true
-		dispels.POISON = true
+		dispels.Curse = true
+		dispels.Poison = true
 		if role == "HEALER" then
-			dispels.MAGIC = true
+			dispels.Magic = true
 		end
 
 	elseif class == "MONK" then
-		dispels.POISON = true
-		dispels.DISEASE = true
+		dispels.Poison = true
+		dispels.Disease = true
 		if role == "HEALER" then
-			dispels.MAGIC = true
+			dispels.Magic = true
 		end
 	end
 
@@ -54,8 +54,26 @@ local function GetPlayerDispellableTypes()
 	return filtered
 end
 
-local function PostUpdateDebuffHighlight(frame, debuffType, _, wasFiltered, _, color)
-	if debuffType and not wasFiltered and color then
+
+function UF:CheckForDispellableAura(frame, unit)
+	local dispellableTypes = frame.DebuffHighlightFilterTable
+	if not dispellableTypes then return end
+
+	local foundType
+	for i = 1, 40 do
+		local name, _, _, debuffType = UnitAura(unit, i, "HARMFUL")
+		if not name then break end
+
+		if debuffType then
+			if dispellableTypes[debuffType] then
+				foundType = debuffType
+				break
+			end
+		end
+	end
+
+	if foundType then
+		local color = dispellableTypes[foundType] or DB.DebuffHighlightColors[foundType] or {r = 0.3, g = 0.3, b = 1}
 		frame.DebuffHighlight:SetVertexColor(color.r, color.g, color.b, frame.DebuffHighlightAlpha or 0.5)
 	else
 		frame.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
@@ -74,7 +92,13 @@ function UF:ToggleDebuffHighlight()
 	end
 end
 
-function UF:CreateDebuffHighlight(frame)
+local function OnUnitAura(self, _, unit)
+	if unit == self.unit then
+		UF:CheckForDispellableAura(self, unit)
+	end
+end
+
+function UF:CreateDebuffHighlight(frame, registerUnitAuraEvent)
 	if not Config.DB.UFs.EnableDebuffHighlight then return end
 
 	local dbh = frame.Health:CreateTexture(nil, "OVERLAY")
@@ -87,7 +111,6 @@ function UF:CreateDebuffHighlight(frame)
 	frame.DebuffHighlightAlpha = 0.5
 	frame.DebuffHighlightFilter = true
 	frame.DebuffHighlightFilterTable = GetPlayerDispellableTypes()
-	frame.DebuffHighlight.PostUpdate = PostUpdateDebuffHighlight
 
 	Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(unit)
 		if unit ~= "player" then return end
@@ -97,4 +120,8 @@ function UF:CreateDebuffHighlight(frame)
 			end
 		end
 	end)
+
+	if registerUnitAuraEvent then
+		frame:RegisterEvent("UNIT_AURA", OnUnitAura)
+	end
 end
