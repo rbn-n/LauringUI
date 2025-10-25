@@ -39,7 +39,7 @@ Config.CornerBuffs = {
 		[84159]  = {"BOTTOMLEFT", true},			-- Die by the Sword
 	},
 	["SHAMAN"] = {
-		[974]    = {"TOPLEFT"},              	-- Earth Shield
+		[974]    = {"TOPLEFT", true},           -- Earth Shield
 		[61295]  = {"TOPLEFT"},              	-- Rip Tide
 		[30823]  = {"BOTTOMLEFT", true},        -- Shamanistic Rage
 	},

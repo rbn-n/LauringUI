@@ -112,7 +112,7 @@ function UF:CreateDebuffHighlight(frame, registerUnitAuraEvent)
 	frame.DebuffHighlightFilter = true
 	frame.DebuffHighlightFilterTable = GetPlayerDispellableTypes()
 
-	Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(unit)
+	Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", function(_, unit)
 		if unit ~= "player" then return end
 		for _, oUFObject in pairs(oUF.objects) do
 			if oUFObject.DebuffHighlight then
