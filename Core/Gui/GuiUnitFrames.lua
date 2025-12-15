@@ -286,10 +286,10 @@ end
 
 local options = {
     {1, "UFs", "Enable", G.HeaderTag..L["Enable UFs"], nil, SetupUnitFrameFunc, nil, L["HideUFWarning"]},
-    {3, "UFs", "UFTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateUFTextScale, nil, nil, true},
-    {1, "UFs", "ShowArena", L["Arena Frame"], nil},
+    {1, "UFs", "ShowArena", L["Arena Frame"], true},
     {1, "UFs", "ShowAuras", L["ShowAuras"].."*", nil, SetupUFAurasFunc, ToggleAllAuras},
     {1, "UFs", "EnableDebuffHighlight", L["DebuffHighlight"].."*", true, nil, ToggleDebuffHighlight, L["DebuffHighlightTip"]},
+	{3, "UFs", "UFTextScale", L["UFTextScale"].."*", nil, {.8, 1.5, .05}, UpdateUFTextScale, nil, nil, true},
 	{}, -- blank
 	{1, "UFs", "ShowAdditionalPower", G.HeaderTag..L["ShowAdditionalPower"], nil, nil, nil, L["ShowAdditionalPowerTip"]},
 	{1, "UFs", "ShowClassPower", G.HeaderTag..L["ShowClassPower"], nil, nil, nil, L["ShowClassPowerTip"]},

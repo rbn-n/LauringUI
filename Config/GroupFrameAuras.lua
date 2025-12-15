@@ -21,9 +21,13 @@ Config.CornerBuffs = {
 		[29166]  = {"BOTTOMLEFT", true},    	-- Innervate
 	},
 	["PALADIN"] = {
+		[114163] = {"TOPLEFT"},              	-- Eternal Flame
+		[53563]  = {"TOPLEFT"},              	-- Beacon
+		--[86273]  = {"TOPLEFT"},              	-- Mastery: Illuminated Healing
 		[1022]   = {"BOTTOMLEFT", true},     	-- Blessing of Protection
 		[1044]   = {"BOTTOMLEFT", true},     	-- Blessing of Freedom
 		[6940]   = {"BOTTOMLEFT", true},     	-- Blessing of Sacrifice
+		[114039] = {"BOTTOMLEFT", true},     	-- Hand of Purity
 	},
 	["WARLOCK"] = {
 		[20707]  = {"BOTTOMRIGHT", true},  		-- Soulstone Resurrection

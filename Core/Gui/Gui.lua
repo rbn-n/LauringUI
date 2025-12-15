@@ -57,6 +57,7 @@ function CreateTab(parent, i, name)
 end
 
 local orderedTabs = {
+	L["General"],
     L["UnitFrames"],
     L["GroupFrames"],
     L["Castbars"],
@@ -138,7 +139,7 @@ local function OpenGUI()
 	end
 	Core:RegisterEvent("PLAYER_REGEN_DISABLED", showLater)
 
-	SelectTab("UnitFrames")
+	SelectTab("General")
 end
 
 function G:OnLogin()

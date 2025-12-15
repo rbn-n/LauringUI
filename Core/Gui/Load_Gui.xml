@@ -2,6 +2,7 @@
 	<Script file="GuiDefaultSettings.lua"/>
     <Script file="Mover.lua"/>
 
+    <Script file="GuiGeneral.lua"/>
     <Script file="GuiUnitFrames.lua"/>
     <Script file="GuiGroupFrames.lua"/>
     <Script file="GuiCastbars.lua"/>

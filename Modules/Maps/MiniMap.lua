@@ -465,7 +465,7 @@ local function ReskinInstanceDifficulty()
 	local function handleFlag(diff)
 		diff:ClearAllPoints()
 		diff:SetPoint("TOPRIGHT", Minimap, "TOPRIGHT", 2, 2)
-		diff:SetScale(.7)
+		diff:SetScale(1)
 	end
 
 	if MiniMapInstanceDifficulty then

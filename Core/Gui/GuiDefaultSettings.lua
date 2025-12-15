@@ -4,6 +4,7 @@ local G = Core:RegisterModule("GUI")
 
 G.HeaderTag = "|cff00cc4c"
 G.TabList = {
+	[L["General"]] = {},
     [L["UnitFrames"]] = {},
     [L["GroupFrames"]] = {},
     [L["Castbars"]] = {},
@@ -84,6 +85,9 @@ G.DefaultSettings = {
 		WhisperInvite = true,
 		WhisperInviteGuildOnly = true,
 		WhisperInviteKeywords = "inv invite",
+	},
+	General = {
+		ClassColoredUFs = true,
 	},
 	Loot = {
 		Enable = true,
@@ -229,9 +233,9 @@ G.DefaultSettings = {
 		HideArenaPower = false,
 		ShowArena = true,
 
-        BossWidth = 175,
-		BossHeight = 30,
-		BossNameOffset = 0,
+        BossWidth = 225,
+		BossHeight = 40,
+		BossNameOffset = 2,
 		BossPowerHeight = 6,
 		BossPowerOffset = 2,
 		HideBossPower = false,

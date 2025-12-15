@@ -89,7 +89,8 @@ local function CreateNameText(frame, textFrame)
     elseif UF.IsPartyOrRaid(frame)  then
         UF:SetPartyAndRaidName(name, frame)
     else
-        name:SetPoint("LEFT", frame, "LEFT", 2, 0)
+        local yOffset = Config.DB.UFs[frame.mystyle.."NameOffset"] or 0
+        name:SetPoint("LEFT", frame, "LEFT", 2, yOffset)
     end
 
     UF:UpdateFrameNameTag(frame)
@@ -153,6 +154,14 @@ function UF:CreateHealthAndNameText(frame)
 end
 
 function UF.HealthPostUpdate(element, unit, cur, max)
+    if Config.DB["General"]["ClassColoredUFs"] then
+        UF.HealthPostUpdateClassColored(element, unit, cur, max)
+    else
+        UF.HealthPostUpdateDarkMode(element, unit, cur, max)
+    end
+end
+
+function UF.HealthPostUpdateClassColored(element, unit, cur, max)
     local self = element.__owner
     local r, g, b
 
@@ -169,7 +178,6 @@ function UF.HealthPostUpdate(element, unit, cur, max)
         elseif dead then
             element:SetStatusBarColor(1, 0, 0, 0.7)
         end
-
         element.bg:SetVertexColor(0.5, 0.5, 0.5, 0.3)
         return
     end
@@ -196,4 +204,26 @@ function UF.HealthPostUpdate(element, unit, cur, max)
 
     element:SetStatusBarColor(.1, .1, .1, 0.7)
     element.bg:SetVertexColor(r, g, b, 0.35)
+end
+
+function UF.HealthPostUpdateDarkMode(element, unit, cur, max)
+    local disconnected = not UnitIsConnected(unit)
+    local dead = UnitIsDead(unit)
+    local ghost = UnitIsGhost(unit)
+
+    if disconnected or dead or ghost then
+        element:SetValue(max)
+        if disconnected then
+            element:SetStatusBarColor(0.35, 0.45, 0.7, 0.6)
+        elseif ghost then
+            element:SetStatusBarColor(1, 1, 1, 0.6)
+        elseif dead then
+            element:SetStatusBarColor(1, 0, 0, 0.7)
+        end
+        element.bg:SetVertexColor(0.5, 0.5, 0.5, 0.3)
+        return
+    end
+
+    element:SetStatusBarColor(0, 0, 0, 0.85)
+    element.bg:SetVertexColor(1, 1, 1, 0.25)
 end

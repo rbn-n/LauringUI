@@ -15,8 +15,7 @@ end
 local currentSpecIndex, currentLootIndex, newMenu, numSpecs, numLocal
 
 INFO.eventList = {
-	"PLAYER_ENTERING_WORLD",
-	"ACTIVE_PLAYER_SPECIALIZATION_CHANGED",
+	"PLAYER_ENTERING_WORLD"
 }
 
 INFO.onEvent = function(self)

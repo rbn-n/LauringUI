@@ -12,7 +12,6 @@ local IsInGuild, CanGuildBankRepair, GetGuildBankWithdrawMoney = IsInGuild, CanG
 local C_Timer_After, IsShiftKeyDown = C_Timer.After, IsShiftKeyDown
 
 local repairCostString = gsub(REPAIR_COST, HEADER_COLON, ":")
-local lowDurabilityCap = .25
 
 local localSlots = {
 	[1] = {1, INVTYPE_HEAD, 1000},
@@ -27,8 +26,6 @@ local localSlots = {
 	[10] = {17, INVTYPE_WEAPONOFFHAND, 1000},
 	[11] = {18, INVTYPE_RANGED, 1000}
 }
-
-local lastClick = 0
 
 local function sortSlots(a, b)
 	if a and b then
@@ -56,14 +53,6 @@ local function UpdateAllSlots()
 	return numSlots
 end
 
-local function isLowDurability()
-	for i = 1, #localSlots do
-		if localSlots[i][3] < lowDurabilityCap then
-			return true
-		end
-	end
-end
-
 local function getDurabilityColor(cur, max)
 	local r, g, b = oUF:RGBColorGradient(cur, max, 1, 0, 0, 1, 1, 0, 0, 1, 0)
 	return r, g, b
@@ -72,10 +61,6 @@ end
 info.eventList = {
 	"UPDATE_INVENTORY_DURABILITY", "PLAYER_ENTERING_WORLD"
 }
-
-local function SaveClickTime()
-	lastClick = GetTime()
-end
 
 info.onEvent = function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
