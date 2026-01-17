@@ -19,7 +19,6 @@ G.TabList = {
     [L["Profile"]] = {},
 }
 
-
 G.DefaultSettings = {
 	BFA = false,
 	Mover = {},
@@ -158,7 +157,7 @@ G.DefaultSettings = {
 		InsecureColor = {r=1, g=.25, b=.25},
 		Interruptor = true,
 		MaxAuras = 5,
-		MinAlpha = 0.5,
+		MinAlpha = 1,
 		MinScale = 1,
 		NameOnlyGuild = false,
 		NameOnlyMode = true,
@@ -312,6 +311,8 @@ G.DefaultSettings = {
 		RaidSpacing = 3,
 		RaidGroups = 5,
 		RaidHPMode = 1,
+		RaidSortByRole = true,
+		RaidSortAscending = false,
 		HideRaidPower = true,
 
 		RaidBuffIndicator = true,

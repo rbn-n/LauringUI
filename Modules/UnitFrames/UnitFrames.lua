@@ -373,23 +373,30 @@ function UF:SetupRaid()
     oUF:SetActiveStyle("Raid")
 
     local function CreateRaidGroup(name, i, width, height)
+        local sortByRole = Config.DB["UFs"]["RaidSortByRole"]
+        local sortAscending = Config.DB["UFs"]["RaidSortAscending"]
+
         local group = oUF:SpawnHeader(name, nil, nil,
-        "showPlayer", true,
-        "showSolo", true,
-        "showParty", true,
-        "showRaid", true,
-        "groupFilter", tostring(i),
-        "groupingOrder", "1,2,3,4,5,6,7,8",
-        "groupBy", "GROUP",
-        "sortMethod", "INDEX",
-        "maxColumns", 1,
-        "unitsPerColumn", 5,
-        "columnSpacing", 5,
-        "columnAnchorPoint", "LEFT",
-        "oUF-initialConfigFunction", ([[
+            "showPlayer", true,
+            "showSolo", true,
+            "showParty", true,
+            "showRaid", true,
+            "groupFilter", tostring(i),
+            "groupBy", sortByRole and "ASSIGNEDROLE" or nil,
+            "groupingOrder", sortByRole and "TANK,HEALER,DAMAGER,NONE" or "",
+            "sortMethod", sortByRole and "NAME" or "INDEX",
+            "sortDir", sortAscending and "ASC" or "DESC",
+            "maxColumns", 1,
+            "unitsPerColumn", 5,
+            "columnSpacing", 5,
+            "columnAnchorPoint", "LEFT",
+
+            "oUF-initialConfigFunction", ([[
             self:SetWidth(%d)
             self:SetHeight(%d)
-        ]]):format(width, height))
+        ]]):format(width, height)
+        )
+
         return group
     end
 

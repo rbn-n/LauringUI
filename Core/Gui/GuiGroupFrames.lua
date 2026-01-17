@@ -62,13 +62,15 @@ local function SetupRaidFrame(parent)
 		end
 	end
 
-	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -30, options, L["RaidDirectionTip"], "UFs", "RaidDirection", 1, UpdateRaidDirection)
-	G:CreateOptionSlider(scroll.child, L["Width"], 60, 200, defaultValue[1], -100, "RaidWidth", ResizeRaidFrame)
-	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -180, "RaidHeight", ResizeRaidFrame)
-	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -260, "RaidPowerHeight", ResizeRaidFrame)
-	G:CreateOptionSlider(scroll.child, L["RaidGroups"], 2, 8, defaultValue[4], -340, "RaidGroups", UpdateNumGroups)
-	G:CreateOptionSlider(scroll.child, L["RaidRows"], 1, 8, defaultValue[5], -420, "RaidRows", UpdateNumGroups)
-	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[6], -500, "RaidSpacing", UpdateNumGroups)
+	G:CreateOptionCheck(scroll.child, -10, L["RaidSortByRole"], "UFs", "RaidSortByRole", ResizeRaidFrame, L["RaidSortByRoleTip"])
+	G:CreateOptionCheck(scroll.child, -40, L["RaidSortAscending"], "UFs", "RaidSortAscending", ResizeRaidFrame, L["RaidSortAscendingTip"])
+	G:CreateOptionDropdown(scroll.child, L["GrowthDirection"], -90, options, L["RaidDirectionTip"], "UFs", "RaidDirection", 1, UpdateRaidDirection)
+	G:CreateOptionSlider(scroll.child, L["Width"], 60, 200, defaultValue[1], -160, "RaidWidth", ResizeRaidFrame)
+	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -240, "RaidHeight", ResizeRaidFrame)
+	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -320, "RaidPowerHeight", ResizeRaidFrame)
+	G:CreateOptionSlider(scroll.child, L["RaidGroups"], 2, 8, defaultValue[4], -400, "RaidGroups", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["RaidRows"], 1, 8, defaultValue[5], -480, "RaidRows", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[6], -560, "RaidSpacing", UpdateNumGroups)
 end
 
 local function SetupPartyFrame(parent)
