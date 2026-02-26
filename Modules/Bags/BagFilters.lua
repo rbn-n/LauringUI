@@ -4,7 +4,7 @@ local module = Core:GetModule("Bags")
 local cargBags = ns.cargBags
 
 local C_ToyBox_GetToyInfo = C_ToyBox and C_ToyBox.GetToyInfo
-local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON, LE_ITEM_QUALITY_LEGENDARY = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON, LE_ITEM_QUALITY_LEGENDARY
+local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_LEGENDARY = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_LEGENDARY
 local LE_ITEM_CLASS_CONSUMABLE, LE_ITEM_CLASS_ITEM_ENHANCEMENT = LE_ITEM_CLASS_CONSUMABLE, LE_ITEM_CLASS_ITEM_ENHANCEMENT
 local LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, LE_ITEM_CLASS_TRADEGOODS = LE_ITEM_CLASS_WEAPON, LE_ITEM_CLASS_ARMOR, LE_ITEM_CLASS_TRADEGOODS
 local AmmoEquipLoc = _G.INVTYPE_AMMO
@@ -129,6 +129,10 @@ local function isEmptySlot(item)
 	return module.initComplete and not item.texture and (Config.DB["Bags"]["ItemFilter"] or cargBags.BagGroups[item.bagId] == 0)
 end
 
+local function isItemKeyRing(item)
+	return item.bagId == -2
+end
+
 local function isTradeGoods(item)
 	if not Config.DB["Bags"]["ItemFilter"] then return end
 	if not Config.DB["Bags"]["FilterGoods"] then return end
@@ -163,6 +167,7 @@ function module:GetFilters()
 	filters.bankEquipSet = function(item) return isItemInBank(item) and isItemEquipSet(item) end
 	filters.bankConsumable = function(item) return isItemInBank(item) and isItemConsumable(item) end
 	filters.onlyReagent = function(item) return item.bagId == -3 end
+	filters.onlyKeyring = function(item) return isItemKeyRing(item) end
 	filters.bagCollection = function(item) return isItemInBag(item) and isItemCollection(item) end
 	filters.bankCollection = function(item) return isItemInBank(item) and isItemCollection(item) end
 	filters.bagGoods = function(item) return isItemInBag(item) and isTradeGoods(item) end

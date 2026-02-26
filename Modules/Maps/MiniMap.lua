@@ -85,7 +85,9 @@ function module:ShowCalendar()
 
 	date:SetScript("OnClick", function()
 		if not InCombatLockdown() then
-			ToggleCalendar()
+			if ToggleCalendar then
+				ToggleCalendar()
+			end
 		end
 	end)
 
@@ -108,7 +110,9 @@ function module:HandleTracking()
                 trackingButton:Click()
             end
 		elseif btn == "MiddleButton" then
-			ToggleCalendar()
+			if ToggleCalendar then
+				ToggleCalendar()
+			end
 		else
 			Minimap_OnClick(Minimap)
 		end
@@ -181,13 +185,21 @@ function module:HideDefaultFrames()
 		"MinimapZoomIn",
 		"MiniMapWorldMapButton",
 		"MiniMapMailBorder",
-		"TimeManagerClockButton",
+		"MinimapToggleButton",
+		"GameTimeFrame",
 	}
 
 	for _, v in pairs(frames) do
-		Core.HideObject(_G[v])
+		local frame = _G[v]
+		if frame then
+			Core.HideObject(_G[v])
+		end
 	end
+
 	MinimapCluster:EnableMouse(false)
+	Core:KillEditMode(MinimapCluster)
+	MinimapCluster:SetAllPoints(Minimap)
+	MinimapCluster.BorderTop:Hide()
 end
 
 function module:RecycleBin()
@@ -412,7 +424,7 @@ function module:RecycleBin()
 end
 
 local function ReskinTracking()
-	MiniMapTracking:SetScale(0.8)
+	MiniMapTracking:SetScale(.8)
 	MiniMapTracking:ClearAllPoints()
 	MiniMapTracking:SetPoint("BOTTOMRIGHT", Minimap, 2, -4)
 	MiniMapTracking:SetFrameLevel(999)
@@ -425,10 +437,23 @@ local function ReskinTracking()
 	hl:SetAllPoints(MiniMapTrackingIcon)
 end
 
+local function SetupLFGMinimapButton()
+	if not LFGMinimapFrame then return false end
+
+	LFGMinimapFrame:ClearAllPoints()
+	LFGMinimapFrame:SetPoint("RIGHT", Minimap, 5, 0)
+	LFGMinimapFrameBorder:Hide()
+
+	return true
+end
+
 local function ReskinLFGFrame()
 	MiniMapBattlefieldFrame:ClearAllPoints()
 	MiniMapBattlefieldFrame:SetPoint("BOTTOMLEFT", Minimap, "BOTTOMLEFT", -5, -5)
 	MiniMapBattlefieldFrame:SetFrameLevel(999)
+	MiniMapBattlefieldBorder:Hide()
+	MiniMapBattlefieldIcon:SetAlpha(0)
+	BattlegroundShine:SetTexture(nil)
 
 	local queueIcon = Minimap:CreateTexture(nil, "ARTWORK")
 	queueIcon:SetPoint("CENTER", MiniMapBattlefieldFrame)
@@ -454,11 +479,27 @@ local function ReskinLFGFrame()
 		end
 	end)
 
-	if not MiniMapLFGFrame then return end
+	local lfgFrame = CreateFrame("Frame")
+	lfgFrame:RegisterEvent("PLAYER_LOGIN")
+	lfgFrame:RegisterEvent("ADDON_LOADED")
+	lfgFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 
-	MiniMapLFGFrame:ClearAllPoints()
-	MiniMapLFGFrame:SetPoint("RIGHT", Minimap, 5, 0)
-	MiniMapLFGFrameBorder:Hide()
+	lfgFrame:SetScript("OnEvent", function(self, event, addon)
+		-- ADDON_LOADED: only care about the group finder addon
+		if event == "ADDON_LOADED" and addon ~= "Blizzard_GroupFinder_VanillaStyle" then
+			return
+		end
+
+		-- Try to apply setup
+		if not SetupLFGMinimapButton() then
+			return
+		end
+
+		-- Success: clean up
+		self:UnregisterEvent("PLAYER_LOGIN")
+		self:UnregisterEvent("ADDON_LOADED")
+		self:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
+	end)
 end
 
 local function ReskinInstanceDifficulty()
@@ -511,11 +552,16 @@ function module:OnLogin()
 	self:UpdateMinimapScale()
 
 	self:HideDefaultFrames()
-	self:ShowCalendar()
+	--self:ShowCalendar()
 	self:HandleTracking()
 	self:EasyVolume()
 	self:CombatPulse()
 	self:WhoPingsMyMap()
 	self:RecycleBin()
 	self:Reskin()
+
+	if LibDBIcon10_TownsfolkTracker then
+		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("OVERLAY")
+		LibDBIcon10_TownsfolkTracker:DisableDrawLayer("BACKGROUND")
+	end
 end

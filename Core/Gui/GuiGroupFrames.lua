@@ -149,8 +149,8 @@ local function SetupPartyPetFrame(parent)
 	G:CreateOptionSlider(scroll.child, L["MaxColumns"], 1, 5, 1, -430, "PartyPetMaxColumn", UpdatePartyPetHeader)
 end
 
-local function SetupDebuffsIndicator(parent)
-	local guiName = "LauringUI_DebuffsIndicator"
+local function SetupBlizzardDebuffs(parent)
+	local guiName = "LauringUI_BlizzardDebuffs"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
 	if exatraGuis[guiName] then return end
 
@@ -233,8 +233,8 @@ local function SetupDebuffsIndicator(parent)
 	end
 end
 
-local function SetupSpellsIndicator(parent)
-	local guiName = "LauringUI_SpellsIndicator"
+local function SetupCornerBuffs(parent)
+	local guiName = "LauringUI_CornerBuffs"
 	local exatraGuis = G:ToggleExtraGUI(guiName)
 	if exatraGuis[guiName] then return end
 
@@ -244,12 +244,10 @@ local function SetupSpellsIndicator(parent)
 	local barList = {}
 
 	local decodeAnchor = {
-		["TL"] = "TOPLEFT",
 		["TR"] = "TOPRIGHT",
-		["BL"] = "BOTTOMLEFT",
 		["BR"] = "BOTTOMRIGHT",
 	}
-	local anchors = {"TL", "TR", "BL", "BR"}
+	local anchors = {"TR", "BR"}
 
 	local function createBar(parent, spellID, anchor, showAll)
 		local name, _, texture = GetSpellInfo(spellID)
@@ -328,7 +326,7 @@ local function SetupSpellsIndicator(parent)
 	scroll.dd:SetPoint("TOPLEFT", 10, -10)
 	scroll.dd.options[1]:Click()
 
-	for i = 1, 4 do
+	for i = 1, 2 do
 		scroll.dd.options[i]:HookScript("OnEnter", optionOnEnter)
 		scroll.dd.options[i]:HookScript("OnLeave", Core.HideTooltip)
 	end
@@ -610,16 +608,16 @@ local function SetupPartyPetFrameFunc()
 	SetupPartyPetFrame(G.GuiPage["GroupFrames"])
 end
 
-local function SetupDebuffsIndicatorFunc()
-	SetupDebuffsIndicator(G.GuiPage["GroupFrames"])
+local function SetupBlizzardDebuffsFunc()
+	SetupBlizzardDebuffs(G.GuiPage["GroupFrames"])
 end
 
 local function UpdateRaidAurasOptions()
 	Core:GetModule("UnitFrames"):RaidAuras_UpdateOptions()
 end
 
-local function SetupSpellsIndicatorFunc()
-	SetupSpellsIndicator(G.GuiPage["GroupFrames"])
+local function SetupCornerBuffsFunc()
+	SetupCornerBuffs(G.GuiPage["GroupFrames"])
 end
 
 local function SetupRaidDebuffsFunc()
@@ -650,7 +648,7 @@ local options = {
 	{1, "UFs", "FrequentHealth", G.HeaderTag..L["FrequentHealth"].."*", nil, nil, UpdateRaidHealthMethod, L["FrequentHealthTip"]},
     {3, "UFs", "HealthFrequency", L["HealthFrequency"].."*", true, {.1, .5, .05}, UpdateRaidHealthMethod, L["HealthFrequencyTip"], nil, true},
     {},--blank
-	{1, "UFs", "ShowBlizzardDebuff", L["ShowBlizzardDebuff"].."*", nil, SetupDebuffsIndicatorFunc, UpdateRaidAurasOptions, L["ShowBlizzardDebuffTip"]},
+	{1, "UFs", "ShowBlizzardDebuff", L["ShowBlizzardDebuff"].."*", nil, SetupBlizzardDebuffsFunc, UpdateRaidAurasOptions, L["ShowBlizzardDebuffTip"]},
 	{3, "UFs", "BlizzardDebuffSize", L["BlizzardDebuffSize"].."*", true, {5, 30, 1}, UpdateRaidAurasOptions, nil, nil, true},
 	{1, "UFs", "DebuffClickThrough", L["DebuffClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
 
@@ -660,8 +658,8 @@ local options = {
 	{3, "UFs", "InstanceAuraScale", L["InstanceAuraScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
 	{1, "UFs", "InstanceAuraClickThrough", L["InstanceAuras ClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
 	{},--blank
-	{1, "UFs", "RaidBuffIndicator", G.HeaderTag..L["RaidBuffIndicator"].."*", nil, SetupSpellsIndicatorFunc, UpdateRaidAurasOptions, L["RaidBuffIndicatorTip"]},
-	{3, "UFs", "BuffIndicatorScale", L["BuffIndicatorScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
+	{1, "UFs", "ShowCornerBuffs", G.HeaderTag..L["ShowCornerBuffs"].."*", nil, SetupCornerBuffsFunc, UpdateRaidAurasOptions, L["CornerBuffTip"]},
+	{3, "UFs", "CornerBuffsScale", L["CornerBuffsScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
     {},--blank
     {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], nil, {ALL, DISABLE, L["HideDPSRole"]}},
     {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateRaidTextScale},

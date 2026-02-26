@@ -209,7 +209,7 @@ local function buttonOnClick(self, btn)
 						local _, charName, client, _, _, _, _, class, _, _, _, _, _, _, _, bnetIDGameAccount, _, _, _, guid = BNGetFriendGameAccountInfo(self.data[1], i)
 						if client == BNET_CLIENT_WOW and CanCooperateWithGameAccount(bnetIDGameAccount) then
 							if not menuList[index] then menuList[index] = {} end
-							menuList[index].text = B.HexRGB(B.ClassColor(DB.ClassList[class]))..charName
+							menuList[index].text = Core.HexRGB(Core.ClassColor(DB.ClassList[class]))..charName
 							menuList[index].notCheckable = true
 							menuList[index].arg1 = bnetIDGameAccount
 							menuList[index].arg2 = guid
@@ -299,7 +299,7 @@ local function buttonOnEnter(self)
 		GameTooltip:AddLine(L["WoW"], 1,.8,0)
 		GameTooltip:AddLine(" ")
 		local name, level, class, area, _, note = unpack(self.data)
-		local classColor = B.HexRGB(B.ClassColor(class))
+		local classColor = Core.HexRGB(Core.ClassColor(class))
 		GameTooltip:AddLine(format("%s %s%s", level, classColor, name))
 		GameTooltip:AddLine(format("%s%s", inactiveZone, area))
 
@@ -356,7 +356,7 @@ function INFO:FriendsPanel_UpdateButton(button)
 		local zoneColor = GetRealZoneText() == area and activeZone or inactiveZone
 		local levelColor = Core.HexRGB(GetQuestDifficultyColor(level))
 		local classColor = DB.ClassColors[class] or levelColor
-		button.name:SetText(format("%s%s|r %s%s", levelColor, level, B.HexRGB(classColor), name))
+		button.name:SetText(format("%s%s|r %s%s", levelColor, level, Core.HexRGB(classColor), name))
 		button.zone:SetText(format("%s%s", zoneColor, area))
 		C_Texture.SetTitleIconTexture(button.gameIcon, BNET_CLIENT_WOW, Enum.TitleIconVersion.Medium)
 		--button.gameIcon:SetAtlas(BNet_GetBattlenetClientAtlas(BNET_CLIENT_WOW))

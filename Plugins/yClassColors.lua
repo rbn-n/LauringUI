@@ -20,7 +20,7 @@ local function classColor(class, showRGB)
 end
 
 local function diffColor(level)
-	return B:HexRGB(GetQuestDifficultyColor(level))
+	return B.HexRGB(GetQuestDifficultyColor(level))
 end
 
 local rankColor = {

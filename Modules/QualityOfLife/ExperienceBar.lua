@@ -4,14 +4,16 @@ local QoL = Core:GetModule("QoL")
 
 local pairs = pairs
 local min, floor = math.min, math.floor
-local GetMaxPlayerLevel = GetMaxPlayerLevel
+local IsPlayerAtEffectiveMaxLevel = IsPlayerAtEffectiveMaxLevel
 local FACTION_BAR_COLORS = FACTION_BAR_COLORS
 
 function QoL:ExperienceBar_Update()
 	local rest = self.restBar
 	if rest then rest:Hide() end
 
-	if UnitLevel("player") < GetMaxPlayerLevel() then
+	local factionData = C_Reputation.GetWatchedFactionData()
+
+	if not IsPlayerAtEffectiveMaxLevel() then
 		local xp, mxp, rxp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion()
 		self:SetStatusBarColor(0, .7, 1)
 		self:SetMinMaxValues(0, mxp)
@@ -22,10 +24,14 @@ function QoL:ExperienceBar_Update()
 			rest:SetValue(min(xp + rxp, mxp))
 			rest:Show()
 		end
-	elseif GetWatchedFactionInfo() then
-		local _, standing, barMin, barMax, value = GetWatchedFactionInfo()
-		--if standing == MAX_REPUTATION_REACTION then barMin, barMax, value = 0, 1, 1 end
-		self:SetStatusBarColor(FACTION_BAR_COLORS[standing].r, FACTION_BAR_COLORS[standing].g, FACTION_BAR_COLORS[standing].b, .85)
+	elseif factionData then
+		local standing = factionData.reaction
+		local barMin = factionData.currentReactionThreshold
+		local barMax = factionData.nextReactionThreshold
+		local value = factionData.currentStanding
+
+		local color = FACTION_BAR_COLORS[standing] or FACTION_BAR_COLORS[5]
+		self:SetStatusBarColor(color.r, color.g, color.b, .85)
 		self:SetMinMaxValues(barMin, barMax)
 		self:SetValue(value)
 		self:Show()
@@ -39,7 +45,7 @@ function QoL:ExperienceBar_UpdateTooltip()
 	GameTooltip:ClearLines()
 	GameTooltip:AddLine(LEVEL.." "..UnitLevel("player"), 0,.6,1)
 
-	if UnitLevel("player") < GetMaxPlayerLevel() then
+	if not IsPlayerAtEffectiveMaxLevel() then
 		GameTooltip:AddLine(" ")
 		local xp, mxp, rxp = UnitXP("player"), UnitXPMax("player"), GetXPExhaustion()
 		GameTooltip:AddDoubleLine(XP..":", xp.." / "..mxp.." ("..floor(xp/mxp*100).."%)", .6,.8,1, 1,1,1)
@@ -57,12 +63,15 @@ function QoL:ExperienceBar_UpdateTooltip()
 		end
 	end
 
-	if GetWatchedFactionInfo() then
-		local name, standing, barMin, barMax, value = GetWatchedFactionInfo()
-		--[[if standing == MAX_REPUTATION_REACTION then
-			barMax = barMin + 1e3
-			value = barMax - 1
-		end]]
+	local factionData = C_Reputation.GetWatchedFactionData()
+
+	if factionData then
+		local name = factionData.name
+		local standing = factionData.reaction
+		local barMin = factionData.currentReactionThreshold
+		local barMax = factionData.nextReactionThreshold
+		local value = factionData.currentStanding
+
 		local standingtext = _G["FACTION_STANDING_LABEL"..standing] or UNKNOWN
 		GameTooltip:AddLine(" ")
 		GameTooltip:AddLine(name, 0,.6,1)

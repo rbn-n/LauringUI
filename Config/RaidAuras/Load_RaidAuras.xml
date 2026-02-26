@@ -1,4 +1,12 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-	<Script file="Cata\CataDungeons.lua"/>
-	<Script file="Cata\DragonSoul.lua"/>
+	<Script file="TBC\BlackTemple.lua"/>
+	<Script file="TBC\GruulsLair.lua"/>
+	<Script file="TBC\HyjalSummit.lua"/>
+	<Script file="TBC\Karazhan.lua"/>
+	<Script file="TBC\MagtheridonsLair.lua"/>
+	<Script file="TBC\Party.lua"/>
+	<Script file="TBC\SerpentshrineCavern.lua"/>
+	<Script file="TBC\SunwellPlateau.lua"/>
+	<Script file="TBC\TempestKeep.lua"/>
+	<Script file="TBC\ZulAman.lua"/>
 </Ui>

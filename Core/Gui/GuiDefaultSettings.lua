@@ -181,6 +181,7 @@ G.DefaultSettings = {
 		TargetColor = {r=0, g=.6, b=1},
 		TargetName = false,
 		TankMode = true,
+		TankRole = false,
 		TransColor = {r=1, g=.93, b=.43},
 		UnitTargeted = false,
 		VerticalSpacing = 1.4,
@@ -293,7 +294,6 @@ G.DefaultSettings = {
 		PartyPetMaxColumn = 1,
 		PartyPetPowerHeight = 1,
 		HidePartyPetPower = true,
-		ShowPartyPets = false,
 
 		EnableRaidFrame = true,
 		Raid10PowerHeight = 2,
@@ -315,14 +315,14 @@ G.DefaultSettings = {
 		RaidSortAscending = false,
 		HideRaidPower = true,
 
-		RaidBuffIndicator = true,
+		ShowCornerBuffs = true,
 		ShowInstanceAuras = true,
 		InstanceAuraClickThrough = false,
 		InstanceAuraScale = 1,
 		InstanceAuraDispellType = 1,
 		BuffClickThrough = false,
 		DebuffClickThrough = false,
-		BuffIndicatorScale = 1,
+		CornerBuffsScale = 1,
 		ShowBlizzardDebuff = true,
 		BlizzardDebuffSize = 12,
 

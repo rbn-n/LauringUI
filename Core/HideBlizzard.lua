@@ -84,3 +84,8 @@ function Core:HideDefaultRaidFrame()
         CompactRaidFrameManager:SetParent(Core.HiddenFrame)
     end
 end
+
+function Core:KillEditMode(object)
+    object.HighlightSystem = Core.Dummy
+    object.ClearHighlight = Core.Dummy
+end

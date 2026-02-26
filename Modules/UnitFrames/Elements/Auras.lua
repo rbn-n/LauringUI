@@ -87,7 +87,7 @@ function UF.PostCreateIcon(element, button)
 	button.count = Core.CreateFS(parentFrame, fontSize, "", false, "BOTTOMRIGHT", 6, -3)
 	button.cd:SetReverse(true)
 	local needShadow = true
-	if UF.IsPartyOrRaid(element.__owner) and not Config.DB["UFs"]["RaidBuffIndicator"] then
+	if UF.IsPartyOrRaid(element.__owner) and not Config.DB["UFs"]["ShowCornerBuffs"] then
 		needShadow = false
 	end
 	button.iconbg = Core.ReskinIcon(button.icon, needShadow)

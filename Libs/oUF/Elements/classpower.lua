@@ -50,19 +50,9 @@ local oUF = ns.oUF
 
 local _, PlayerClass = UnitClass('player')
 
--- sourced from Blizzard_FrameXMLBase/Constants.lua
-local SPEC_MAGE_ARCANE = _G.SPEC_MAGE_ARCANE or 1
-local SPEC_MONK_WINDWALKER = _G.SPEC_MONK_WINDWALKER or 3
-local SPEC_WARLOCK_DESTRUCTION = _G.SPEC_WARLOCK_DESTRUCTION or 3
-local SPEC_PRIEST_SHADOW = _G.SPEC_PRIEST_SHADOW or 3
-
+-- sourced from FrameXML/Constants.lua
 local SPELL_POWER_ENERGY = Enum.PowerType.Energy or 3
 local SPELL_POWER_COMBO_POINTS = Enum.PowerType.ComboPoints or 4
-local SPELL_POWER_SOUL_SHARDS = Enum.PowerType.SoulShards or 7
-local SPELL_POWER_HOLY_POWER = Enum.PowerType.HolyPower or 9
-local SPELL_POWER_CHI = Enum.PowerType.Chi or 12
-local SPELL_POWER_ARCANE_CHARGES = Enum.PowerType.ArcaneCharges or 16
-local SPELL_POWER_SHADOW_ORBS = Enum.PowerType.ShadowOrbs or 28
 
 -- Holds the class specific stuff.
 local ClassPowerID, ClassPowerType
@@ -81,18 +71,6 @@ local function UpdateColor(element, powerType)
 			local mu = bg.multiplier or 1
 			bg:SetVertexColor(r * mu, g * mu, b * mu)
 		end
-	end
-
-	--[[ Callback: ClassPower:PostUpdateColor(r, g, b)
-	Called after the element color has been updated.
-
-	* self - the ClassPower element
-	* r    - the red component of the used color (number)[0-1]
-	* g    - the green component of the used color (number)[0-1]
-	* b    - the blue component of the used color (number)[0-1]
-	--]]
-	if(element.PostUpdateColor) then
-		element:PostUpdateColor(r, g, b)
 	end
 end
 
@@ -122,17 +100,13 @@ local function Update(self, event, unit, powerType)
 	local cur, max, mod, oldMax
 	if(event ~= 'ClassPowerDisable') then
 		local powerID = unit == 'vehicle' and SPELL_POWER_COMBO_POINTS or ClassPowerID
-		cur = powerID == SPELL_POWER_COMBO_POINTS and GetComboPoints(unit, 'target') or UnitPower(unit, powerID, true) -- has to use GetComboPoints in classic
+		--cur = UnitPower(unit, powerID, true)
+		cur = GetComboPoints(unit, 'target')	-- has to use GetComboPoints in classic
 		max = UnitPowerMax(unit, powerID)
 		mod = UnitPowerDisplayMod(powerID)
 
 		-- mod should never be 0, but according to Blizz code it can actually happen
 		cur = mod == 0 and 0 or cur / mod
-
-		-- BUG: Destruction is supposed to show partial soulshards, but Affliction and Demonology should only show full ones
-		if(ClassPowerType == 'SOUL_SHARDS' and C_SpecializationInfo.GetSpecialization() ~= SPEC_WARLOCK_DESTRUCTION) then
-			cur = cur - cur % 1
-		end
 
 		local numActive = cur + 0.9
 		for i = 1, max do
@@ -290,16 +264,7 @@ do
 		B:UnregisterEvent('UNIT_POWER_FREQUENT', WatchVehicleCombos)
 	end
 
-	if(PlayerClass == 'MONK') then
-		ClassPowerID = SPELL_POWER_CHI
-		ClassPowerType = 'CHI'
-	elseif(PlayerClass == 'PALADIN') then
-		ClassPowerID = SPELL_POWER_HOLY_POWER
-		ClassPowerType = 'HOLY_POWER'
-	elseif(PlayerClass == 'WARLOCK') then
-		ClassPowerID = SPELL_POWER_SOUL_SHARDS
-		ClassPowerType = 'SOUL_SHARDS'
-	elseif(PlayerClass == 'ROGUE' or PlayerClass == 'DRUID') then
+	if(PlayerClass == 'ROGUE' or PlayerClass == 'DRUID') then
 		ClassPowerID = SPELL_POWER_COMBO_POINTS
 		ClassPowerType = 'COMBO_POINTS'
 
@@ -307,14 +272,6 @@ do
 			RequirePower = SPELL_POWER_ENERGY
 			RequireSpell = 768 -- Cat Form
 		end
-	elseif(PlayerClass == 'MAGE') then
-		ClassPowerID = SPELL_POWER_ARCANE_CHARGES
-		ClassPowerType = 'ARCANE_CHARGES'
-		RequireSpec = SPEC_MAGE_ARCANE
-	elseif(PlayerClass == 'PRIEST') then
-		ClassPowerID = SPELL_POWER_SHADOW_ORBS
-		ClassPowerType = 'SHADOW_ORBS'
-		RequireSpec = SPEC_PRIEST_SHADOW
 	end
 end
 

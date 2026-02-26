@@ -193,9 +193,9 @@ function Nameplates:UpdateColor(_, unit)
             r, g, b = .6, .6, .6
         else
             r, g, b = UnitSelectionColor(unit, true)
-            if status and (Config.DB["Nameplates"]["TankMode"] or DB.Role == "TANK" or isSolo) then
+             if status and (Config.DB["Nameplates"]["TankMode"] or DB.IsTank or isSolo) then
                 if status == 3 then
-                    if DB.Role ~= "TANK" and revertThreat and not isSolo then
+                    if not DB.IsTank and revertThreat and not isSolo then
                         r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
                     else
                         if isOffTank then
@@ -207,7 +207,7 @@ function Nameplates:UpdateColor(_, unit)
                 elseif status == 2 or status == 1 then
                     r, g, b = transColor.r, transColor.g, transColor.b
                 elseif status == 0 then
-                    if DB.Role ~= "TANK" and revertThreat and not isSolo then
+                    if not DB.IsTank and revertThreat and not isSolo then
                         r, g, b = secureColor.r, secureColor.g, secureColor.b
                     else
                         r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
@@ -215,6 +215,30 @@ function Nameplates:UpdateColor(_, unit)
                 end
             end
         end
+		-- else
+        --     r, g, b = UnitSelectionColor(unit, true)
+        --     if status and isSolo then
+        --         if status == 3 then
+        --             if revertThreat and not isSolo then
+        --                 r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
+        --             else
+        --                 if isOffTank then
+        --                     r, g, b = offTankColor.r, offTankColor.g, offTankColor.b
+        --                 else
+        --                     r, g, b = secureColor.r, secureColor.g, secureColor.b
+        --                 end
+        --             end
+        --         elseif status == 2 or status == 1 then
+        --             r, g, b = transColor.r, transColor.g, transColor.b
+        --         elseif status == 0 then
+        --             if revertThreat and not isSolo then
+        --                 r, g, b = secureColor.r, secureColor.g, secureColor.b
+        --             else
+        --                 r, g, b = insecureColor.r, insecureColor.g, insecureColor.b
+        --             end
+        --         end
+        --     end
+        -- end
     end
 
 	if r or g or b then

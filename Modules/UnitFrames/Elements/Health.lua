@@ -73,9 +73,25 @@ function UF:UpdateFrameNameTag(frame)
     UF:UpdateFrameNameVisibility(frame)
 end
 
+function UF:UpdatePartyAndRaidNameAnchor(frame)
+    local name = frame.Name
+	if not name then return end
+
+	name:ClearAllPoints()
+
+	local roleIcon = frame.GroupRoleIndicator
+	if roleIcon and roleIcon:IsShown() then
+		name:SetPoint("LEFT", roleIcon, "RIGHT", 4, 0)
+	else
+		name:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
+	end
+end
+
 function UF:SetPartyAndRaidName(name, frame)
-    name:SetJustifyH("CENTER")
-    name:SetPoint("CENTER", frame, "CENTER", 0, 0)
+    frame.Name = name
+
+	name:SetJustifyH("LEFT")
+	UF:UpdatePartyNameAnchor(frame)
 end
 
 local function CreateNameText(frame, textFrame)
@@ -125,7 +141,7 @@ local function CreateHealthText(frame, textFrame)
     elseif UF.IsPartyOrRaid(frame) then
         frame:Tag(healthText, "[raidhp]")
         healthText:ClearAllPoints()
-        healthText:SetPoint("BOTTOM", 0, 1)
+        healthText:SetPoint("BOTTOM", 0, 5)
         healthText:SetJustifyH("CENTER")
         healthText:SetScale(Config.DB["UFs"]["RaidTextScale"])
     else

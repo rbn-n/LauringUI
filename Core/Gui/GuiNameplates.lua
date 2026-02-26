@@ -523,8 +523,9 @@ local options = {
 		{1, "Nameplates", "ShowCustomUnits", G.HeaderTag..L["ShowCustomUnits"].."*", nil, SetupNameplateUnitFilterFunc, RefreshUnitTable, L["CustomUnitsTip"]},
 		{},--blank
 		{1, "Nameplates", "TankMode", G.HeaderTag..L["Tank Mode"].."*", nil, nil, nil, L["TankModeTip"]},
-		{1, "Nameplates", "DPSRevertThreat", L["DPS Revert Threat"].."*", true, nil, nil, L["RevertThreatTip"]},
-		{1, "Nameplates", "OffTankThreat", L["OffTankThreat"].."*", nil, nil, nil, L["OffTankThreatTip"]},
+		{1, "Nameplates", "TankRole", L["Tank Role"].."*", true, nil, nil, L["TankRoleTip"]},
+		{1, "Nameplates", "DPSRevertThreat", L["DPS Revert Threat"].."*", nil, nil, nil, L["RevertThreatTip"]},
+		{1, "Nameplates", "OffTankThreat", L["OffTankThreat"].."*", true, nil, nil, L["OffTankThreatTip"]},
 		{5, "Nameplates", "SecureColor", L["Secure Color"].."*"},
 		{5, "Nameplates", "TransColor", L["Trans Color"].."*", 1},
 		{5, "Nameplates", "InsecureColor", L["Insecure Color"].."*", 2},

@@ -262,7 +262,7 @@ function Tooltip:GameTooltip_ShowProgressBar()
 
 	local bar = self.progressBarPool:GetNextActive()
 	if bar and not bar.styled then
-		Core.StripTextures(bar.Bar)
+		Core.RemoveBlizzTextures(bar.Bar)
 		Core.CreateBDFrame(bar.Bar, .25)
 		bar.Bar:SetStatusBarTexture(DB.StatusBarTexture2)
 

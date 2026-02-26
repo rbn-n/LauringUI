@@ -5,6 +5,7 @@ local B, C, L, DB = unpack(ns)
 -- NDui MOD
 --------------------------
 local _G, pairs, type = getfenv(0), pairs, type
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
 local frames = {
 	-- ["FrameName"] = true (the parent frame should be moved) or false (the frame itself should be moved)
@@ -13,6 +14,8 @@ local frames = {
 
 	-- Blizz Frames
 	["AddonList"] = false,
+	["ArenaFrame"] = false,
+	["BattlefieldFrame"] = true,
 	["ChannelFrame"] = false,
 	["ChatConfigFrame"] = false,
 	["DressUpFrame"] = false,
@@ -30,8 +33,8 @@ local frames = {
 	["PetitionFrame"] = false,
 	["PetStableFrame"] = false,
 	["PVEFrame"] = false,
-	["PVPFrame"] = false,
 	["QuestFrame"] = false,
+	["QuestLogFrame"] = false,
 	["QuestLogDetailFrame"] = false,
 	["RaidParentFrame"] = false,
 	["SendMailFrame"] = true,
@@ -41,13 +44,14 @@ local frames = {
 	["TaxiFrame"] = false,
 	--["TradeFrame"] = false,
 	["TutorialFrame"] = false,
-	["PlayerPowerBarAlt"] = false,
 }
 
 local function CharacterFrameMoveCheck()
-	if C_AddOns.IsAddOnLoaded("RXPGuides") then return end
+	if IsAddOnLoaded("RXPGuides") then return end
 
 	frames["PaperDollFrame"] = "CharacterFrame"
+	frames["PetPaperDollFrameCompanionFrame"] = "CharacterFrame"
+	frames["PetPaperDollFramePetFrame"] = "CharacterFrame"
 	frames["ReputationFrame"] = true
 	frames["SkillFrame"] = true
 	frames["TokenFrame"] = true

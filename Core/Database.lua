@@ -7,6 +7,27 @@ local GetSpecializationInfo = GetSpecializationInfo or C_SpecializationInfo.GetS
 local CUSTOM_CLASS_COLORS = CUSTOM_CLASS_COLORS
 local LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON = LE_ITEM_QUALITY_POOR, LE_ITEM_QUALITY_COMMON
 
+-- Deprecated
+do
+	local function EasyMenu_Initialize( frame, level, menuList )
+		for index = 1, #menuList do
+			local value = menuList[index]
+			if (value.text) then
+				value.index = index
+				UIDropDownMenu_AddButton( value, level )
+			end
+		end
+	end
+
+	function EasyMenu(menuList, menuFrame, anchor, x, y, displayMode, autoHideDelay )
+		if ( displayMode == "MENU" ) then
+			menuFrame.displayMode = displayMode
+		end
+		UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
+		ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
+	end
+end
+
 DB.ScreenWidth, DB.ScreenHeight = GetPhysicalScreenSize()
 
 local Media = "Interface\\AddOns\\LauringUI\\Media\\"
@@ -106,17 +127,74 @@ LE_ITEM_CLASS_GLYPH = LE_ITEM_CLASS_GLYPH or Enum.ItemClass.Glyph
 LE_ITEM_CLASS_BATTLEPET = LE_ITEM_CLASS_BATTLEPET or Enum.ItemClass.Battlepet
 LE_ITEM_CLASS_WOW_TOKEN = LE_ITEM_CLASS_WOW_TOKEN or Enum.ItemClass.WoWToken
 
-local function CheckRole()
-	local specIndex = GetSpecialization()
-	if not specIndex then
-		DB.Role = nil
+-- local function CheckRole()
+-- 	local specIndex = GetSpecialization()
+-- 	if not specIndex then
+-- 		DB.Role = nil
+-- 		return
+-- 	end
+
+-- 	local _, _, _, _, role = GetSpecializationInfo(specIndex)
+-- 	DB.Role = role
+-- end
+
+-- Core:RegisterEvent("PLAYER_LOGIN", CheckRole)
+-- Core:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
+-- Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", CheckRole)
+
+local function HasProtectionAsMainTree()
+	local _, class = UnitClass("player")
+	if class ~= "WARRIOR" and class ~= "PALADIN" then
+		return false
+	end
+
+	local highestPoints = 0
+	local highestTabName = nil
+
+	for treeIndex = 1, GetNumTalentTabs() do
+		local _, tabname, _, _, pointsSpent = GetTalentTabInfo(treeIndex)
+
+		if pointsSpent > highestPoints then
+			highestPoints = pointsSpent
+			highestTabName = tabname
+		end
+	end
+
+	if not highestTabName then
+		return false
+	end
+
+	return highestTabName == "Protection" or highestTabName == L["Protection"]
+end
+
+local function IsAssignedTankRole()
+	return UnitGroupRolesAssigned("player") == "TANK"
+end
+
+local function UpdateTankState()
+	-- Config override
+	if Config.DB["Nameplates"] and Config.DB["Nameplates"].TankRole then
+		DB.IsTank = true
 		return
 	end
 
-	local _, _, _, _, role = GetSpecializationInfo(specIndex)
-	DB.Role = role
+	-- Assigned role
+	if IsAssignedTankRole() then
+		DB.IsTank = true
+		return
+	end
+
+	-- Talent-based tank detection
+	if HasProtectionAsMainTree() then
+		DB.IsTank = true
+		return
+	end
+
+	DB.IsTank = false
 end
 
-Core:RegisterEvent("PLAYER_LOGIN", CheckRole)
-Core:RegisterEvent("PLAYER_TALENT_UPDATE", CheckRole)
-Core:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED", CheckRole)
+Core:RegisterEvent("PLAYER_LOGIN", UpdateTankState)
+Core:RegisterEvent("PLAYER_TALENT_UPDATE", UpdateTankState)
+Core:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", UpdateTankState) -- dual spec swap
+Core:RegisterEvent("GROUP_ROSTER_UPDATE", UpdateTankState)
+Core:RegisterEvent("PLAYER_ROLES_ASSIGNED", UpdateTankState)

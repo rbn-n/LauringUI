@@ -11,6 +11,6 @@
 	<Script file="RaidMark.lua"/>
 	<Script file="RaidAuras.lua"/>
 	<Script file="AurasIndicator.lua"/>
-	<Script file="SpellsIndicator.lua"/>
-	<Script file="DebuffsIndicator.lua"/>
+	<Script file="CornerBuffs.lua"/>
+	<Script file="BlizzardDebuffs.lua"/>
 </Ui>

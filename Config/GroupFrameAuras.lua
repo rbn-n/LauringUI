@@ -2,75 +2,55 @@ local _, ns = ...
 local Core, Config, L, DB = unpack(ns)
 
 Config.CornerBuffs = {
-	["ALL"] = {
-		[94794]     = {"BOTTOMRIGHT", true},    -- Rocket Fuel Leak
-	},
+	["ALL"] = {},
+
 	["PRIEST"] = {
-		[17]     = {"TOPLEFT"},            		-- Power Word: Shield
-		[139]    = {"TOPLEFT"},           		-- Renew
-		[6346]   = {"BOTTOMLEFT", true},        -- Fear Ward
-		[6788]   = {"BOTTOMRIGHT", true},   	-- Weakened Soul
-		[33206]  = {"BOTTOMLEFT", true},    	-- Pain Suppression
-		[41635]  = {"TOPLEFT"},             	-- Prayer of Mending
+		[17]    = {"BOTTOMRIGHT"},              -- Power Word: Shield
+		[139]   = {"BOTTOMRIGHT"},              -- Renew
+		[6346]  = {"TOPRIGHT", true},       -- Fear Ward
+		[6788]  = {"TOPRIGHT", true},    -- Weakened Soul
+		[33076] = {"BOTTOMRIGHT"},              -- Prayer of Mending (TBC)
 	},
+
 	["DRUID"] = {
-		[774]    = {"TOPLEFT"},           		-- Rejuvenation
-		[8936]   = {"TOPLEFT"},             	-- Regrowth
-		[33763]  = {"TOPLEFT"},            		-- Lifebloom
-		[48438]  = {"TOPRIGHT"},          		-- Wild Growth
-		[29166]  = {"BOTTOMLEFT", true},    	-- Innervate
+		[774]   = {"BOTTOMRIGHT"},              -- Rejuvenation
+		[8936]  = {"BOTTOMRIGHT"},              -- Regrowth
+		[33763] = {"BOTTOMRIGHT"},              -- Lifebloom (TBC added)
+		[29166] = {"TOPRIGHT", true},    	-- Innervate
 	},
+
 	["PALADIN"] = {
-		[114163] = {"TOPLEFT"},              	-- Eternal Flame
-		[53563]  = {"TOPLEFT"},              	-- Beacon
-		--[86273]  = {"TOPLEFT"},              	-- Mastery: Illuminated Healing
-		[1022]   = {"BOTTOMLEFT", true},     	-- Blessing of Protection
-		[1044]   = {"BOTTOMLEFT", true},     	-- Blessing of Freedom
-		[6940]   = {"BOTTOMLEFT", true},     	-- Blessing of Sacrifice
-		[114039] = {"BOTTOMLEFT", true},     	-- Hand of Purity
+		[53563] = {"BOTTOMRIGHT"},              -- Beacon of Light (TBC)
+		[1022]  = {"TOPRIGHT", true},     	-- Blessing of Protection
+		[1044]  = {"TOPRIGHT", true},    	-- Blessing of Freedom
+		[6940]  = {"TOPRIGHT", true},     	-- Blessing of Sacrifice
 	},
+
 	["WARLOCK"] = {
-		[20707]  = {"BOTTOMRIGHT", true},  		-- Soulstone Resurrection
-		[110913]  = {"BOTTOMLEFT", true},  		-- Dark Bargain
-		[104773]  = {"BOTTOMLEFT", true},  		-- Unending Resolve
+		[20707] = {"TOPRIGHT", true},    -- Soulstone Resurrection
 	},
+
 	["MAGE"] = {
-		[45438]  = {"BOTTOMLEFT", true},        -- Ice Block
-		[86949]  = {"BOTTOMRIGHT", true},       -- Cauterize
+		[45438] = {"TOPRIGHT", true},     -- Ice Block
 	},
+
 	["WARRIOR"] = {
-		[871]     = {"BOTTOMLEFT", true},			-- Shield Wall
-		[84159]  = {"BOTTOMLEFT", true},			-- Die by the Sword
+		[871]   = {"TOPRIGHT", true},     -- Shield Wall
 	},
+
 	["SHAMAN"] = {
-		[974]    = {"TOPLEFT", true},           -- Earth Shield
-		[61295]  = {"TOPLEFT"},              	-- Rip Tide
-		[30823]  = {"BOTTOMLEFT", true},        -- Shamanistic Rage
+		[974]   = {"BOTTOMRIGHT", true},        -- Earth Shield (TBC)
+		[61295] = {"BOTTOMRIGHT"},              -- Riptide (⚠ NOT TBC → remove)
 	},
-	["HUNTER"] = {
-		[19263]  = {"BOTTOMLEFT", true},         -- Deterrence
-	},
+
+	["HUNTER"] = {},
+
 	["ROGUE"] = {
-		[31224]  = {"BOTTOMLEFT", true},     	-- Cloak of Shadows
-		[26669]  = {"BOTTOMLEFT", true},         -- Evasion
+		[31224] = {"TOPRIGHT", true},     -- Cloak of Shadows (TBC)
+		[26669] = {"TOPRIGHT", true},     -- Evasion
 	},
-	["DEATHKNIGHT"] = {
-		[47484]     = {"BOTTOMLEFT", true},		-- Huddle
-		[48792]     = {"BOTTOMLEFT", true},		-- Icebound Fortitude
-		[48707]     = {"BOTTOMLEFT", true},		-- Anti-Magic Shell
-	},
-	["MONK"] = {
-        [119611]     = {"TOPLEFT"},				-- Renewing Mist
-        [132120]     = {"TOPLEFT"},				-- Enveloping Mist
-        [115175]     = {"TOPLEFT"},				-- Soothing Mist
-        [116849]     = {"BOTTOMLEFT", true},	-- Life Cocoon
-        [120954]     = {"BOTTOMLEFT", true},	-- Fortyfying Brew
-        [131523]     = {"BOTTOMLEFT", true},	-- Zen Meditation
-        [122783]     = {"BOTTOMLEFT", true},	-- Difuse Magic
-        [124274]     = {"BOTTOMRIGHT", true},	-- Moderate Stagger
-        [124273]     = {"BOTTOMRIGHT", true},	-- Heavy Stagger
-    },
 }
+
 
 -- Corner icon blacklist (used to ignore certain auras from being shown in corner indicators)
 Config.CornerBlackList = {

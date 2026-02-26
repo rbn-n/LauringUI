@@ -7,7 +7,7 @@ local GetSpellInfo = GetSpellInfo
 
 local RaidDebuffs = {}
 function module:RegisterDebuff(_, instID, _, spellID, level)
-	local instName = EJ_GetInstanceInfo(instID)
+	local instName = GetRealZoneText(instID)
 
 	if not RaidDebuffs[instName] then RaidDebuffs[instName] = {} end
 	if not level then level = 2 end

@@ -418,29 +418,20 @@ function QoL:ShowItemLevel()
 	-- iLvl on CharacterFrame
 	CharacterFrame:HookScript("OnShow", QoL.ItemLevel_UpdatePlayer)
 	Core:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", QoL.ItemLevel_UpdatePlayer)
-
-	hooksecurefunc("PaperDollFrame_SetItemLevel", function(statFrame, unit)
-		if unit ~= "player" then return end
-
-		local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
-
-		local text = _G[statFrame:GetName().."StatText"]
-		if text then
-			text:SetText(format("%.1f", avgItemLevelEquipped).."/"..format("%.1f", avgItemLevel))
-		end
-	end)
+	CharacterModelFrameRotateRightButton:ClearAllPoints()
+	CharacterModelFrameRotateRightButton:SetPoint("BOTTOMLEFT", CharacterFrameTab1, "TOPLEFT", 0, 2)
 
 	-- iLvl on InspectFrame
 	Core:RegisterEvent("INSPECT_READY", QoL.ItemLevel_UpdateInspect)
 
 	-- iLvl on FlyoutButtons
-	hooksecurefunc("EquipmentFlyout_UpdateItems", function()
-		for _, button in pairs(EquipmentFlyoutFrame.buttons) do
-			if button:IsShown() then
-				QoL.ItemLevel_FlyoutSetup(button)
-			end
-		end
-	end)
+	-- hooksecurefunc("EquipmentFlyout_UpdateItems", function()
+	-- 	for _, button in pairs(EquipmentFlyoutFrame.buttons) do
+	-- 		if button:IsShown() then
+	-- 			QoL.ItemLevel_FlyoutSetup(button)
+	-- 		end
+	-- 	end
+	-- end)
 
 	-- Update item quality
 	QoL.QualityUpdater = CreateFrame("Frame")
@@ -453,9 +444,6 @@ function QoL:ShowItemLevel()
 	-- iLvl on TradeFrame
 	hooksecurefunc("TradeFrame_UpdatePlayerItem", QoL.ItemLevel_UpdateTradePlayer)
 	hooksecurefunc("TradeFrame_UpdateTargetItem", QoL.ItemLevel_UpdateTradeTarget)
-
-	-- iLvl on GuildNews
-	hooksecurefunc("GuildNewsButton_SetText", QoL.ItemLevel_ReplaceGuildNews)
 end
 
 QoL:RegisterQoL("GearInfo", QoL.ShowItemLevel)

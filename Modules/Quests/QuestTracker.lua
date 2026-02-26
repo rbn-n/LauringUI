@@ -4,56 +4,146 @@ local Core, Config, L, DB = unpack(ns)
 local Quests = Core:RegisterModule("Quests")
 
 local _G = getfenv(0)
-local GetNumQuestLogEntries, GetQuestLogTitle  = GetNumQuestLogEntries, GetQuestLogTitle
-local GetQuestIndexForWatch = GetQuestIndexForWatch
-local QUESTS_DISPLAYED = QUESTS_DISPLAYED or 22
-local CodexQuest, QuestLogListScrollFrame = CodexQuest, QuestLogListScrollFrame
-local WatchFrame, WatchFrameHeader, WatchFrameCollapseExpandButton = WatchFrame, WatchFrameHeader, WatchFrameCollapseExpandButton
-local QuestLogFrame = QuestLogFrame
-local IsAddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local pairs, tinsert, select = pairs, tinsert, select
+local GetNumQuestLogEntries, GetQuestLogTitle, GetNumQuestWatches = GetNumQuestLogEntries, GetQuestLogTitle, GetNumQuestWatches
+local IsShiftKeyDown, RemoveQuestWatch, ShowUIPanel, GetCVarBool = IsShiftKeyDown, RemoveQuestWatch, ShowUIPanel, GetCVarBool
+local GetQuestIndexForWatch, GetNumQuestLeaderBoards, GetQuestLogLeaderBoard = GetQuestIndexForWatch, GetNumQuestLeaderBoards, GetQuestLogLeaderBoard
+local FauxScrollFrame_GetOffset = FauxScrollFrame_GetOffset
+
+local MAX_QUESTLOG_QUESTS = MAX_QUESTLOG_QUESTS or 20
+local MAX_WATCHABLE_QUESTS = MAX_WATCHABLE_QUESTS or 5
+local headerString = QUESTS_LABEL.." %s/%s"
+-- local CodexQuest, QuestLogListScrollFrame, QuestWatchFrame, GetQuestIDFromLogIndex, QuestLogEx, QuestLogExFrame, ClassicQuestLog, QuestGuru, QuestLogFrame = CodexQuest, QuestLogListScrollFrame, QuestWatchFrame, GetQuestIDFromLogIndex, QuestLogEx, QuestLogExFrame, ClassicQuestLog, QuestGuru, QuestLogFrame
+-- local QUESTS_DISPLAYED, QUEST_WATCH_LIST, QuestWatch_Update, QuestLog_SetSelection, QuestLog_Update, AutoQuestWatch_Insert, QUEST_WATCH_NO_EXPIRE = QUESTS_DISPLAYED, QUEST_WATCH_LIST, QuestWatch_Update, QuestLog_SetSelection, QuestLog_Update, AutoQuestWatch_Insert, QUEST_WATCH_NO_EXPIRE
+
+local sharedWindowData = {
+	area = "override",
+	xoffset = -16,
+	yoffset = 12,
+	bottomClampOverride = 152,
+	width = 714,
+	height = 487,
+	whileDead = 1,
+}
+
+local function EnlargeDefaultUIPanel(name, pushed)
+	local frame = _G[name]
+	if not frame then return end
+
+	UIPanelWindows[name] = sharedWindowData
+	UIPanelWindows[name].pushable = pushed
+
+	frame:SetSize(sharedWindowData.width, sharedWindowData.height)
+	frame.TitleText:ClearAllPoints()
+	frame.TitleText:SetPoint("TOP", frame, 0, -18)
+
+	frame.scrollFrame:ClearAllPoints()
+	frame.scrollFrame:SetPoint("TOPRIGHT", frame, -65, -70)
+	frame.scrollFrame:SetPoint("BOTTOMRIGHT", frame, -65, 80)
+	frame.listScrollFrame:ClearAllPoints()
+	frame.listScrollFrame:SetPoint("TOPLEFT", frame, 19, -70)
+	frame.listScrollFrame:SetPoint("BOTTOMLEFT", frame, 19, 80)
+
+	local leftTex = frame:CreateTexture(nil, "BACKGROUND")
+	leftTex:SetTexture(309665)
+	leftTex:SetSize(512, 512)
+	leftTex:SetPoint("TOPLEFT")
+	local rightTex = frame:CreateTexture(nil, "BACKGROUND")
+	rightTex:SetTexture(309666)
+	rightTex:SetSize(256, 512)
+	rightTex:SetPoint("TOPLEFT", leftTex, "TOPRIGHT")
+
+	local cover1 = frame:CreateTexture(nil, "ARTWORK")
+	cover1:SetPoint("BOTTOMLEFT", 20, 54)
+	cover1:SetSize(301, 25)
+	cover1:SetColorTexture(0, 0, 0)
+
+	local cover2 = frame:CreateTexture(nil, "ARTWORK")
+	cover2:SetPoint("BOTTOMLEFT", cover1, "BOTTOMRIGHT", -1, 0)
+	cover2:SetSize(25, 360)
+	cover2:SetColorTexture(0, 0, 0)
+
+	local cover3 = frame:CreateTexture(nil, "ARTWORK")
+	cover3:SetPoint("BOTTOMRIGHT", -38, 56)
+	cover3:SetSize(25, 360)
+	cover3:SetTexture("Interface\\TradeSkillFrame\\UI-TradeSkill-TopLeft")
+	cover3:SetTexCoord(.3, .4, .15, .25)
+end
+
+local frame
 
 function Quests:ExtQuestLogFrame()
+	local QuestLogFrame = _G.QuestLogFrame
+	if QuestLogFrame:GetWidth() > 700 then return end
+
+	Core.RemoveBlizzTextures(QuestLogFrame, 2)
+	QuestLogFrame.TitleText = _G.QuestLogTitleText
+	QuestLogFrame.scrollFrame = _G.QuestLogDetailScrollFrame
+	QuestLogFrame.listScrollFrame = _G.QuestLogListScrollFrame
+	EnlargeDefaultUIPanel("QuestLogFrame", 0)
+
+	Core.RemoveBlizzTextures(_G.EmptyQuestLogFrame)
+	_G.QuestLogNoQuestsText:ClearAllPoints()
+	_G.QuestLogNoQuestsText:SetPoint("CENTER", QuestLogFrame.listScrollFrame)
+	_G.QuestFramePushQuestButton:ClearAllPoints()
+	_G.QuestFramePushQuestButton:SetPoint("LEFT", _G.QuestLogFrameAbandonButton, "RIGHT", 1, 0)
+
+	_G.QUESTS_DISPLAYED = 22
+	for i = 7, _G.QUESTS_DISPLAYED do
+		local button = _G["QuestLogTitle"..i]
+		if not button then
+			button = CreateFrame("Button", "QuestLogTitle"..i, QuestLogFrame, "QuestLogTitleButtonTemplate")
+			button:SetPoint("TOPLEFT", _G["QuestLogTitle"..(i-1)], "BOTTOMLEFT", 0, 1)
+			button:SetID(i)
+			button:Hide()
+		end
+	end
+
+	local toggleMap = CreateFrame("Button", nil, QuestLogFrame)
+	toggleMap:SetPoint("TOP", 10, -35)
+	toggleMap:SetSize(48, 32)
+	local text = Core.CreateFS(toggleMap, 14, SHOW_MAP)
+	text:ClearAllPoints()
+	text:SetPoint("LEFT", toggleMap, "RIGHT")
+	local tex = toggleMap:CreateTexture(nil, "ARTWORK")
+	tex:SetAllPoints()
+	tex:SetTexture(316593)
+	tex:SetTexCoord(.125, .875, 0, .5)
+	toggleMap:SetScript("OnClick", ToggleWorldMap)
+	toggleMap:SetScript("OnMouseUp", function() tex:SetTexCoord(.125, .875, 0, .5) end)
+	toggleMap:SetScript("OnMouseDown", function() tex:SetTexCoord(.125, .875, .5, 1) end)
+
+	Core.CreateBDFrame(QuestLogFrame.scrollFrame, .25)
+
 	-- Move ClassicCodex
-	if not CodexQuest then return end
+	if CodexQuest then
+		local buttonShow = CodexQuest.buttonShow
+		buttonShow:SetWidth(55)
+		buttonShow:SetText(DB.InfoColor..SHOW)
 
-    local buttonShow = CodexQuest.buttonShow
-    if not buttonShow then return end
-    buttonShow:SetWidth(55)
-    buttonShow:SetText(DB.InfoColor..SHOW)
+		local buttonHide = CodexQuest.buttonHide
+		buttonHide:ClearAllPoints()
+		buttonHide:SetPoint("LEFT", buttonShow, "RIGHT", 5, 0)
+		buttonHide:SetWidth(55)
+		buttonHide:SetText(DB.InfoColor..HIDE)
 
-    local buttonHide = CodexQuest.buttonHide
-    buttonHide:ClearAllPoints()
-    buttonHide:SetPoint("LEFT", buttonShow, "RIGHT", 5, 0)
-    buttonHide:SetWidth(55)
-    buttonHide:SetText(DB.InfoColor..HIDE)
-
-    local buttonReset = CodexQuest.buttonReset
-    buttonReset:ClearAllPoints()
-    buttonReset:SetPoint("LEFT", buttonHide, "RIGHT", 5, 0)
-    buttonReset:SetWidth(55)
-    buttonReset:SetText(DB.InfoColor..RESET)
+		local buttonReset = CodexQuest.buttonReset
+		buttonReset:ClearAllPoints()
+		buttonReset:SetPoint("LEFT", buttonHide, "RIGHT", 5, 0)
+		buttonReset:SetWidth(55)
+		buttonReset:SetText(DB.InfoColor..RESET)
+	end
 end
 
 function Quests:QuestLogLevel()
 	local numEntries = GetNumQuestLogEntries()
-	local scrollOffset = HybridScrollFrame_GetOffset(QuestLogListScrollFrame)
-	local buttons = QuestLogListScrollFrame.buttons
-
-	local questIndex, questLogTitle, questTitleTag, questNumGroupMates, questNormalText, questCheck
-	local questLogTitleText, level, isHeader, isComplete
 
 	for i = 1, QUESTS_DISPLAYED, 1 do
-		questLogTitle = buttons[i]
-		if not questLogTitle then break end -- precaution for other addons
-
-		questIndex = i + scrollOffset
-		questTitleTag = questLogTitle.tag
-		questNumGroupMates = questLogTitle.groupMates
-		questNormalText = questLogTitle.normalText
-		questCheck = questLogTitle.check
-
+		local questIndex = i + FauxScrollFrame_GetOffset(QuestLogListScrollFrame)
 		if questIndex <= numEntries then
-			questLogTitleText, level, _, isHeader, _, isComplete = GetQuestLogTitle(questIndex)
+			local questLogTitle = _G["QuestLogTitle"..i]
+			local questTitleTag = _G["QuestLogTitle"..i.."Tag"]
+			local questLogTitleText, level, _, isHeader, _, isComplete = GetQuestLogTitle(questIndex)
 			if not isHeader then
 				questLogTitle:SetText("["..level.."] "..questLogTitleText)
 				if isComplete then
@@ -64,9 +154,10 @@ function Quests:QuestLogLevel()
 				end
 			end
 
-			if questNormalText then
-				questNormalText:SetWidth(questNormalText:GetWidth() + 30)
-				local width = questNormalText:GetStringWidth()
+			local questText = _G["QuestLogTitle"..i.."NormalText"]
+			local questCheck = _G["QuestLogTitle"..i.."Check"]
+			if questText then
+				local width = questText:GetStringWidth()
 				if width then
 					if width <= 210 then
 						questCheck:SetPoint("LEFT", questLogTitle, "LEFT", width+22, 0)
@@ -76,6 +167,7 @@ function Quests:QuestLogLevel()
 				end
 			end
 
+			local questNumGroupMates = _G["QuestLogTitle"..i.."GroupMates"]
 			if not questNumGroupMates.anchored then
 				questNumGroupMates:SetPoint("LEFT")
 				questNumGroupMates.anchored = true
@@ -84,115 +176,184 @@ function Quests:QuestLogLevel()
 	end
 end
 
-local function UpdateMinimizeButton(self)
-	WatchFrameCollapseExpandButton.__texture:DoCollapse(self.collapsed)
-	WatchFrame.header:SetShown(not self.collapsed)
-end
-
-local function ReskinMinimizeButton(button)
-	Core.ReskinCollapse(button)
-	button:GetNormalTexture():SetAlpha(0)
-	button:GetPushedTexture():SetAlpha(0)
-	button.__texture:DoCollapse(false)
-end
-
-local function ReskinQuestIcon(button)
-	if not button then return end
-	if not button.SetNormalTexture then return end
-
-	if not button.styled then
-		button:SetSize(32, 32)
-		button:SetNormalTexture(0)
-		button:SetPushedTexture(0)
-		button:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-		local icon = _G[button:GetName().."IconTexture"]
-		if icon then
-			button.bg = Core.ReskinIcon(icon, true)
-			Core:SetInside(icon)
-		end
-
-		button.styled = true
-	end
-
-	if button.bg then
-		button.bg:SetFrameLevel(0)
-	end
-end
-
--- Move and save blizz frames
-function Quests:MoveBlizzFrames()
-	if not IsAddOnLoaded("RXPGuides") then
-		Core:BlizzFrameMover(CharacterFrame)
-	end
-	Core:BlizzFrameMover(QuestLogFrame)
-end
-
-function Quests:OnLogin()
-    Quests:MoveBlizzFrames()
-
-	-- Mover for quest tracker
-	local frame = CreateFrame("Frame", "LauringQuestMover", UIParent)
-	frame:SetSize(240, 50)
-	Core.Mover(frame, L["QuestTracker"], "QuestTracker", {"RIGHT", UIParent, "RIGHT", -507, 220})
-
-	WatchFrame:ClearAllPoints()
-	WatchFrame:SetPoint("TOPRIGHT", frame)
-	WatchFrame:SetClampedToScreen(false)
-	WatchFrame:SetHeight(GetScreenHeight()*.65)
-
-	hooksecurefunc(WatchFrame, "SetPoint", function(self, _, parent)
-		if parent ~= frame then
-			self:ClearAllPoints()
-			self:SetPoint("TOPRIGHT", frame)
-		end
-	end)
-
-	hooksecurefunc("WatchFrameItem_UpdateCooldown", function(button)
-		ReskinQuestIcon(button)
-	end)
-
-	ReskinMinimizeButton(WatchFrameCollapseExpandButton)
-	hooksecurefunc("WatchFrame_Collapse", UpdateMinimizeButton)
-	hooksecurefunc("WatchFrame_Expand", UpdateMinimizeButton)
-
-	local header = CreateFrame("Frame", nil, WatchFrameHeader)
-	header:SetSize(1, 1)
-	header:SetPoint("TOPLEFT")
-	WatchFrame.header = header
+function Quests:EnhancedQuestTracker()
+	local header = CreateFrame("Frame", nil, frame)
+	header:SetAllPoints()
+	header:SetParent(QuestWatchFrame)
+	header.Text = Core.CreateFS(header, 16, "", true, "TOPLEFT", 0, 15)
 
 	local bg = header:CreateTexture(nil, "ARTWORK")
 	bg:SetTexture("Interface\\LFGFrame\\UI-LFG-SEPARATOR")
 	bg:SetTexCoord(0, .66, 0, .31)
 	bg:SetVertexColor(DB.r, DB.g, DB.b, .8)
-	bg:SetPoint("TOPLEFT", -25, 5)
+	bg:SetPoint("TOPLEFT", 0, 20)
 	bg:SetSize(250, 30)
 
-	if not Config.DB["Quests"]["Tracker"] then return end
+	local bu = CreateFrame("Button", nil, frame)
+	bu:SetSize(20, 20)
+	bu:SetPoint("TOPRIGHT", 0, 18)
+	bu.collapse = false
+	bu:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+	bu:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight")
+	bu:SetPoint("TOPRIGHT", 0, 14)
+	Core.ReskinCollapse(bu)
+	bu:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+	bu:SetShown(GetNumQuestWatches() > 0)
 
-	Quests:ExtQuestLogFrame()
-	hooksecurefunc("QuestLog_Update", Quests.QuestLogLevel)
-	hooksecurefunc(QuestLogListScrollFrame, "update", Quests.QuestLogLevel)
+	bu.Text = Core.CreateFS(bu, 16, TRACKER_HEADER_OBJECTIVE, "system", "RIGHT", -24, 3)
+	bu.Text:Hide()
 
-	-- Extend the wrap text on WatchFrame, needs review
-	hooksecurefunc("WatchFrame_SetLine", function(line)
-		if not line.text then return end
-
-		local height = line:GetHeight()
-		if height > 28 and height < 34 then
-			line:SetHeight(34)
-			line.text:SetHeight(34)
-		end
-	end)
-
-	-- Allow to send quest name
-	hooksecurefunc("WatchFrameLinkButtonTemplate_OnClick", function(self)
-		if IsModifiedClick("CHATLINK") and ChatEdit_GetActiveWindow() then
-			if self.type == "QUEST" then
-				local name, _ = GetQuestLogTitle(GetQuestIndexForWatch(self.index))
-				if name then
-					ChatEdit_InsertLink("["..name.."]")
-				end
+	bu:SetScript("OnClick", function(self)
+		self.collapse = not self.collapse
+		if self.collapse then
+			self:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
+			self.Text:Show()
+			QuestWatchFrame:Hide()
+		else
+			self:SetNormalTexture("Interface\\Buttons\\UI-MinusButton-Up")
+			self.Text:Hide()
+			if GetNumQuestWatches() > 0 then
+				QuestWatchFrame:Show()
 			end
 		end
 	end)
+
+	-- ModernQuestWatch, Ketho
+	local function onMouseUp(self)
+		if IsShiftKeyDown() then -- untrack quest
+			local questID = GetQuestIDFromLogIndex(self.questIndex)
+			for index, value in ipairs(QUEST_WATCH_LIST) do
+				if value.id == questID then
+					tremove(QUEST_WATCH_LIST, index)
+				end
+			end
+			RemoveQuestWatch(self.questIndex)
+			QuestWatch_Update()
+		else -- open to quest log
+			if QuestLogEx then -- https://www.wowinterface.com/downloads/info24980-QuestLogEx.html
+				ShowUIPanel(QuestLogExFrame)
+				QuestLogEx:QuestLog_SetSelection(self.questIndex)
+				QuestLogEx:Maximize()
+			elseif ClassicQuestLog then -- https://www.wowinterface.com/downloads/info24937-ClassicQuestLogforClassic.html
+				ShowUIPanel(ClassicQuestLog)
+				QuestLog_SetSelection(self.questIndex)
+			elseif QuestGuru then -- https://www.curseforge.com/wow/addons/questguru_classic
+				ShowUIPanel(QuestGuru)
+				QuestLog_SetSelection(self.questIndex)
+			else
+				ShowUIPanel(QuestLogFrame)
+				QuestLog_SetSelection(self.questIndex)
+				local valueStep = QuestLogListScrollFrame.ScrollBar:GetValueStep()
+				QuestLogListScrollFrame.ScrollBar:SetValue(self.questIndex*valueStep/2)
+			end
+		end
+		QuestLog_Update()
+	end
+
+	local function onEnter(self)
+		if self.completed then
+			-- use normal colors instead as highlight
+			self.headerText:SetTextColor(.75, .61, 0)
+			for _, text in ipairs(self.objectiveTexts) do
+				text:SetTextColor(.8, .8, .8)
+			end
+		else
+			self.headerText:SetTextColor(1, .8, 0)
+			for _, text in ipairs(self.objectiveTexts) do
+				text:SetTextColor(1, 1, 1)
+			end
+		end
+	end
+
+	local ClickFrames = {}
+	local function SetClickFrame(watchIndex, questIndex, headerText, objectiveTexts, completed)
+		if not ClickFrames[watchIndex] then
+			ClickFrames[watchIndex] = CreateFrame("Frame")
+			ClickFrames[watchIndex]:SetScript("OnMouseUp", onMouseUp)
+			ClickFrames[watchIndex]:SetScript("OnEnter", onEnter)
+			ClickFrames[watchIndex]:SetScript("OnLeave", QuestWatch_Update)
+		end
+
+		local f = ClickFrames[watchIndex]
+		f:SetAllPoints(headerText)
+		f.watchIndex = watchIndex
+		f.questIndex = questIndex
+		f.headerText = headerText
+		f.objectiveTexts = objectiveTexts
+		f.completed = completed
+	end
+
+	hooksecurefunc("QuestWatch_Update", function()
+		local numQuests = select(2, GetNumQuestLogEntries())
+		header.Text:SetFormattedText(headerString, numQuests, MAX_QUESTLOG_QUESTS)
+
+		local watchTextIndex = 1
+		local numWatches = GetNumQuestWatches()
+		for i = 1, numWatches do
+			local questIndex = GetQuestIndexForWatch(i)
+			if questIndex then
+				local numObjectives = GetNumQuestLeaderBoards(questIndex)
+				if numObjectives > 0 then
+					local headerText = _G["QuestWatchLine"..watchTextIndex]
+					if watchTextIndex > 1 then
+						headerText:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -10)
+					end
+					watchTextIndex = watchTextIndex + 1
+					local objectivesGroup = {}
+					local objectivesCompleted = 0
+					for j = 1, numObjectives do
+						local finished = select(3, GetQuestLogLeaderBoard(j, questIndex))
+						if finished then
+							objectivesCompleted = objectivesCompleted + 1
+						end
+						_G["QuestWatchLine"..watchTextIndex]:SetPoint("TOPLEFT", "QuestWatchLine"..(watchTextIndex - 1), "BOTTOMLEFT", 0, -5)
+						tinsert(objectivesGroup, _G["QuestWatchLine"..watchTextIndex])
+						watchTextIndex = watchTextIndex + 1
+					end
+					SetClickFrame(i, questIndex, headerText, objectivesGroup, objectivesCompleted == numObjectives)
+				end
+			end
+		end
+		-- hide/show frames so it doesnt eat clicks, since we cant parent to a FontString
+		for _, frame in pairs(ClickFrames) do
+			frame[GetQuestIndexForWatch(frame.watchIndex) and "Show" or "Hide"](frame)
+		end
+
+		bu:SetShown(numWatches > 0)
+		if bu.collapse then QuestWatchFrame:Hide() end
+	end)
+
+	local function autoQuestWatch(_, questIndex)
+		-- tracking otherwise untrackable quests (without any objectives) would still count against the watch limit
+		-- calling AddQuestWatch() while on the max watch limit silently fails
+		if GetCVarBool("autoQuestWatch") and GetNumQuestLeaderBoards(questIndex) ~= 0 and GetNumQuestWatches() < MAX_WATCHABLE_QUESTS then
+			AutoQuestWatch_Insert(questIndex, QUEST_WATCH_NO_EXPIRE)
+		end
+	end
+	Core:RegisterEvent("QUEST_ACCEPTED", autoQuestWatch)
+end
+
+function Quests:OnLogin()
+	-- Mover for quest tracker
+	frame = CreateFrame("Frame", "LauringUIQuestMover", UIParent)
+	frame:SetSize(240, 50)
+	Core.Mover(frame, L["QuestTracker"], "QuestTracker", {"TOPRIGHT", Minimap, "BOTTOMRIGHT", -170, -155})
+
+	--QuestWatchFrame:SetHeight(GetScreenHeight()*.65)
+	QuestWatchFrame:SetClampedToScreen(false)
+	QuestWatchFrame:SetMovable(true)
+
+	local function QuestFrameReset(self, _, parent)
+		if parent ~= frame then
+			self:ClearAllPoints()
+			self:SetPoint("TOPLEFT", frame, 5, -5)
+		end
+	end
+
+	QuestFrameReset(QuestWatchFrame)
+	hooksecurefunc(QuestWatchFrame, "SetPoint", QuestFrameReset)
+
+	Quests:EnhancedQuestTracker()
+	Quests:ExtQuestLogFrame()
+	hooksecurefunc("QuestLog_Update", Quests.QuestLogLevel)
 end

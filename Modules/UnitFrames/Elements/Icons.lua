@@ -3,13 +3,16 @@ local Core, Config, L, DB = unpack(ns)
 local UF = Core:GetModule("UnitFrames")
 
 local function PostUpdateRole(element, role)
-	if element:IsShown() then
-		if role == "DAMAGER" then
-			element:Hide()
-			return
-		end
-
+	if role == "DAMAGER" then
+		element:Hide()
+	else
+		element:Show()
 		Core.ReskinSmallRole(element, role)
+	end
+
+	local frame = element.__owner
+	if frame then
+		UF:UpdatePartyAndRaidNameAnchor(frame)
 	end
 end
 
@@ -36,7 +39,7 @@ function UF:CreateIcons(frame)
 		frame.QuestIndicator = quest
 	elseif UF.IsPartyOrRaid(frame)  then
 		local roleIcon = frame:CreateTexture(nil, "OVERLAY")
-		roleIcon:SetPoint("TOPRIGHT", frame, 0, 5)
+		roleIcon:SetPoint("TOPLEFT", frame, 0, 8)
 		roleIcon:SetSize(13, 13)
 		roleIcon.PostUpdate = PostUpdateRole
 		frame.GroupRoleIndicator = roleIcon

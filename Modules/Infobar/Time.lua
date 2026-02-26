@@ -103,6 +103,8 @@ INFO.onMouseUp = function(_, btn)
 		end
 	else
 		--if InCombatLockdown() then UIErrorsFrame:AddMessage(DB.InfoColor..ERR_NOT_IN_COMBAT) return end -- fix by LibShowUIPanel
-		ToggleCalendar()
+		if ToggleCalendar then
+			ToggleCalendar()
+		end
 	end
 end

@@ -169,6 +169,7 @@ local function CreatePartyPet(frame)
 	UF:CreateHealthAndNameText(frame)
     UF:CreatePowerBar(frame)
 	UF:CreateRaidMark(frame)
+    UF:CreateDebuffHighlight(frame)
 	UF:CreateTargetBorder(frame)
 	UF:CreateHealPrediction(frame)
 	UF:CreateThreatBorder(frame)
@@ -308,7 +309,7 @@ function UF:SetupParty()
 
     UF:CreateAndUpdatePartyHeader()
 
-    if not Config.DB["UFs"]["ShowPartyPets"] then return end
+    if not Config.DB["UFs"]["EnablePartyPetFrame"] then return end
 
     local partyPet, petMover
     oUF:RegisterStyle("PartyPet", CreatePartyPet)
