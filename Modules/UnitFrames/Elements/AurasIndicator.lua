@@ -120,15 +120,15 @@ function UF:AurasIndicator_UpdateOptions()
 	local auras = self.AurasIndicator
 	if not auras then return end
 
-	auras.instAura = Config.DB["UFs"]["ShowInstanceAuras"]
-	auras.dispellType = Config.DB["UFs"]["InstanceAuraDispellType"]
-	local scale = Config.DB["UFs"]["InstanceAuraScale"]
-	local disableMouse = Config.DB["UFs"]["InstanceAuraClickThrough"]
+	auras.instAura = Config.DB["UFs"]["ShowCustomInstanceAuras"]
+	auras.dispellType = Config.DB["UFs"]["CustomInstanceAuraDispellType"]
+	local size = Config.DB["UFs"]["CustomInstanceAuraSize"]
+	local disableMouse = Config.DB["UFs"]["CustomInstanceAuraClickThrough"]
 
 	for i = 1, 2 do
 		local button = auras.buttons[i]
 		if button then
-			button:SetScale(scale)
+			button:SetSize(size, size)
 			button:EnableMouse(not disableMouse)
 		end
 	end
@@ -144,8 +144,8 @@ function UF:CreateAurasIndicator(frame)
 	auraFrame:SetSize(totalWidth, auraSize)
 	auraFrame:SetPoint("BOTTOM", frame.Health, "BOTTOM", 0, 3)
 	auraFrame:SetFrameLevel(frame:GetFrameLevel() + 5)
-	auraFrame.instAura = Config.DB["UFs"]["ShowInstanceAuras"]
-	auraFrame.dispellType = Config.DB["UFs"]["InstanceAuraDispellType"]
+	auraFrame.instAura = Config.DB["UFs"]["ShowCustomInstanceAuras"]
+	auraFrame.dispellType = Config.DB["UFs"]["CustomInstanceAuraDispellType"]
 
 	auraFrame.buttons = {}
 

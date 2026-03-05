@@ -81,7 +81,7 @@ function UF:UpdatePartyAndRaidNameAnchor(frame)
 
 	local roleIcon = frame.GroupRoleIndicator
 	if roleIcon and roleIcon:IsShown() then
-		name:SetPoint("LEFT", roleIcon, "RIGHT", 4, 0)
+		name:SetPoint("LEFT", roleIcon, "RIGHT", 0, 0)
 	else
 		name:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -2)
 	end
@@ -90,8 +90,12 @@ end
 function UF:SetPartyAndRaidName(name, frame)
     frame.Name = name
 
+    local fontSize = Config.DB["UFs"][frame.mystyle.."FontSize"]
+    local font, _, flags = name:GetFont()
+    name:SetFont(font, fontSize, flags)
 	name:SetJustifyH("LEFT")
-	UF:UpdatePartyNameAnchor(frame)
+
+	UF:UpdatePartyAndRaidNameAnchor(frame)
 end
 
 local function CreateNameText(frame, textFrame)

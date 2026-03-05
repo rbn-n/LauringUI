@@ -53,7 +53,7 @@ function UF:UpdateCornerSpells()
 	end
 end
 
-function UF:CornerBuffsHideButtons()
+function UF:CornerBuffs_HideButtons()
 	local spells = self.SpellsIndicator
 	if not spells then return end
 
@@ -64,7 +64,7 @@ function UF:CornerBuffsHideButtons()
 	end
 end
 
-function UF:CornerBuffsOnUpdate(elapsed)
+function UF:CornerBuffs_OnUpdate(elapsed)
 	Core.CooldownOnUpdate(self, elapsed, true)
 end
 
@@ -80,7 +80,7 @@ function UF:CornerBuffsUpdateButton(button, aura)
 	button:Show()
 end
 
-function UF:RefreshBuffIndicator(buff)
+function UF:RefreshCornerBuffs(buff)
 	buff:SetScript("OnUpdate", nil)
 	--buff.timer:Hide()
 	buff.count:ClearAllPoints()
@@ -91,21 +91,23 @@ function UF:RefreshBuffIndicator(buff)
 	buff.bg:Show()
 end
 
-function UF:CornerBuffsUpdateOptions()
+function UF:CornerBuffs_UpdateOptions()
 	local spells = self.SpellsIndicator
 	if not spells then return end
 
+	local size = Config.DB["UFs"]["CornerBuffsSize"]
+
 	for _, group in pairs(spells) do
 		for _, button in ipairs(group) do
-			button:SetScale(Config.DB["UFs"]["CornerBuffsScale"])
-			UF:RefreshBuffIndicator(button)
+			button:SetSize(size, size)
+			UF:RefreshCornerBuffs(button)
 		end
 	end
 end
 
 local maxPerAnchor = 3
 
-function UF:CreateSpellsIndicator(frame)
+function UF:CreateCornerBuffs(frame)
 	local spellSize = Config.DB["UFs"]["RaidSpellSize"] or 20
 	local spacing = 2        -- Horizontal spacing between buffs
 	local edgeOffset = 1     -- First-buff edge nudge (X)
@@ -148,12 +150,12 @@ function UF:CreateSpellsIndicator(frame)
 			button.index = i
 			button:Hide()
 
-			UF:RefreshBuffIndicator(button)
+			UF:RefreshCornerBuffs(button)
 			tinsert(buttons[anchor], button)
 		end
 	end
 
 	frame.SpellsIndicator = buttons
-	UF.CornerBuffsUpdateOptions(frame)
+	UF.CornerBuffs_UpdateOptions(frame)
 end
 

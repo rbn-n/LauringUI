@@ -52,10 +52,11 @@ function UF:CreatePowerBar(frame)
 
     local power = CreateFrame("StatusBar", nil, frame)
 
-    if UF.IsPlayerOrTarget(frame) then
+    if UF.IsPlayerOrTarget(frame) or UF.IsPartyOrRaid(frame) then
         power:SetPoint("LEFT")
         power:SetPoint("RIGHT")
-        power:SetPoint("TOP", frame.Health, "BOTTOM" , 0, -Config.DB.UFs.PlayerPowerOffset)
+		local powerOffset = frame.mystyle == "Target" and "PlayerPowerOffset" or frame.mystyle.."PowerOffset"
+        power:SetPoint("TOP", frame.Health, "BOTTOM" , 0, -Config.DB.UFs[powerOffset])
     else
         power:SetPoint("BOTTOMLEFT", frame)
 	    power:SetPoint("BOTTOMRIGHT", frame)

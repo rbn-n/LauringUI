@@ -4,6 +4,7 @@ local oUF = ns.oUF
 local UF = Core:GetModule("UnitFrames")
 
 local SpellGetVisibilityInfo = SpellGetVisibilityInfo
+local maxButtons = 6
 
 UF.RaidDebuffsBlack = {}
 function UF:UpdateRaidDebuffsBlack()
@@ -25,8 +26,8 @@ function UF:UpdateRaidDebuffsBlack()
 	end
 end
 
-function UF:BlizzardDebuffs_HideButtons(from, to)
-	for i = from, to do
+function UF:BlizzardDebuffs_HideButtons(from)
+	for i = from, maxButtons do
 		local button = self.DebuffsIndicator.buttons[i]
 		if button then
 			button:Hide()
@@ -85,7 +86,7 @@ function UF:BlizzardDebuffs_UpdateOptions()
 
 	debuffs.enable = Config.DB["UFs"]["ShowBlizzardDebuff"]
 	local size = Config.DB["UFs"]["BlizzardDebuffSize"]
-	local disableMouse = Config.DB["UFs"]["DebuffClickThrough"]
+	local disableMouse = Config.DB["UFs"]["BlizzardDebuffClickThrough"]
 
 	for i = 1, 3 do
 		local button = debuffs.buttons[i]
@@ -96,12 +97,11 @@ function UF:BlizzardDebuffs_UpdateOptions()
 	end
 end
 
-function UF:CreateDebuffsIndicator(frame)
+function UF:CreateBlizzardDebuffs(frame)
 	local debuffFrame = CreateFrame("Frame", nil, frame)
 	local size = Config.DB["UFs"]["BlizzardDebuffSize"] or 20
 	local spacing = 2
 
-	local maxButtons = 6
 	local buttonsPerRow = 3
 	local rows = math.ceil(maxButtons / buttonsPerRow)
 
@@ -109,7 +109,7 @@ function UF:CreateDebuffsIndicator(frame)
 	local totalHeight = (size + spacing) * (rows - 1) + size
 
 	debuffFrame:SetSize(totalWidth, totalHeight)
-	debuffFrame:SetPoint("BOTTOMLEFT", frame.Health, "BOTTOMLEFT", 2, 2)
+	debuffFrame:SetPoint("BOTTOMLEFT", frame.Health, "BOTTOMLEFT", 0, 0)
 	debuffFrame:SetFrameLevel(frame:GetFrameLevel() + 5)
 
 	debuffFrame.buttons = {}
@@ -118,6 +118,7 @@ function UF:CreateDebuffsIndicator(frame)
 		local button = CreateFrame("Frame", nil, debuffFrame)
 		button:SetSize(size, size)
 		Core.PixelIcon(button)
+
 		button:SetScript("OnEnter", UF.AuraButton_OnEnter)
 		button:SetScript("OnLeave", Core.HideTooltip)
 		button:Hide()
@@ -131,11 +132,13 @@ function UF:CreateDebuffsIndicator(frame)
 		local overlay = CreateFrame("Frame", nil, button)
 		overlay:SetAllPoints()
 		overlay:SetFrameLevel(button:GetFrameLevel() + 6)
+
 		button.count = Core.CreateFS(overlay, 12, "", false, "BOTTOMRIGHT", 6, -3)
 
 		debuffFrame.buttons[i] = button
 	end
 
+	-- Position buttons: bottom-left → right → up
 	for i = 1, maxButtons do
 		local button = debuffFrame.buttons[i]
 		button:ClearAllPoints()
@@ -144,29 +147,11 @@ function UF:CreateDebuffsIndicator(frame)
 		local column = index % buttonsPerRow
 		local row = math.floor(index / buttonsPerRow)
 
-		-- Invert row so higher indices go UP
-		local invertedRow = (rows - 1) - row
-
 		local x = column * (size + spacing)
-		local y = invertedRow * (size + spacing)
+		local y = row * (size + spacing)
 
 		button:SetPoint("BOTTOMLEFT", debuffFrame, "BOTTOMLEFT", x, y)
 	end
-
-	-- Position: grow RIGHT, then UP
-	-- for i = 1, maxButtons do
-	-- 	local button = debuffFrame.buttons[i]
-	-- 	button:ClearAllPoints()
-
-	-- 	local index = i - 1
-	-- 	local column = index % buttonsPerRow
-	-- 	local row = math.floor(index / buttonsPerRow)
-
-	-- 	local x = column * (size + spacing)
-	-- 	local y = row * (size + spacing)
-
-	-- 	button:SetPoint("BOTTOMLEFT", debuffFrame, "BOTTOMLEFT", x, y)
-	-- end
 
 	frame.DebuffsIndicator = debuffFrame
 	UF.BlizzardDebuffs_UpdateOptions(frame)

@@ -7,8 +7,8 @@ local invalidPrio = -1
 
 function UF:CreateRaidAuras(frame)
 	UF:CreateAurasIndicator(frame)
-	UF:CreateSpellsIndicator(frame)
-	UF:CreateDebuffsIndicator(frame)
+	UF:CreateCornerBuffs(frame)
+	UF:CreateBlizzardDebuffs(frame)
 
 	local raidAuras = CreateFrame("Frame", nil, frame)
 	raidAuras:SetSize(1, 1)
@@ -31,7 +31,7 @@ function UF.RaidAurasPostUpdate(element, unit)
 
 	element.isInCombat = UnitAffectingCombat("player")
 
-	if Config.DB["UFs"]["InstanceAuraDispellType"] ~= 3 or Config.DB["UFs"]["ShowInstanceAuras"] then
+	if Config.DB["UFs"]["CustomInstanceAuraDispellType"] ~= 3 or Config.DB["UFs"]["ShowCustomInstanceAuras"] then
 		UF.AurasIndicator_UpdatePriority(self, numDebuffs, unit)
 		UF.AurasIndicator_HideButtons(self)
 
@@ -47,7 +47,7 @@ function UF.RaidAurasPostUpdate(element, unit)
 		end
 	end
 
-	UF.CornerBuffsHideButtons(self)
+	UF.CornerBuffs_HideButtons(self)
 
 	for i = auraIndex + 1, numDebuffs do
 		local aura = element.debuffList[i]
@@ -69,7 +69,7 @@ function UF.RaidAurasPostUpdate(element, unit)
 		end
 	end
 
-	UF.BlizzardDebuffs_HideButtons(self, debuffIndex + 1, 3)
+	UF.BlizzardDebuffs_HideButtons(self, debuffIndex + 1)
 
 	for i = 1, numBuffs do
 		local aura = element.buffList[i]
@@ -98,7 +98,7 @@ function UF:RaidAuras_UpdateOptions()
 	for _, frame in pairs(oUF.objects) do
 		if UF.IsPartyOrRaid(frame) then
 			UF.AurasIndicator_UpdateOptions(frame)
-			UF.CornerBuffsUpdateOptions(frame)
+			UF.CornerBuffs_UpdateOptions(frame)
 			UF.BlizzardDebuffs_UpdateOptions(frame)
 		end
 	end

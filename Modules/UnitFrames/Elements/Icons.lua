@@ -39,10 +39,14 @@ function UF:CreateIcons(frame)
 		frame.QuestIndicator = quest
 	elseif UF.IsPartyOrRaid(frame)  then
 		local roleIcon = frame:CreateTexture(nil, "OVERLAY")
-		roleIcon:SetPoint("TOPLEFT", frame, 0, 8)
-		roleIcon:SetSize(13, 13)
+		roleIcon:SetPoint("TOPLEFT", frame, 0, 0)
+		roleIcon:SetSize(15, 15)
 		roleIcon.PostUpdate = PostUpdateRole
 		frame.GroupRoleIndicator = roleIcon
+
+		-- Disable legacy raid role icons
+		frame:DisableElement("MainTankIndicator")
+		frame:DisableElement("MainAssistIndicator")
 
 		local masterlooterIcon = frame:CreateTexture(nil, "OVERLAY")
 		masterlooterIcon:SetPoint("RIGHT", frame, "RIGHT")
@@ -50,12 +54,12 @@ function UF:CreateIcons(frame)
 		frame.MasterLooterIndicator = masterlooterIcon
 
 		local leaderIcon = frame:CreateTexture(nil, "OVERLAY")
-		leaderIcon:SetPoint("TOPLEFT", frame, 0, 8)
+		leaderIcon:SetPoint("TOPLEFT", frame, 0, 10)
 		leaderIcon:SetSize(15, 15)
 		frame.LeaderIndicator = leaderIcon
 
 		local assistIcon = frame:CreateTexture(nil, "OVERLAY")
-		assistIcon:SetPoint("TOPLEFT", frame, -1, 8)
+		assistIcon:SetPoint("TOPLEFT", frame, -1, 10)
 		assistIcon:SetSize(12, 12)
 		frame.AssistantIndicator = assistIcon
 	end
@@ -76,7 +80,7 @@ function UF:CreateRaidIcons(frame)
 
 	local readyCheck = parent:CreateTexture(nil, "OVERLAY")
 	readyCheck:SetSize(16, 16)
-	readyCheck:SetPoint("BOTTOM", 0, 1)
+	readyCheck:SetPoint("CENTER", 0, 0)
 	frame.ReadyCheckIndicator = readyCheck
 
 	local resurrect = parent:CreateTexture(nil, "OVERLAY")

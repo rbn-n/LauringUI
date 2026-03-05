@@ -29,7 +29,7 @@ local function SetupRaidFrame(parent)
 	local scroll = G:CreateScroll(panel, 260, 540)
 	local UF = Core:GetModule("UnitFrames")
 
-	local defaultValue = {80, 32, 2, 8, 1, 5}
+	local defaultValue = {80, 32, 2, 1, 8, 1, 5}
 	local options = {}
 	for i = 1, 8 do
 		options[i] = UF.RaidDirections[i].name
@@ -68,9 +68,11 @@ local function SetupRaidFrame(parent)
 	G:CreateOptionSlider(scroll.child, L["Width"], 60, 200, defaultValue[1], -160, "RaidWidth", ResizeRaidFrame)
 	G:CreateOptionSlider(scroll.child, L["Height"], 25, 60, defaultValue[2], -240, "RaidHeight", ResizeRaidFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -320, "RaidPowerHeight", ResizeRaidFrame)
-	G:CreateOptionSlider(scroll.child, L["RaidGroups"], 2, 8, defaultValue[4], -400, "RaidGroups", UpdateNumGroups)
-	G:CreateOptionSlider(scroll.child, L["RaidRows"], 1, 8, defaultValue[5], -480, "RaidRows", UpdateNumGroups)
-	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[6], -560, "RaidSpacing", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["Power Offset"], 0, 30, defaultValue[4], -400, "RaidPowerOffset", ResizeRaidFrame)
+	G:CreateOptionSlider(scroll.child, L["RaidGroups"], 2, 8, defaultValue[5], -480, "RaidGroups", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["RaidRows"], 1, 8, defaultValue[6], -560, "RaidRows", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[7], -640, "RaidSpacing", UpdateNumGroups)
+	G:CreateOptionSlider(scroll.child, L["Font Size"], 5, 20, defaultValue[8], -720, "RaidFontSize", ResizeRaidFrame)
 end
 
 local function SetupPartyFrame(parent)
@@ -94,7 +96,7 @@ local function SetupPartyFrame(parent)
 		end
 	end
 
-	local defaultValue = {100, 32, 2, 5}
+	local defaultValue = {100, 32, 2, 1, 5, 15}
 	local options = {}
 	for i = 1, 4 do
 		options[i] = UF.PartyDirections[i].name
@@ -105,7 +107,9 @@ local function SetupPartyFrame(parent)
 	G:CreateOptionSlider(scroll.child, L["Width"], 80, 400, defaultValue[1], -180, "PartyWidth", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Height"], 25, 200, defaultValue[2], -260, "PartyHeight", ResizePartyFrame)
 	G:CreateOptionSlider(scroll.child, L["Power Height"], 0, 30, defaultValue[3], -340, "PartyPowerHeight", ResizePartyFrame)
-	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[4], -420, "PartySpacing", ResizePartyFrame)
+	G:CreateOptionSlider(scroll.child, L["Power Offset"], 0, 30, defaultValue[4], -420, "PartyPowerOffset", ResizePartyFrame)
+	G:CreateOptionSlider(scroll.child, L["Spacing"], 0, 10, defaultValue[5], -500, "PartySpacing", ResizePartyFrame)
+	G:CreateOptionSlider(scroll.child, L["Font Size"], 5, 20, defaultValue[6], -580, "PartyFontSize", ResizePartyFrame)
 end
 
 local function SetupPartyPetFrame(parent)
@@ -650,16 +654,15 @@ local options = {
     {},--blank
 	{1, "UFs", "ShowBlizzardDebuff", L["ShowBlizzardDebuff"].."*", nil, SetupBlizzardDebuffsFunc, UpdateRaidAurasOptions, L["ShowBlizzardDebuffTip"]},
 	{3, "UFs", "BlizzardDebuffSize", L["BlizzardDebuffSize"].."*", true, {5, 30, 1}, UpdateRaidAurasOptions, nil, nil, true},
-	{1, "UFs", "DebuffClickThrough", L["DebuffClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
-
-	{4, "UFs", "InstanceAuraDispellType", L["Dispellable"].."*", nil, {L["Always"], L["Filter"], DISABLE}, UpdateRaidAurasOptions, L["DispellTypeTip"]},
-
-	{1, "UFs", "ShowInstanceAuras", G.HeaderTag..L["Instance Auras"].."*", nil, SetupRaidDebuffsFunc, UpdateRaidAurasOptions, L["InstanceAurasTip"]},
-	{3, "UFs", "InstanceAuraScale", L["InstanceAuraScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
-	{1, "UFs", "InstanceAuraClickThrough", L["InstanceAuras ClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
+	{1, "UFs", "BlizzardDebuffClickThrough", L["BlizzardDebuffClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
+	{},--blank
+	{4, "UFs", "CustomInstanceAuraDispellType", L["Dispellable"].."*", nil, {L["Always"], L["Filter"], DISABLE}, UpdateRaidAurasOptions, L["DispellTypeTip"]},
+	{1, "UFs", "ShowCustomInstanceAuras", G.HeaderTag..L["Custom Instance Auras"].."*", nil, SetupRaidDebuffsFunc, UpdateRaidAurasOptions, L["CustomInstanceAurasTip"]},
+	{3, "UFs", "CustomInstanceAuraSize", L["CustomInstanceAuraSize"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
+	{1, "UFs", "CustomInstanceAuraClickThrough", L["Custom InstanceAuras ClickThrough"].."*", nil, nil, UpdateRaidAurasOptions, L["ClickThroughTip"]},
 	{},--blank
 	{1, "UFs", "ShowCornerBuffs", G.HeaderTag..L["ShowCornerBuffs"].."*", nil, SetupCornerBuffsFunc, UpdateRaidAurasOptions, L["CornerBuffTip"]},
-	{3, "UFs", "CornerBuffsScale", L["CornerBuffsScale"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
+	{3, "UFs", "CornerBuffsSize", L["CornerBuffsSize"].."*", true, {.8, 2, .1}, UpdateRaidAurasOptions, nil, nil, true},
     {},--blank
     {4, "UFs", "ShowRoleMode", L["ShowRoleMode"], nil, {ALL, DISABLE, L["HideDPSRole"]}},
     {3, "UFs", "RaidTextScale", L["UFTextScale"].."*", true, {.8, 1.5, .05}, UpdateRaidTextScale},
