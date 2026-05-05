@@ -88,9 +88,9 @@ local function CreatePet(frame)
 	UF:CreateHealthBar(frame)
 	UF:CreateHealthAndNameText(frame)
     UF:CreatePowerBar(frame)
+    UF:CreateCastbar(frame)
 	UF:CreateRaidMark(frame)
 	UF:CreateAuras(frame)
-	UF:CreateSparkleCastbar(frame)
 end
 
 local function CreateBoss(frame)

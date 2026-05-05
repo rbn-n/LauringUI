@@ -13,6 +13,7 @@ Config.UFs = {
 	PlayerCastbar       = { "BOTTOM", UIParent, "BOTTOM", 0, 384 },
 	TargetCastbar       = { "BOTTOM", UIParent, "BOTTOM", 0, 606 },
 	FocusCastbar        = { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 967, 599 },
+	PetCastbar        	= { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 1064, 475 },
 
 	PlayerPosition      = { "BOTTOM", UIParent, "BOTTOM", -400, 450 },
 	TargetPosition      = { "BOTTOM", UIParent, "BOTTOM", 400, 450 },

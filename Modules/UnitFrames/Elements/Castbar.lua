@@ -483,22 +483,3 @@ function UF:CreateCastbar(frame)
 
 	frame.Castbar = castbar
 end
-
-function UF:CreateSparkleCastbar(frame)
-	if not Config.DB["Castbars"]["ShowPet"] then return end
-
-	local bar = CreateFrame("StatusBar", "oUF_SparkleCastbar"..frame.mystyle, frame)
-	bar:SetAllPoints(frame.Power)
-	bar:SetStatusBarTexture(DB.StatusBarTexture2)
-	bar:SetStatusBarColor(1, 1, 1, .25)
-
-	local spark = bar:CreateTexture(nil, "OVERLAY")
-	spark:SetTexture(DB.sparkTex)
-	spark:SetBlendMode("ADD")
-	spark:SetAlpha(.8)
-	spark:SetPoint("TOPLEFT", bar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
-	spark:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
-	bar.Spark = spark
-
-	frame.Castbar = bar
-end
